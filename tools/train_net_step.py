@@ -38,6 +38,8 @@ logging.getLogger('roi_data.loader').setLevel(logging.INFO)
 rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
 resource.setrlimit(resource.RLIMIT_NOFILE, (4096, rlimit[1]))
 
+os.chdir("/data1/data/expes/stage_mplocharski/pcl.pytorch")
+
 def parse_args():
     """Parse input arguments"""
     parser = argparse.ArgumentParser(description='Train a X-RCNN network')
@@ -421,7 +423,6 @@ def main():
 
             if (step+1) % CHECKPOINT_PERIOD == 0:
                 save_ckpt(output_dir, args, step, train_size, pcl, optimizer)
-
         # ---- Training ends ----
         # Save last checkpoint
         save_ckpt(output_dir, args, step, train_size, pcl, optimizer)

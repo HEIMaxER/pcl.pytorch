@@ -1,0 +1,10 @@
+data/
+*.o
+*.pyc
+*.so
+OAR.*.std
+OAR.*.stderr
+OAR.*.stdout
+!**/__pycache__/
+Outputs/
+venv/

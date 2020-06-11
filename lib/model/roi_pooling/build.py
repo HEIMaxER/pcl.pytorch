@@ -28,7 +28,8 @@ ffi = create_extension(
     define_macros=defines,
     relative_to=__file__,
     with_cuda=with_cuda,
-    extra_objects=extra_objects
+    extra_objects=extra_objects,
+    include_dirs=['/usr/local/cuda-9.0/include/']
 )
 
 if __name__ == '__main__':

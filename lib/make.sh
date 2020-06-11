@@ -17,8 +17,9 @@ CUDA_ARCH="-gencode arch=compute_30,code=sm_30 \
 # compile NMS
 cd model/nms/src
 echo "Compiling nms kernels by nvcc..."
-nvcc -c -o nms_cuda_kernel.cu.o nms_cuda_kernel.cu \
+nvcc -c -o nms_cuda_kernel.cu.o nms_cuda_kernel.cu -I${CUDA_PATH}/include\
 	 -D GOOGLE_CUDA=1 -x cu -Xcompiler -fPIC $CUDA_ARCH
+
 
 cd ../
 python build.py
@@ -27,10 +28,13 @@ python build.py
 cd ../../
 cd model/roi_pooling/src
 echo "Compiling roi pooling kernels by nvcc..."
-nvcc -c -o roi_pooling.cu.o roi_pooling_kernel.cu \
+nvcc -c -o roi_pooling.cu.o roi_pooling_kernel.cu -I${CUDA_PATH}/include\
 	 -D GOOGLE_CUDA=1 -x cu -Xcompiler -fPIC $CUDA_ARCH
+
+
 cd ../
 python build.py
+
 
 # # compile roi_align
 # cd ../../
@@ -54,7 +58,7 @@ python build.py
 cd ../../
 cd modeling/roi_xfrom/roi_align/src
 echo "Compiling roi align kernels by nvcc..."
-nvcc -c -o roi_align_kernel.cu.o roi_align_kernel.cu \
+nvcc -c -o roi_align_kernel.cu.o roi_align_kernel.cu -I${CUDA_PATH}/include\
 	 -D GOOGLE_CUDA=1 -x cu -Xcompiler -fPIC $CUDA_ARCH
 cd ../
 python build.py
@@ -63,7 +67,7 @@ python build.py
 cd ../../../
 cd model/pcl_losses/src
 echo "Compiling pcl losses kernels by nvcc..."
-nvcc -c -o pcl_losses_kernel.cu.o pcl_losses_kernel.cu \
+nvcc -c -I${CUDA_PATH}/include -o pcl_losses_kernel.cu.o pcl_losses_kernel.cu \
      -D GOOGLE_CUDA=1 -x cu -Xcompiler -fPIC $CUDA_ARCH
 cd ../
 python build.py

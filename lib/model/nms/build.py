@@ -18,10 +18,10 @@ if torch.cuda.is_available():
     with_cuda = True
 
 this_file = os.path.dirname(os.path.realpath(__file__))
-print(this_file)
+print("this file :", this_file)
 extra_objects = ['src/nms_cuda_kernel.cu.o']
 extra_objects = [os.path.join(this_file, fname) for fname in extra_objects]
-print(extra_objects)
+print("extra object :", extra_objects)
 
 ffi = create_extension(
     '_ext.nms',
@@ -30,7 +30,8 @@ ffi = create_extension(
     define_macros=defines,
     relative_to=__file__,
     with_cuda=with_cuda,
-    extra_objects=extra_objects
+    extra_objects=extra_objects,
+    include_dirs=['/usr/local/cuda-9.0/include']
 )
 
 if __name__ == '__main__':
