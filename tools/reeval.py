@@ -22,6 +22,7 @@ import utils.logging
 # thread safe and causes unwanted GPU memory allocations.
 cv2.ocl.setUseOpenCL(False)
 
+os.chdir("/data1/data/expes/stage_mplocharski/pcl.pytorch")
 
 def parse_args():
     """Parse in command line arguments"""
