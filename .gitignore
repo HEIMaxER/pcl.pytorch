@@ -8,3 +8,5 @@ OAR.*.stdout
 !**/__pycache__/
 Outputs/
 venv/
+env/
+.idea/
