@@ -4,10 +4,12 @@ import scipy.special
 import os
 # from lib.datasets.dataset_catalog import DATASETS
 
-set_path = "../data/VOCdevkit/VOC2007/ImageSets/Main/"
-opensetpath = "../data/VOCdevkit/VOC2007/Openset/"
-
 def get_class_labels(filename):
+    """
+    open VOC Imageset text files with image ids and labels and puts them in a dict project
+    :param filename: name of text file to extract labels from
+    :return dict object
+    """
     id_file = open(filename, 'r')
     lines = id_file.readlines()
     labels = {}
@@ -20,6 +22,11 @@ def get_class_labels(filename):
     return labels
 
 def get_class_names(set_dir):
+    """
+    gets class names from a VOC Imageset Main directory
+    :param set_dir: path to directory containing label files
+    :return list object :
+    """
     filenames = os.listdir(set_dir)
     class_names = []
     for name in filenames:
@@ -29,13 +36,19 @@ def get_class_names(set_dir):
     return class_names
 
 def make_class_labels(label_dict, openset_dir):
+    """
+    generates labels files from dict object
+    :param label_dict: dict structured like VOC label set files
+    :param openset_dir: path to the openset directory where to generate the label files
+    :return:
+    """
     os.makedirs(openset_dir)
     class_names = list(label_dict.keys())
 
     for set in list(label_dict[class_names[0]].keys()):
         file_name = set+".txt"
         file_path = os.path.join(openset_dir, file_name)
-        file = open(file_path, "w")
+        file = open(file_path, "w")                 #generates
         keys = list(label_dict[class_names[0]][set].keys())
         keys = np.sort(keys)
         for key in keys:
@@ -59,69 +72,75 @@ def make_class_labels(label_dict, openset_dir):
 
 
 def get_unknown_classes(class_names, seed, unknw_nbr):
-    perm = list(combinations(class_names, unknw_nbr))
-    print('permutaion length :', len(perm))
-    return list(perm[int(seed)])
+    """
+    chooses class names to be branded as unknow based on class names and a seed corresponding to one possible pick
+    :param class_names: classes to choose from
+    :param seed: id of the possible cobination of unknown classes
+    :param unknw_nbr: number of unknown clisses to be picked
+    :return:
+    """
+    comb = list(combinations(class_names, unknw_nbr))
+    return list(comb[seed])
 
 
 
 def make_openset(set_dir, opensets_path, unkwn_nbr, seed):
+    """
+    Generates openset labelling from VOC Imageset
+    :param set_dir: path to original VOC set to generate from
+    :param opensets_path: path to generate openset labels in
+    :param unkwn_nbr: number of classes to make as unknown
+    :param seed: id of the combination of classes chosen as unknown
+    :return: openset path
+    """
 
     class_names = get_class_names(set_dir)
-    print('max seed : ',scipy.special.comb(len(class_names), unkwn_nbr))
-    seed %= scipy.special.comb(len(class_names), unkwn_nbr)  # la grain de l'open set correspond à un choix de classes inconnues parmis les classes labelisees
-    folder_name = str(unkwn_nbr)+'_'+str(int(seed))
-    openset_dir = os.path.join(opensets_path, folder_name)
+
+    seed %= scipy.special.comb(len(class_names), unkwn_nbr) #normalizing seed as diffent unknown numbers can have a different amount of possible seeds
+    seed = int(seed)
+
+    folder_name = str(unkwn_nbr)+'_'+str(seed)
+    openset_dir = os.path.join(opensets_path, folder_name) #generating openset foldername
     openset_dir = os.path.join(openset_dir, 'Main')
-    print(openset_dir)
+
     if os.path.exists(openset_dir):
-        print("Open set already exists")
+        print("Open set already exists")   #checking if openset already exists
+
     else:
 
         sets = ['train', 'trainval', 'val', 'test']
         set_separation = {}
         for set in sets:
-            set_separation[set] = get_class_labels(os.path.join(set_dir, set+'.txt'))
-            print(set, len(set_separation[set].keys()))
+            set_separation[set] = get_class_labels(os.path.join(set_dir, set+'.txt'))  #gettting general set layout
 
-        unkwn_classes = get_unknown_classes(class_names, seed, unkwn_nbr)
+        unkwn_classes = get_unknown_classes(class_names, seed, unkwn_nbr)        #getting unknown class names
 
-        print('unknown classes : ', unkwn_classes)
 
         labels = {}
         for name in class_names:
-            labels[name] = {}
+            labels[name] = {}                  #getting all original labels
             for set in sets:
                 labels[name][set] = get_class_labels(os.path.join(set_dir, name+'_'+set+'.txt'))
 
-        unknown = {}
 
-        for id in list(set_separation[sets[1]].keys()):
+        for id in list(set_separation[sets[1]].keys()):         # all images containing unknown class entries are moved to the testing set
             for cls in unkwn_classes :
                 if labels[cls][sets[1]][id] == 0 or labels[cls][sets[1]][id] == 1:
                     if id in set_separation[sets[1]]:
                         set_separation[sets[1]].pop(id)
-                        if id in set_separation[sets[0]]:
+                        if id in set_separation[sets[0]]:       # sets[1] is the joined training and validation sets (sets[0], sets[2])
                             set_separation[sets[0]].pop(id)
                         else:
-                            set_separation[sets[2]].pop(id)
+                            set_separation[sets[2]].pop(id)    # all images containing unknown classes from the trainval sets are moved to the testing set
                         set_separation[sets[3]][id] = None
-                        unknown[id] = labels[cls][sets[1]][id]
-        unknown_test = {}
-        for id in list(set_separation[sets[-1]].keys()):
-            for cls in unkwn_classes :
-                try:
-                    if labels[cls][sets[-1]][id] == 0 or labels[cls][sets[-1]][id] == 1:
-                        unknown_test[id] = labels[cls][sets[-1]][id]
-                except:
-                    pass
+
 
         new_labels = {'unknown':{s:{} for s in sets}}
 
         for cls in class_names:
             if cls not in unkwn_classes:
                 new_labels[cls] = {}
-                for set in sets:
+                for set in sets:                                 # new label files are reconstructed based on the new set separations
                     new_labels[cls][set] = {}
                     for id in set_separation[set].keys():
                         for old_set in sets:
@@ -133,7 +152,7 @@ def make_openset(set_dir, opensets_path, unkwn_nbr, seed):
                 for set in sets:
                     for id in set_separation[set].keys():
                         for old_set in sets:
-                            try:
+                            try:                                                            # all labels from classes chosen as unknown are mashed into the new unknown class wich only has entries in the testing set
                                 if id not in new_labels['unknown'][set]:
                                     new_labels['unknown'][set][id] = labels[cls][old_set][id]
                                 elif labels[cls][old_set][id] > new_labels['unknown'][set][id]:
@@ -141,48 +160,6 @@ def make_openset(set_dir, opensets_path, unkwn_nbr, seed):
                             except:
                                 pass
 
-        print(len(class_names), '-', len(unkwn_classes), " + 1 =", len(new_labels.keys()))
-
-        for set in sets:
-            print(set, len(set_separation[set].keys()))
-
-
-        print('unknown', len(unknown.keys()), len(unknown_test.keys()), len(new_labels['unknown']['test'].keys()))
-
-        make_class_labels(new_labels, openset_dir)
+        make_class_labels(new_labels, openset_dir)                           #generating new label files
         print("Made new Openset : ", openset_dir)
-
-
-
-make_openset(set_path, opensetpath, 1, 325)
-
-
-
-
-
-# print(get_class_names(set_path+"Main"))
-
-
-# print(len(get_class_labels(set_path+'train.txt')), get_class_labels(set_path+'train.txt'))
-# print(len(get_class_labels(set_path+'test.txt')), get_class_labels(set_path+'test.txt'))
-# print(len(get_class_labels(set_path+'trainval.txt')), get_class_labels(set_path+'trainval.txt'))
-# print(len(get_class_labels(set_path+'val.txt')), get_class_labels(set_path+'val.txt'))
-
-# print(len(get_class_labels(set_path+'Main/train.txt')), len(get_class_labels(set_path+'Layout/train.txt')), len(get_class_labels(set_path+'Segmentation/train.txt')))
-# print(len(get_class_labels(set_path+'Main/trainval.txt')), len(get_class_labels(set_path+'Layout/trainval.txt')), len(get_class_labels(set_path+'Segmentation/trainval.txt')))
-# print(len(get_class_labels(set_path+'Main/val.txt')), len(get_class_labels(set_path+'Layout/val.txt')), len(get_class_labels(set_path+'Segmentation/val.txt')))
-# print(len(get_class_labels(set_path+'Main/test.txt')), len(get_class_labels(set_path+'Layout/test.txt')), len(get_class_labels(set_path+'Segmentation/test.txt')))
-#
-# unique_labels = []
-# for x in os.listdir(set_path):
-#     labels = get_class_labels(set_path+x)
-#     for i in labels.items():
-#         if i[1] not in unique_labels:
-#             unique_labels.append(i[1])
-# print(unique_labels)
-
-
-#
-# labels = get_class_labels(set_path+"/aeroplane_test.txt")
-#
-# print(labels)
+    return openset_dir
