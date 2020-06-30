@@ -22,6 +22,7 @@ import nn as mynn
 import utils.net as net_utils
 import utils.misc as misc_utils
 from core.config import cfg, cfg_from_file, cfg_from_list, assert_and_infer_cfg
+from openset.data import make_openset
 from datasets.roidb import combined_roidb_for_training
 from roi_data.loader import RoiDataLoader, MinibatchSampler, BatchSampler, collate_minibatch
 from modeling.model_builder import Generalized_RCNN
@@ -63,10 +64,10 @@ def parse_args():
     parser.add_argument(
         '--no_cuda', dest='cuda', help='Do not use CUDA device', action='store_false')
     parser.add_argument(
-        '--openess',
-        help='Propportion of unknown classes', default=0.2, type=float)
+        '--openness', dest='openness',
+        help='Propportion of unknown classes', default=0.05, type=float)
     parser.add_argument(
-        '--seed',
+        '--seed', dest='seed',
         help='Propportion of unkown classes', default=0, type=int)
 
     # Optimization
@@ -160,16 +161,16 @@ def main():
 
     if args.dataset == "coco2014":
         cfg.TRAIN.DATASETS = ('coco_2014_train',)
-        cfg.MODEL.NUM_CLASSES = int(80*(1-args.openness))
+        cfg.MODEL.NUM_CLASSES = min(int(80*(1-args.openness)), 79)
     elif args.dataset == "coco2017":
         cfg.TRAIN.DATASETS = ('coco_2017_train',)
-        cfg.MODEL.NUM_CLASSES = int(80*(1-args.openness))
+        cfg.MODEL.NUM_CLASSES = min(int(80*(1-args.openness)), 79)
     elif args.dataset == 'voc2007':
         cfg.TRAIN.DATASETS = ('voc_2007_trainval',)
-        cfg.MODEL.NUM_CLASSES = int(20*(1-args.openness))
+        cfg.MODEL.NUM_CLASSES = min(int(20*(1-args.openness)), 19)
     elif args.dataset == 'voc2012':
         cfg.TRAIN.DATASETS = ('voc_2012_trainval',)
-        cfg.MODEL.NUM_CLASSES = int(20*(1-args.openness))
+        cfg.MODEL.NUM_CLASSES = min(int(20*(1-args.openness)), 19)
     else:
         raise ValueError("Unexpected args.dataset: {}".format(args.dataset))
 

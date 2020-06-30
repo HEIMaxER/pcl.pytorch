@@ -1,4 +1,5 @@
 import numpy as np
+import json
 from itertools import combinations
 import scipy.special
 import os
@@ -82,11 +83,139 @@ def get_unknown_classes(class_names, seed, unknw_nbr):
     comb = list(combinations(class_names, unknw_nbr))
     return list(comb[seed])
 
+def make_annotations(annotaion_fn, seed, unkwn_nbr):
+    split_path = annotaion_fn.split('/')
+    split_path[-1] = split_path[-1].split('_')[:-1]
 
+    trainval_path = split_path.copy()
+    trainval_path[-1].append('trainval.json')
+    trainval_path[-1] = '_'.join(trainval_path[-1])
+    trainval_path = '/'.join(trainval_path)
+
+    split_path[-1] = split_path[-1][:-1]
+
+    test_path = split_path.copy()
+    test_path[-1].append('test.json')
+    test_path[-1] = '_'.join(test_path[-1])
+    test_path = '/'.join(test_path)
+
+    with open(trainval_path) as json_file:
+        trainval_annotations = json.load(json_file)
+
+    with open(test_path) as json_file:
+        test_annotations = json.load(json_file)
+
+    class_names = []
+
+    for data in trainval_annotations['categories']:
+        class_names.append(data['name'])
+
+    seed %= scipy.special.comb(len(class_names), unkwn_nbr)  # normalizing seed as diffent unknown numbers can have a different amount of possible seeds
+    seed = int(seed)
+
+    unknw_class = get_unknown_classes(class_names, seed, unkwn_nbr)
+
+    unknw_ids = []
+
+    k=0
+    i=0
+    for data in trainval_annotations['categories']:
+        if data['name'] in unknw_class:
+            unknw_ids.append(data['id'])
+            class_names[k] = [class_names[k], None]
+            i+=1
+        else:
+            class_names[k] = [class_names[k], data['id']-i]
+        k+=1
+
+    new_trainval_annotations = {'images': [], 'type': 'instances', 'annotations': [], 'categories': []}
+    new_test_annotations = {'images': [], 'type': 'instances', 'annotations': [], 'categories': []}
+
+    for k in range(len(class_names)):
+        if class_names[k][1] != None:
+            new_trainval_annotations['categories'].append({'supercategory': 'none', 'id': class_names[k][1], 'name': class_names[k][0]})
+            new_test_annotations['categories'].append({'supercategory': 'none', 'id': class_names[k][1], 'name': class_names[k][0]})
+    new_test_annotations['categories'].append(
+        {'supercategory': 'none', 'id': len(new_test_annotations['categories'])+1, 'name': 'unknown'})
+
+    print('test', len(test_annotations['images']), len(test_annotations['annotations']))
+    print('trainval', len(trainval_annotations['images']), len(trainval_annotations['annotations']))
+
+    image_ids = {'trainval':[], 'test':[]}
+    for k in range(len(test_annotations['annotations'])):
+        annot = test_annotations['annotations'][k]
+        if annot['category_id'] in unknw_ids:
+            # print('unknown')
+            annot['category_id'] = new_test_annotations['categories'][-1]['id']
+        else:
+            annot['category_id'] = class_names[annot['category_id']-1][1]
+        image_ids['test'].append(annot['image_id'])
+        new_test_annotations['annotations'].append(annot)
+
+    for k in range(len(trainval_annotations['annotations'])):
+        annot = trainval_annotations['annotations'][k]
+        if annot['category_id'] in unknw_ids:
+            # print('unknown')
+            annot['category_id'] = new_test_annotations['categories'][-1]['id']
+            image_ids['test'].append(annot['image_id'])
+            new_test_annotations['annotations'].append(annot)
+        else:
+            annot['category_id'] = class_names[annot['category_id']-1][1]
+            image_ids['trainval'].append(annot['image_id'])
+            new_trainval_annotations['annotations'].append(annot)
+
+    for k in range(len(test_annotations['images'])):
+        img = test_annotations['images'][k]
+        if img['id'] in image_ids['test']:
+            new_test_annotations['images'].append(img)
+        else :
+            print('error')
+
+    for k in range(len(trainval_annotations['images'])):
+        img = trainval_annotations['images'][k]
+        if img['id'] in image_ids['test']:
+            new_test_annotations['images'].append(img)
+        elif img['id'] in image_ids['trainval']:
+            new_trainval_annotations['images'].append(img)
+        else:
+            print('error')
+
+    new_trainval_path = trainval_path.split('.')[:-1]
+    new_trainval_path[-1] += '_'+str(unkwn_nbr)+'_'+str(seed)
+    new_trainval_path.append('json')
+    new_test_path = '.'.join(new_trainval_path)
+
+    new_test_path = test_path.split('.')[:-1]
+    new_test_path[-1] += '_'+str(unkwn_nbr)+'_'+str(seed)
+    new_test_path.append('json')
+    new_test_path = '.'.join(new_test_path)
+
+    print(new_test_path)
+    #
+    # for k in range(len(trainval_annotations['annotations'])):
+    #     if trainval_annotations['annotations'][k]['category_id'] in unknw_ids:
+    #         annot = trainval_annotations['annotations'][k]
+    #         img = trainval_annotations['images'][k]
+    #         new_test_annotations['images'].append()
+    train_class = []
+    test_class = ['unknown))']
+    # print(annotations.keys(), '\n')
+
+    print('images', test_annotations['images'][0])
+    # print('images', trainval_annotations['images'][0])
+    # print('type', test_annotations['type'])
+    # print('annotations', test_annotations['annotations'][0])
+    # print('annotations', trainval_annotations['annotations'][0])
+    # print('categories', test_annotations['categories'])
+
+    # for key in annotations.keys():
+    #     print(key, annotations[key], '\n')
+
+    # return train_annotaion_fn, test_annotation_fn
 
 def make_openset(set_dir, opensets_path, unkwn_nbr, seed):
     """
-    Generates openset labelling from VOC Imageset
+    Generates openset labelling from VOC Imageset as well as COCO annotations for the said set
     :param set_dir: path to original VOC set to generate from
     :param opensets_path: path to generate openset labels in
     :param unkwn_nbr: number of classes to make as unknown
@@ -163,3 +292,7 @@ def make_openset(set_dir, opensets_path, unkwn_nbr, seed):
         make_class_labels(new_labels, openset_dir)                           #generating new label files
         print("Made new Openset : ", openset_dir)
     return openset_dir
+
+annotaion_fn = "../data/VOCdevkit/VOC2007/Annotations/voc_2007_test.json"
+
+make_annotations(annotaion_fn, 200, 1)
