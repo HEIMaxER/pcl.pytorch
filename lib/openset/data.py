@@ -121,7 +121,7 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
     new_trainval_path = trainval_path.split('.')[:-1]
     new_trainval_path[-1] += '_' + str(unkwn_nbr) + '_' + str(seed)
     new_trainval_path.append('json')
-    new_trainval_path '.'.join(new_trainval_path)
+    new_trainval_path = '.'.join(new_trainval_path)
 
     new_test_path = test_path.split('.')[:-1]
     new_test_path[-1] += '_' + str(unkwn_nbr) + '_' + str(seed)

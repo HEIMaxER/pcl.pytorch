@@ -46,6 +46,7 @@ from .dataset_catalog import ANN_FN
 from .dataset_catalog import DATASETS
 from .dataset_catalog import IM_DIR
 from .dataset_catalog import IM_PREFIX
+from ..openset import data.
 
 logger = logging.getLogger(__name__)
 
