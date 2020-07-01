@@ -409,7 +409,6 @@ def main():
                 lr = optimizer.param_groups[0]['lr']
                 assert lr == lr_new
                 decay_steps_ind += 1
-
             training_stats.IterTic()
             optimizer.zero_grad()
             for inner_iter in range(args.iter_size):
@@ -422,7 +421,6 @@ def main():
                 for key in input_data:
                     if key != 'roidb': # roidb is a list of ndarrays with inconsistent length
                         input_data[key] = list(map(Variable, input_data[key]))
-
                 net_outputs = pcl(**input_data)
                 training_stats.UpdateIterStats(net_outputs, inner_iter)
                 loss = net_outputs['total_loss']
