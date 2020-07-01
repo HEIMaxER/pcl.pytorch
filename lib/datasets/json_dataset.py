@@ -46,15 +46,14 @@ from .dataset_catalog import ANN_FN
 from .dataset_catalog import DATASETS
 from .dataset_catalog import IM_DIR
 from .dataset_catalog import IM_PREFIX
-from ..openset import data.
-
+from ..openset.data import make_annotations
 logger = logging.getLogger(__name__)
 
 
 class JsonDataset(object):
     """A class representing a COCO json dataset."""
 
-    def __init__(self, name):
+    def __init__(self, name, seed=None, unkwn_nbr=None, mode=None):
         assert name in DATASETS.keys(), \
             'Unknown dataset name: {}'.format(name)
         assert os.path.exists(DATASETS[name][IM_DIR]), \
@@ -67,7 +66,11 @@ class JsonDataset(object):
         self.image_prefix = (
             '' if IM_PREFIX not in DATASETS[name] else DATASETS[name][IM_PREFIX]
         )
-        self.COCO = COCO(DATASETS[name][ANN_FN])
+        if seed != None and unkwn_nbr != None and mode != None:
+            ann_fn = make_annotations(DATASETS[name][ANN_FN], seed, unkwn_nbr)[mode]
+            self.COCO = COCO(ann_fn)
+        else:
+            self.COCO = COCO(DATASETS[name][ANN_FN])
         self.debug_timer = Timer()
         # Set up dataset classes
         category_ids = self.COCO.getCatIds()

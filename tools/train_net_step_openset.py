@@ -68,7 +68,7 @@ def parse_args():
         help='Propportion of unknown classes', default=0.05, type=float)
     parser.add_argument(
         '--seed', dest='seed',
-        help='Propportion of unkown classes', default=0, type=int)
+        help='Seed for choosing categories as unknown', default=0, type=int)
 
     # Optimization
     # These options has the highest prioity and can overwrite the values in config file
@@ -124,14 +124,14 @@ def parse_args():
     return parser.parse_args()
 
 
-def save_ckpt(output_dir, args, step, train_size, model, optimizer):
+def save_ckpt(output_dir, args, step, train_size, model, optimizer, unkwn_nbr, seed):
     """Save checkpoint"""
     if args.no_save:
         return
     ckpt_dir = os.path.join(output_dir, 'ckpt')
     if not os.path.exists(ckpt_dir):
         os.makedirs(ckpt_dir)
-    save_name = os.path.join(ckpt_dir, 'model_step{}.pth'.format(step))
+    save_name = os.path.join(ckpt_dir, 'model{}_{}_step{}.pth'.format(unkwn_nbr, seed, step))
     if isinstance(model, mynn.DataParallel):
         model = model.module
     model_state_dict = model.state_dict()
@@ -162,15 +162,19 @@ def main():
     if args.dataset == "coco2014":
         cfg.TRAIN.DATASETS = ('coco_2014_train',)
         cfg.MODEL.NUM_CLASSES = min(int(80*(1-args.openness)), 79)
+        unkwn_nbr = max(1, int(80*args.openness))
     elif args.dataset == "coco2017":
         cfg.TRAIN.DATASETS = ('coco_2017_train',)
         cfg.MODEL.NUM_CLASSES = min(int(80*(1-args.openness)), 79)
+        unkwn_nbr = max(1, int(80 * args.openness))
     elif args.dataset == 'voc2007':
         cfg.TRAIN.DATASETS = ('voc_2007_trainval',)
         cfg.MODEL.NUM_CLASSES = min(int(20*(1-args.openness)), 19)
+        unkwn_nbr = max(1, int(20 * args.openness))
     elif args.dataset == 'voc2012':
         cfg.TRAIN.DATASETS = ('voc_2012_trainval',)
         cfg.MODEL.NUM_CLASSES = min(int(20*(1-args.openness)), 19)
+        unkwn_nbr = max(1, int(20*args.openness))
     else:
         raise ValueError("Unexpected args.dataset: {}".format(args.dataset))
 
@@ -233,7 +237,7 @@ def main():
     ### Dataset ###
     timers['roidb'].tic()
     roidb, ratio_list, ratio_index = combined_roidb_for_training(
-        cfg.TRAIN.DATASETS, cfg.TRAIN.PROPOSAL_FILES)
+        cfg.TRAIN.DATASETS, cfg.TRAIN.PROPOSAL_FILES, cfg.seed, unkwn_nbr, 'trainval')
     timers['roidb'].toc()
     roidb_size = len(roidb)
     logger.info('{:d} roidb entries'.format(roidb_size))
@@ -437,7 +441,7 @@ def main():
     except (RuntimeError, KeyboardInterrupt):
         del dataiterator
         logger.info('Save ckpt on exception ...')
-        save_ckpt(output_dir, args, step, train_size, pcl, optimizer)
+        save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, cfg.seed)
         logger.info('Save ckpt done.')
         stack_trace = traceback.format_exc()
         print(stack_trace)

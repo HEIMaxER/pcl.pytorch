@@ -31,13 +31,13 @@ from .json_dataset import JsonDataset
 logger = logging.getLogger(__name__)
 
 
-def combined_roidb_for_training(dataset_names, proposal_files):
+def combined_roidb_for_training(dataset_names, proposal_files, seed=None, unkwn_nbr=None, mode=None):
     """Load and concatenate roidbs for one or more datasets, along with optional
     object proposals. The roidb entries are then prepared for use in training,
     which involves caching certain types of metadata for each roidb entry.
     """
     def get_roidb(dataset_name, proposal_file):
-        ds = JsonDataset(dataset_name)
+        ds = JsonDataset(dataset_name, seed, unkwn_nbr, mode)
         roidb = ds.get_roidb(
             gt=True,
             proposal_file=proposal_file,

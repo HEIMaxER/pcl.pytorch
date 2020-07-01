@@ -127,6 +127,8 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
     new_test_path[-1] += '_' + str(unkwn_nbr) + '_' + str(seed)
     new_test_path.append('json')
     new_test_path = '.'.join(new_test_path)
+    file_names = {'tainval': new_trainval_path, 'test': new_test_path}
+
 
     if os.path.exists(new_test_path) and os.path.exists(new_trainval_path):
         print("Openset already exists")
@@ -203,33 +205,11 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
 
         with open(new_test_path, 'w') as outfile:
             json.dump(new_test_annotations, outfile)
-                                                            #writting annotaions to json
+            #writting annotaions to json
         with open(new_trainval_path, 'w') as outfile:
             json.dump(new_test_annotations, outfile)
 
-    return new_trainval_path, new_test_path
-
-    #
-    # for k in range(len(trainval_annotations['annotations'])):
-    #     if trainval_annotations['annotations'][k]['category_id'] in unknw_ids:
-    #         annot = trainval_annotations['annotations'][k]
-    #         img = trainval_annotations['images'][k]
-    #         new_test_annotations['images'].append()
-    train_class = []
-    test_class = ['unknown))']
-    # print(annotations.keys(), '\n')
-
-    print('images', test_annotations['images'][0])
-    # print('images', trainval_annotations['images'][0])
-    # print('type', test_annotations['type'])
-    # print('annotations', test_annotations['annotations'][0])
-    # print('annotations', trainval_annotations['annotations'][0])
-    # print('categories', test_annotations['categories'])
-
-    # for key in annotations.keys():
-    #     print(key, annotations[key], '\n')
-
-    # return train_annotaion_fn, test_annotation_fn
+    return file_names
 
 def make_openset(set_dir, opensets_path, unkwn_nbr, seed):
     """
