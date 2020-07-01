@@ -99,6 +99,8 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
     test_path[-1] = '_'.join(test_path[-1])
     test_path = '/'.join(test_path)
 
+    print(trainval_path)
+
     try:
         with open(trainval_path) as json_file:
             trainval_annotations = json.load(json_file)
@@ -127,7 +129,7 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
     new_test_path[-1] += '_' + str(unkwn_nbr) + '_' + str(seed)
     new_test_path.append('json')
     new_test_path = '.'.join(new_test_path)
-    file_names = {'tainval': new_trainval_path, 'test': new_test_path}
+    file_names = {'trainval': new_trainval_path, 'test': new_test_path}
 
 
     if os.path.exists(new_test_path) and os.path.exists(new_trainval_path):
@@ -291,6 +293,3 @@ def make_openset(set_dir, opensets_path, unkwn_nbr, seed):
         print("Made new Openset : ", openset_dir)
     return openset_dir
 
-annotaion_fn = "../data/VOCdevkit/VOC2007/Annotations/voc_2007_test.json"
-
-make_annotations(annotaion_fn, 200, 1)

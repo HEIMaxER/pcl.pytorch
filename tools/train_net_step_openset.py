@@ -181,7 +181,7 @@ def main():
     cfg_from_file(args.cfg_file)
     if args.set_cfgs is not None:
         cfg_from_list(args.set_cfgs)
-
+    
     ### Adaptively adjust some configs ###
     original_batch_size = cfg.NUM_GPUS * cfg.TRAIN.IMS_PER_BATCH
     original_ims_per_batch = cfg.TRAIN.IMS_PER_BATCH
@@ -237,7 +237,7 @@ def main():
     ### Dataset ###
     timers['roidb'].tic()
     roidb, ratio_list, ratio_index = combined_roidb_for_training(
-        cfg.TRAIN.DATASETS, cfg.TRAIN.PROPOSAL_FILES, cfg.seed, unkwn_nbr, 'trainval')
+        cfg.TRAIN.DATASETS, cfg.TRAIN.PROPOSAL_FILES, args.seed, unkwn_nbr, 'trainval')
     timers['roidb'].toc()
     roidb_size = len(roidb)
     logger.info('{:d} roidb entries'.format(roidb_size))
@@ -441,7 +441,7 @@ def main():
     except (RuntimeError, KeyboardInterrupt):
         del dataiterator
         logger.info('Save ckpt on exception ...')
-        save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, cfg.seed)
+        save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, args.seed)
         logger.info('Save ckpt done.')
         stack_trace = traceback.format_exc()
         print(stack_trace)
