@@ -99,98 +99,116 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
     test_path[-1] = '_'.join(test_path[-1])
     test_path = '/'.join(test_path)
 
-    with open(trainval_path) as json_file:
-        trainval_annotations = json.load(json_file)
+    try:
+        with open(trainval_path) as json_file:
+            trainval_annotations = json.load(json_file)
 
-    with open(test_path) as json_file:
-        test_annotations = json.load(json_file)
+        with open(test_path) as json_file:
+            test_annotations = json.load(json_file)
+
+    except:
+        print("Annotation file dosen't exist")
 
     class_names = []
 
     for data in trainval_annotations['categories']:
         class_names.append(data['name'])
 
-    seed %= scipy.special.comb(len(class_names), unkwn_nbr)  # normalizing seed as diffent unknown numbers can have a different amount of possible seeds
+    seed %= scipy.special.comb(len(class_names),
+                               unkwn_nbr)  # normalizing seed as diffent unknown numbers can have a different amount of possible seeds
     seed = int(seed)
 
-    unknw_class = get_unknown_classes(class_names, seed, unkwn_nbr)
-
-    unknw_ids = []
-
-    k=0
-    i=0
-    for data in trainval_annotations['categories']:
-        if data['name'] in unknw_class:
-            unknw_ids.append(data['id'])
-            class_names[k] = [class_names[k], None]
-            i+=1
-        else:
-            class_names[k] = [class_names[k], data['id']-i]
-        k+=1
-
-    new_trainval_annotations = {'images': [], 'type': 'instances', 'annotations': [], 'categories': []}
-    new_test_annotations = {'images': [], 'type': 'instances', 'annotations': [], 'categories': []}
-
-    for k in range(len(class_names)):
-        if class_names[k][1] != None:
-            new_trainval_annotations['categories'].append({'supercategory': 'none', 'id': class_names[k][1], 'name': class_names[k][0]})
-            new_test_annotations['categories'].append({'supercategory': 'none', 'id': class_names[k][1], 'name': class_names[k][0]})
-    new_test_annotations['categories'].append(
-        {'supercategory': 'none', 'id': len(new_test_annotations['categories'])+1, 'name': 'unknown'})
-
-    print('test', len(test_annotations['images']), len(test_annotations['annotations']))
-    print('trainval', len(trainval_annotations['images']), len(trainval_annotations['annotations']))
-
-    image_ids = {'trainval':[], 'test':[]}
-    for k in range(len(test_annotations['annotations'])):
-        annot = test_annotations['annotations'][k]
-        if annot['category_id'] in unknw_ids:
-            # print('unknown')
-            annot['category_id'] = new_test_annotations['categories'][-1]['id']
-        else:
-            annot['category_id'] = class_names[annot['category_id']-1][1]
-        image_ids['test'].append(annot['image_id'])
-        new_test_annotations['annotations'].append(annot)
-
-    for k in range(len(trainval_annotations['annotations'])):
-        annot = trainval_annotations['annotations'][k]
-        if annot['category_id'] in unknw_ids:
-            # print('unknown')
-            annot['category_id'] = new_test_annotations['categories'][-1]['id']
-            image_ids['test'].append(annot['image_id'])
-            new_test_annotations['annotations'].append(annot)
-        else:
-            annot['category_id'] = class_names[annot['category_id']-1][1]
-            image_ids['trainval'].append(annot['image_id'])
-            new_trainval_annotations['annotations'].append(annot)
-
-    for k in range(len(test_annotations['images'])):
-        img = test_annotations['images'][k]
-        if img['id'] in image_ids['test']:
-            new_test_annotations['images'].append(img)
-        else :
-            print('error')
-
-    for k in range(len(trainval_annotations['images'])):
-        img = trainval_annotations['images'][k]
-        if img['id'] in image_ids['test']:
-            new_test_annotations['images'].append(img)
-        elif img['id'] in image_ids['trainval']:
-            new_trainval_annotations['images'].append(img)
-        else:
-            print('error')
-
     new_trainval_path = trainval_path.split('.')[:-1]
-    new_trainval_path[-1] += '_'+str(unkwn_nbr)+'_'+str(seed)
+    new_trainval_path[-1] += '_' + str(unkwn_nbr) + '_' + str(seed)
     new_trainval_path.append('json')
-    new_test_path = '.'.join(new_trainval_path)
+    new_trainval_path '.'.join(new_trainval_path)
 
     new_test_path = test_path.split('.')[:-1]
-    new_test_path[-1] += '_'+str(unkwn_nbr)+'_'+str(seed)
+    new_test_path[-1] += '_' + str(unkwn_nbr) + '_' + str(seed)
     new_test_path.append('json')
     new_test_path = '.'.join(new_test_path)
 
-    print(new_test_path)
+    if os.path.exists(new_test_path) and os.path.exists(new_trainval_path):
+        print("Openset already exists")
+
+    else:
+        print("Making Openset :")
+
+        unknw_class = get_unknown_classes(class_names, seed, unkwn_nbr)
+
+        if unkwn_nbr > 1:
+            print("{} unknown classes : ".format(unkwn_nbr), *unknw_class, sep = ", ")
+
+        else :
+            print("{} unknown classe : ".format(unkwn_nbr), unknw_class)
+        unknw_ids = []
+
+        k=0
+        i=0
+        for data in trainval_annotations['categories']:
+            if data['name'] in unknw_class:
+                unknw_ids.append(data['id'])             #Making new class ids
+                class_names[k] = [class_names[k], None]
+                i+=1
+            else:
+                class_names[k] = [class_names[k], data['id']-i]
+            k+=1
+
+        new_trainval_annotations = {'images': [], 'type': 'instances', 'annotations': [], 'categories': []}
+        new_test_annotations = {'images': [], 'type': 'instances', 'annotations': [], 'categories': []}        #creating new annotation dict
+
+        for k in range(len(class_names)):
+            if class_names[k][1] != None:
+                new_trainval_annotations['categories'].append({'supercategory': 'none', 'id': class_names[k][1], 'name': class_names[k][0]})
+                new_test_annotations['categories'].append({'supercategory': 'none', 'id': class_names[k][1], 'name': class_names[k][0]})      #filling categories
+        new_test_annotations['categories'].append(
+            {'supercategory': 'none', 'id': len(new_test_annotations['categories'])+1, 'name': 'unknown'})
+
+        image_ids = {'trainval':[], 'test':[]}
+        for k in range(len(test_annotations['annotations'])):
+            annot = test_annotations['annotations'][k]
+            if annot['category_id'] in unknw_ids:                                   #copying and sorting annotations in test set
+                annot['category_id'] = new_test_annotations['categories'][-1]['id']
+            else:
+                annot['category_id'] = class_names[annot['category_id']-1][1]
+            image_ids['test'].append(annot['image_id'])
+            new_test_annotations['annotations'].append(annot)
+
+        for k in range(len(trainval_annotations['annotations'])):
+            annot = trainval_annotations['annotations'][k]
+            if annot['category_id'] in unknw_ids:
+                annot['category_id'] = new_test_annotations['categories'][-1]['id']  #copying and sorting annotations in trainval set
+                image_ids['test'].append(annot['image_id'])
+                new_test_annotations['annotations'].append(annot)
+            else:
+                annot['category_id'] = class_names[annot['category_id']-1][1]
+                image_ids['trainval'].append(annot['image_id'])
+                new_trainval_annotations['annotations'].append(annot)
+
+        for k in range(len(test_annotations['images'])):
+            img = test_annotations['images'][k]
+            if img['id'] in image_ids['test']:
+                new_test_annotations['images'].append(img)     #copying and sorting image references in test set
+            else :
+                print('Unknown test annotaion id')
+
+        for k in range(len(trainval_annotations['images'])):
+            img = trainval_annotations['images'][k]
+            if img['id'] in image_ids['test']:
+                new_test_annotations['images'].append(img)      #copying and sorting image references in trainval set
+            elif img['id'] in image_ids['trainval']:
+                new_trainval_annotations['images'].append(img)
+            else:
+                print("Unknown trainval annotion id")
+
+        with open(new_test_path, 'w') as outfile:
+            json.dump(new_test_annotations, outfile)
+                                                            #writting annotaions to json
+        with open(new_trainval_path, 'w') as outfile:
+            json.dump(new_test_annotations, outfile)
+
+    return new_trainval_path, new_test_path
+
     #
     # for k in range(len(trainval_annotations['annotations'])):
     #     if trainval_annotations['annotations'][k]['category_id'] in unknw_ids:
