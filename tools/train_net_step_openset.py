@@ -181,7 +181,7 @@ def main():
     cfg_from_file(args.cfg_file)
     if args.set_cfgs is not None:
         cfg_from_list(args.set_cfgs)
-
+    
     ### Adaptively adjust some configs ###
     original_batch_size = cfg.NUM_GPUS * cfg.TRAIN.IMS_PER_BATCH
     original_ims_per_batch = cfg.TRAIN.IMS_PER_BATCH
@@ -237,7 +237,7 @@ def main():
     ### Dataset ###
     timers['roidb'].tic()
     roidb, ratio_list, ratio_index = combined_roidb_for_training(
-        cfg.TRAIN.DATASETS, cfg.TRAIN.PROPOSAL_FILES, cfg.seed, unkwn_nbr, 'trainval')
+        cfg.TRAIN.DATASETS, cfg.TRAIN.PROPOSAL_FILES, args.seed, unkwn_nbr, 'trainval')
     timers['roidb'].toc()
     roidb_size = len(roidb)
     logger.info('{:d} roidb entries'.format(roidb_size))
@@ -409,7 +409,6 @@ def main():
                 lr = optimizer.param_groups[0]['lr']
                 assert lr == lr_new
                 decay_steps_ind += 1
-
             training_stats.IterTic()
             optimizer.zero_grad()
             for inner_iter in range(args.iter_size):
@@ -422,7 +421,6 @@ def main():
                 for key in input_data:
                     if key != 'roidb': # roidb is a list of ndarrays with inconsistent length
                         input_data[key] = list(map(Variable, input_data[key]))
-
                 net_outputs = pcl(**input_data)
                 training_stats.UpdateIterStats(net_outputs, inner_iter)
                 loss = net_outputs['total_loss']
