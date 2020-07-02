@@ -46,7 +46,7 @@ from .dataset_catalog import ANN_FN
 from .dataset_catalog import DATASETS
 from .dataset_catalog import IM_DIR
 from .dataset_catalog import IM_PREFIX
-from ..openset.data import make_annotations
+from ..openset.data import make_annotations, split_proposals
 logger = logging.getLogger(__name__)
 
 
@@ -66,8 +66,12 @@ class JsonDataset(object):
         self.image_prefix = (
             '' if IM_PREFIX not in DATASETS[name] else DATASETS[name][IM_PREFIX]
         )
-        if seed != None and unkwn_nbr != None and mode != None:
-            ann_fn = make_annotations(DATASETS[name][ANN_FN], seed, unkwn_nbr)[mode]
+        self.seed = seed
+        self.unkwn_nbr = unkwn_nbr
+        self.mode = mode
+        if self.seed != None and self.unkwn_nbr != None and self.mode != None:
+            ann_fn, split_ids = make_annotations(DATASETS[name][ANN_FN], seed, unkwn_nbr)[self.mode]
+            self.split_ids = split_ids
             self.COCO = COCO(ann_fn)
         else:
             self.COCO = COCO(DATASETS[name][ANN_FN])
@@ -153,6 +157,8 @@ class JsonDataset(object):
         if proposal_file is not None:
             # Include proposals from a file
             self.debug_timer.tic()
+            if self.seed != None and self.unkwn_nbr != None and self.mode !=None:
+                proposal_file = split_proposals(proposal_file, self.split_ids, self.seed, self.unkwn_nbr)[self.mode]
             self._add_proposals_from_file(
                 roidb, proposal_file, min_proposal_size, proposal_limit,
                 crowd_filter_thresh

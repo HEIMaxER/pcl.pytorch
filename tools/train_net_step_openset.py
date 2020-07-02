@@ -441,7 +441,7 @@ def main():
     except (RuntimeError, KeyboardInterrupt):
         del dataiterator
         logger.info('Save ckpt on exception ...')
-        save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, cfg.seed)
+        save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, args.seed)
         logger.info('Save ckpt done.')
         stack_trace = traceback.format_exc()
         print(stack_trace)
