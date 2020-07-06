@@ -131,7 +131,7 @@ def save_ckpt(output_dir, args, step, train_size, model, optimizer, unkwn_nbr, s
     ckpt_dir = os.path.join(output_dir, 'ckpt')
     if not os.path.exists(ckpt_dir):
         os.makedirs(ckpt_dir)
-    save_name = os.path.join(ckpt_dir, 'model{}_{}_step{}.pth'.format(unkwn_nbr, seed, step))
+    save_name = os.path.join(ckpt_dir, 'model_{}_{}_step{}.pth'.format(unkwn_nbr, seed, step))
     if isinstance(model, mynn.DataParallel):
         model = model.module
     model_state_dict = model.state_dict()
@@ -177,7 +177,7 @@ def main():
         unkwn_nbr = max(1, int(20*args.openness))
     else:
         raise ValueError("Unexpected args.dataset: {}".format(args.dataset))
-
+    print("Number of classes : ", cfg.MODEL.NUM_CLASSES)
     cfg_from_file(args.cfg_file)
     if args.set_cfgs is not None:
         cfg_from_list(args.set_cfgs)

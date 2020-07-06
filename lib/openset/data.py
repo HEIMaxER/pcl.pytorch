@@ -247,7 +247,7 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
             #writting annotaions to json
         with open(new_trainval_path, 'w') as outfile:
             json.dump(new_trainval_annotations, outfile)
-
+    print(len(image_ids['trainval']), len(image_ids['test']))
     return file_names, image_ids
 
 def split_proposals(proposal_file, ids, seed, unkwn_nbr):
