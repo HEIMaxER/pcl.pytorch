@@ -242,6 +242,13 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
             else:
                 print("Unknown trainval annotion id")
 
+        image_ids = {'trainval': [], 'test': []}
+        for img in new_trainval_annotations['images']:
+            image_ids['trainval'].append(img['id'])
+
+        for img in new_test_annotations['images']:
+            image_ids['test'].append(img['id'])
+
         with open(new_test_path, 'w') as outfile:
             json.dump(new_test_annotations, outfile)
             #writting annotaions to json
@@ -317,11 +324,44 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
             else:
                 print("Test proposal not found in openset split{}".format(test_proposals['indexes'][k]))
 
+        sorted_new_test_proposals = {}
+        sorted_new_trainval_proposals = {}
+
+        for k in trainval_proposals.keys():
+            sorted_new_test_proposals[k] = []
+            sorted_new_trainval_proposals[k] = []
+
+        for id in ids['test']:
+            k = 0
+            found = 0
+            while k < len(new_test_proposals['indexes']) and found == 0:
+                if new_test_proposals['indexes'][k] == id:
+                    for key in new_test_proposals.keys():
+                        sorted_new_test_proposals[key].append(new_test_proposals[key][k])
+                    found = 1
+                else:
+                    k += 1
+            if found == 0:
+                print("Test index not found")
+
+        for id in ids['trainval']:
+            k = 0
+            found = 0
+            while k < len(new_trainval_proposals['indexes']) and found == 0:
+                if new_trainval_proposals['indexes'][k] == id:
+                    for key in new_trainval_proposals.keys():
+                        sorted_new_trainval_proposals[key].append(new_trainval_proposals[key][k])
+                    found = 1
+                else:
+                    k += 1
+            if found == 0:
+                print("Training or validation index not found")
+
         with open(new_test_path, 'wb') as outfile:
-            pickle.dump(new_test_proposals, outfile)
+            pickle.dump(sorted_new_test_proposals, outfile)
             #writting proposals to pickle
         with open(new_trainval_path, 'wb') as outfile:
-            pickle.dump(new_trainval_proposals, outfile)
+            pickle.dump(sorted_new_trainval_proposals, outfile)
     return file_names
 
 def make_openset(set_dir, opensets_path, unkwn_nbr, seed):
