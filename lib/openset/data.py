@@ -85,6 +85,13 @@ def get_unknown_classes(class_names, seed, unknw_nbr):
     return list(comb[seed])
 
 def make_annotations(annotaion_fn, seed, unkwn_nbr):
+    """
+    Make an openset split of COCO annotation files based on the number of unknown classes and seed number
+    :param annotaion_fn: Annotations file name
+    :param seed: Integer used for picking unknown classes from all the classes in the dataset
+    :param unkwn_nbr: number of unknown classes
+    :return: new annotation file names and trainval/test split
+    """
     split_path = annotaion_fn.split('/')
     split_path[-1] = split_path[-1].split('_')[:-1]
 
@@ -99,8 +106,6 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
     test_path[-1].append('test.json')
     test_path[-1] = '_'.join(test_path[-1])
     test_path = '/'.join(test_path)
-
-    print(trainval_path)
 
     try:
         with open(trainval_path) as json_file:
@@ -117,13 +122,12 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
     for data in trainval_annotations['categories']:
         class_names.append(data['name'])
 
-    seed %= scipy.special.comb(len(class_names),
-                               unkwn_nbr)  # normalizing seed as diffent unknown numbers can have a different amount of possible seeds
+    seed %= scipy.special.comb(len(class_names),unkwn_nbr)  # normalizing seed as diffent unknown numbers can have a different amount of possible seeds
     seed = int(seed)
 
     new_trainval_path = trainval_path.split('.')[:-1]
     new_trainval_path[-1] += '_' + str(unkwn_nbr) + '_' + str(seed)
-    new_trainval_path.append('json')
+    new_trainval_path.append('json')                                      #setting new annotation file names
     new_trainval_path = '.'.join(new_trainval_path)
 
     new_test_path = test_path.split('.')[:-1]
@@ -145,7 +149,7 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
 
         image_ids = {'trainval': [], 'test': []}
         for k in range(len(os_trainval_annotations['images'])):
-            annot = os_trainval_annotations['images'][k]
+            annot = os_trainval_annotations['images'][k]           #getting image ids for later proposal split
             image_ids['trainval'].append(annot['id'])
         for k in range(len(os_test_annotations['images'])):
             annot = os_test_annotations['images'][k]
@@ -154,8 +158,7 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
 
     else:
         print("Making Openset :")
-
-        unknw_class = get_unknown_classes(class_names, seed, unkwn_nbr)
+        unknw_class = get_unknown_classes(class_names, seed, unkwn_nbr) #getting unknown class names
 
         if unkwn_nbr > 1:
             print("{} unknown classes : ".format(unkwn_nbr), *unknw_class, sep = ", ")
@@ -192,7 +195,7 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
             if annot['category_id'] in unknw_ids and annot['image_id'] not in image_ids['test']:
                 image_ids['test'].append(annot['image_id'])
             elif annot['image_id'] not in image_ids['trainval'] and annot['image_id'] not in image_ids['test']:
-                image_ids['trainval'].append(annot['image_id'])
+                image_ids['trainval'].append(annot['image_id'])                   #spliting images based on annotations
 
         for k in range(len(test_annotations['annotations'])):
             annot = test_annotations['annotations'][k]
@@ -203,7 +206,7 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
         image_ids['trainval'] = list(np.unique(image_ids['trainval']))
 
         for id in image_ids['test']:
-            if id in image_ids['trainval']:
+            if id in image_ids['trainval']:                 #removing images from training set that belong in the test set as image may contain multiple objects
                 image_ids['trainval'].remove(id)
 
         for k in range(len(test_annotations['annotations'])):
@@ -242,22 +245,22 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
             else:
                 print("Unknown trainval annotion id")
 
-        image_ids = {'trainval': [], 'test': []}
-        for img in new_trainval_annotations['images']:
-            image_ids['trainval'].append(img['id'])
-
-        for img in new_test_annotations['images']:
-            image_ids['test'].append(img['id'])
-
         with open(new_test_path, 'w') as outfile:
             json.dump(new_test_annotations, outfile)
-            #writting annotaions to json
+            #writting annotations to json
         with open(new_trainval_path, 'w') as outfile:
             json.dump(new_trainval_annotations, outfile)
-    print(len(image_ids['trainval']), len(image_ids['test']))
     return file_names, image_ids
 
 def split_proposals(proposal_file, ids, seed, unkwn_nbr):
+    """
+    Splitting precalculated proposals based on an openset split
+    :param proposal_file: proposal file name
+    :param ids: ids split betweed trainval and test sets
+    :param seed: openset seed
+    :param unkwn_nbr: number of unknown classes
+    :return: new proposal file name
+    """
     proposal_path = proposal_file.split('/')
     proposal_path[-1] = proposal_path[-1].split('_')[:-1]
 
@@ -266,7 +269,7 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
     trainval_path[-1] = '_'.join(trainval_path[-1])
     trainval_path = '/'.join(trainval_path)
 
-    proposal_path[-1] = proposal_path[-1][:-1]
+    proposal_path[-1] = proposal_path[-1][:-1]                      #getting basic trainval and test proposal files
 
     test_path = proposal_path.copy()
     test_path[-1].append('test.pkl')
@@ -276,7 +279,7 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
     try:
         with open(trainval_path, 'rb') as f:
             trainval_proposals = pickle.load(f)
-
+                                                                    #loading basic proposal files
         with open(test_path, 'rb') as f:
             test_proposals = pickle.load(f)
 
@@ -287,7 +290,7 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
     new_trainval_path[-1] += '_' + str(unkwn_nbr) + '_' + str(seed)
     new_trainval_path.append('pkl')
     new_trainval_path = '.'.join(new_trainval_path)
-
+                                                                    #building path for new proposal files
     new_test_path = test_path.split('.')[:-1]
     new_test_path[-1] += '_' + str(unkwn_nbr) + '_' + str(seed)
     new_test_path.append('pkl')
@@ -298,7 +301,7 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
         print("Proposals already sorted")
         print(new_trainval_path)
         print(new_test_path)
-    else:
+    else:                                                          #checking openset proposal file already exist
         print("Splitting selective search proposals proposals")
         new_test_proposals = {}
         new_trainval_proposals = {}
@@ -316,7 +319,7 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
                     new_test_proposals[key].append(trainval_proposals[key][k])
             else:
                 print("Unknown proposal index : {}".format(trainval_proposals['indexes'][k]))
-
+                                                                                        #splitting proposals based on ids
         for k in range(len(test_proposals['indexes'])):
             if test_proposals['indexes'][k] in ids['test']:
                 for key in new_test_proposals.keys():
@@ -324,44 +327,11 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
             else:
                 print("Test proposal not found in openset split{}".format(test_proposals['indexes'][k]))
 
-        sorted_new_test_proposals = {}
-        sorted_new_trainval_proposals = {}
-
-        for k in trainval_proposals.keys():
-            sorted_new_test_proposals[k] = []
-            sorted_new_trainval_proposals[k] = []
-
-        for id in ids['test']:
-            k = 0
-            found = 0
-            while k < len(new_test_proposals['indexes']) and found == 0:
-                if new_test_proposals['indexes'][k] == id:
-                    for key in new_test_proposals.keys():
-                        sorted_new_test_proposals[key].append(new_test_proposals[key][k])
-                    found = 1
-                else:
-                    k += 1
-            if found == 0:
-                print("Test index not found")
-
-        for id in ids['trainval']:
-            k = 0
-            found = 0
-            while k < len(new_trainval_proposals['indexes']) and found == 0:
-                if new_trainval_proposals['indexes'][k] == id:
-                    for key in new_trainval_proposals.keys():
-                        sorted_new_trainval_proposals[key].append(new_trainval_proposals[key][k])
-                    found = 1
-                else:
-                    k += 1
-            if found == 0:
-                print("Training or validation index not found")
-
         with open(new_test_path, 'wb') as outfile:
-            pickle.dump(sorted_new_test_proposals, outfile)
+            pickle.dump(new_test_proposals, outfile)
             #writting proposals to pickle
         with open(new_trainval_path, 'wb') as outfile:
-            pickle.dump(sorted_new_trainval_proposals, outfile)
+            pickle.dump(new_trainval_proposals, outfile)
     return file_names
 
 def make_openset(set_dir, opensets_path, unkwn_nbr, seed):
