@@ -70,9 +70,9 @@ class JsonDataset(object):
         self.unkwn_nbr = unkwn_nbr
         self.mode = mode
         if self.seed != None and self.unkwn_nbr != None and self.mode != None:
-            ann_fn, split_ids = make_annotations(DATASETS[name][ANN_FN], seed, unkwn_nbr)[self.mode]
+            ann_fn, split_ids = make_annotations(DATASETS[name][ANN_FN], seed, unkwn_nbr)
             self.split_ids = split_ids
-            self.COCO = COCO(ann_fn)
+            self.COCO = COCO(ann_fn[self.mode])
         else:
             self.COCO = COCO(DATASETS[name][ANN_FN])
         self.debug_timer = Timer()
@@ -132,7 +132,10 @@ class JsonDataset(object):
             self._prep_roidb_entry(entry)
         if gt:
             # Include ground-truth object annotations
-            cache_filepath = os.path.join(self.cache_path, self.name+'_gt_roidb.pkl')
+            if self.seed != None and self.unkwn_nbr != None and self.mode != None:
+                cache_filepath = os.path.join(self.cache_path, self.name+'_gt_roidb_{}_{}.pkl'.format(self.unkwn_nbr, self.seed))
+            else:
+                cache_filepath = os.path.join(self.cache_path, self.name+'_gt_roidb.pkl')
             if os.path.exists(cache_filepath) and not cfg.DEBUG:
                 self.debug_timer.tic()
                 logger.info('Loading cached gt_roidb from %s', cache_filepath)
@@ -226,12 +229,15 @@ class JsonDataset(object):
         self, roidb, proposal_file, min_proposal_size, top_k, crowd_thresh
     ):
         """Add proposals from a proposals file to an roidb."""
+        print("proposal file name : ", proposal_file)
         logger.info('Loading proposals from: {}'.format(proposal_file))
         with open(proposal_file, 'rb') as f:
             proposals = pickle.load(f)
         id_field = 'indexes' if 'indexes' in proposals else 'ids'  # compat fix
         _sort_proposals(proposals, id_field)
         box_list = []
+        print(len([(a,b) for a,b in enumerate(roidb)]))
+        print(len(proposals[id_field]))
         for i, entry in enumerate(roidb):
             if i % 2500 == 0:
                 logger.info(' {:d}/{:d}'.format(i + 1, len(roidb)))
