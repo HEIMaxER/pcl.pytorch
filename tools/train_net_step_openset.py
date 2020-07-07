@@ -431,10 +431,10 @@ def main():
             training_stats.LogIterStats(step, lr)
 
             if (step+1) % CHECKPOINT_PERIOD == 0:
-                save_ckpt(output_dir, args, step, train_size, pcl, optimizer)
+                save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, args.seed)
         # ---- Training ends ----
         # Save last checkpoint
-        save_ckpt(output_dir, args, step, train_size, pcl, optimizer)
+        save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, args.seed)
 
     except (RuntimeError, KeyboardInterrupt):
         del dataiterator
