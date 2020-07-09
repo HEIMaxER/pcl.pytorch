@@ -5,6 +5,7 @@ import pprint
 import sys
 import time
 
+import _init_paths
 from datasets.json_dataset import JsonDataset
 from modeling import model_builder
 import nn as mynn
