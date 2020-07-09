@@ -83,7 +83,10 @@ def weibull_fit():
 
 def main():
     args = parse_args()
-
+    if args.cfg_file is not None:
+        merge_cfg_from_file(args.cfg_file)
+    if args.set_cfgs is not None:
+        merge_cfg_from_list(args.set_cfgs)
     print('Called with args:')
     print(args)
 
