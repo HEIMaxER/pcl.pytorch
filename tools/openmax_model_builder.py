@@ -8,6 +8,7 @@ import time
 import _init_paths
 from datasets.json_dataset import JsonDataset
 from modeling import model_builder
+from core.config import cfg, cfg_from_file, cfg_from_list, assert_and_infer_cfg
 import nn as mynn
 from utils.detectron_weight_helper import load_detectron_weight
 import utils.env as envu
@@ -89,6 +90,63 @@ def main():
         merge_cfg_from_list(args.set_cfgs)
     print('Called with args:')
     print(args)
+
+    if not torch.cuda.is_available():
+        sys.exit("Need a CUDA device to run the code.")
+
+    if args.cuda or cfg.NUM_GPUS > 0:
+        cfg.CUDA = True
+    else:
+        raise ValueError("Need Cuda device to run !")
+
+    if args.dataset == "coco2014":
+        cfg.TRAIN.DATASETS = ('coco_2014_train',)
+        cfg.MODEL.NUM_CLASSES = min(int(80 * (1 - args.openness)), 79)
+        unkwn_nbr = max(1, int(80 * args.openness))
+    elif args.dataset == "coco2017":
+        cfg.TRAIN.DATASETS = ('coco_2017_train',)
+        cfg.MODEL.NUM_CLASSES = min(int(80 * (1 - args.openness)), 79)
+        unkwn_nbr = max(1, int(80 * args.openness))
+    elif args.dataset == 'voc2007':
+        cfg.TRAIN.DATASETS = ('voc_2007_trainval',)
+        cfg.MODEL.NUM_CLASSES = min(int(20 * (1 - args.openness)), 19)
+        unkwn_nbr = max(1, int(20 * args.openness))
+    elif args.dataset == 'voc2012':
+        cfg.TRAIN.DATASETS = ('voc_2012_trainval',)
+        cfg.MODEL.NUM_CLASSES = min(int(20 * (1 - args.openness)), 19)
+        unkwn_nbr = max(1, int(20 * args.openness))
+    else:
+        raise ValueError("Unexpected args.dataset: {}".format(args.dataset))
+    print("Number of classes : ", cfg.MODEL.NUM_CLASSES)
+    cfg_from_file(args.cfg_file)
+    if args.set_cfgs is not None:
+        cfg_from_list(args.set_cfgs)
+
+    ### Adaptively adjust some configs ###
+    original_batch_size = cfg.NUM_GPUS * cfg.TRAIN.IMS_PER_BATCH
+    original_ims_per_batch = cfg.TRAIN.IMS_PER_BATCH
+    original_num_gpus = cfg.NUM_GPUS
+    if args.batch_size is None:
+        args.batch_size = original_batch_size
+    cfg.NUM_GPUS = torch.cuda.device_count()
+    assert (args.batch_size % cfg.NUM_GPUS) == 0, \
+        'batch_size: %d, NUM_GPUS: %d' % (args.batch_size, cfg.NUM_GPUS)
+    cfg.TRAIN.IMS_PER_BATCH = args.batch_size // cfg.NUM_GPUS
+    effective_batch_size = args.iter_size * args.batch_size
+    print('effective_batch_size = batch_size * iter_size = %d * %d' % (args.batch_size, args.iter_size))
+
+    print('Adaptive config changes:')
+    print('    effective_batch_size: %d --> %d' % (original_batch_size, effective_batch_size))
+    print('    NUM_GPUS:             %d --> %d' % (original_num_gpus, cfg.NUM_GPUS))
+    print('    IMS_PER_BATCH:        %d --> %d' % (original_ims_per_batch, cfg.TRAIN.IMS_PER_BATCH))
+
+    ### Adjust learning based on batch size change linearly
+    # For iter_size > 1, gradients are `accumulated`, so lr is scaled based
+    # on batch_size instead of effective_batch_size
+    old_base_lr = cfg.SOLVER.BASE_LR
+    cfg.SOLVER.BASE_LR *= args.batch_size / original_batch_size
+    print('Adjust BASE_LR linearly according to batch_size change:\n'
+          '    BASE_LR: {} --> {}'.format(old_base_lr, cfg.SOLVER.BASE_LR))
 
     model = model_builder.Generalized_RCNN()
     model.eval()
