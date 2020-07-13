@@ -35,7 +35,7 @@ def parse_args():
     """Parse in command line arguments"""
     parser = argparse.ArgumentParser(description='Test a Fast R-CNN network')
     parser.add_argument(
-        '--dataset',
+        '--dataset', dest='dataset', required=True,
         help='training dataset')
     parser.add_argument(
         '--cfg', dest='cfg_file', required=True,
