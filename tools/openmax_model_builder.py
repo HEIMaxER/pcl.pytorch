@@ -91,6 +91,15 @@ def main():
         merge_cfg_from_list(args.set_cfgs)
     print('Called with args:')
     print(args)
+    ds_info = args.dataset.split('.')
+    ds_info[0] = ds_info[0].split("_")
+    seed = ds_info[0][-1]
+    unkwn_nbr = int(ds_info[0][-2])
+    ds_name = ''.join(ds_info[0][0:2])
+
+    model_name = args.load_ckpt.split('/')[-1]
+    if seed not in model_name.split('_') or str(unkwn_nbr) not in model_name.split('_'):
+        raise ValueError("Open dataset and model don't match.")
 
     if not torch.cuda.is_available():
         sys.exit("Need a CUDA device to run the code.")
@@ -100,22 +109,18 @@ def main():
     else:
         raise ValueError("Need Cuda device to run !")
 
-    if args.dataset == "coco2014":
+    if ds_name == "coco2014":
         cfg.TRAIN.DATASETS = ('coco_2014_train',)
-        cfg.MODEL.NUM_CLASSES = min(int(80 * (1 - args.openness)), 79)
-        unkwn_nbr = max(1, int(80 * args.openness))
-    elif args.dataset == "coco2017":
+        cfg.MODEL.NUM_CLASSES = 80 - unkwn_nbr + 1
+    elif ds_name == "coco2017":
         cfg.TRAIN.DATASETS = ('coco_2017_train',)
-        cfg.MODEL.NUM_CLASSES = min(int(80 * (1 - args.openness)), 79)
-        unkwn_nbr = max(1, int(80 * args.openness))
-    elif args.dataset == 'voc2007':
+        cfg.MODEL.NUM_CLASSES = 80 - unkwn_nbr + 1
+    elif ds_name == 'voc2007':
         cfg.TRAIN.DATASETS = ('voc_2007_trainval',)
-        cfg.MODEL.NUM_CLASSES = min(int(20 * (1 - args.openness)), 19)
-        unkwn_nbr = max(1, int(20 * args.openness))
-    elif args.dataset == 'voc2012':
+        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr + 1
+    elif ds_name == 'voc2012':
         cfg.TRAIN.DATASETS = ('voc_2012_trainval',)
-        cfg.MODEL.NUM_CLASSES = min(int(20 * (1 - args.openness)), 19)
-        unkwn_nbr = max(1, int(20 * args.openness))
+        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr + 1
     else:
         raise ValueError("Unexpected args.dataset: {}".format(args.dataset))
     print("Number of classes : ", cfg.MODEL.NUM_CLASSES)
