@@ -40,7 +40,8 @@ def parse_args():
     parser.add_argument(
         '--cfg', dest='cfg_file', required=True,
         help='optional config file')
-
+    parser.add_argument(
+        '--no_cuda', dest='cuda', help='Do not use CUDA device', action='store_false')
     parser.add_argument(
         '--load_ckpt', help='path of checkpoint to load')
     parser.add_argument(
