@@ -144,7 +144,7 @@ def main():
         net_utils.load_ckpt(model, checkpoint['model'])
         mapping, _ = model.detectron_weight_mapping
         print(mapping)
-        print('_')
+        print(_)
 
 
 if __name__ == '__main__':
