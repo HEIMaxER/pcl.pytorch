@@ -111,18 +111,19 @@ def main():
 
     if ds_name == "coco2014":
         cfg.TRAIN.DATASETS = ('coco_2014_train',)
-        cfg.MODEL.NUM_CLASSES = 80 - unkwn_nbr + 1
+        cfg.MODEL.NUM_CLASSES = 80 - unkwn_nbr
     elif ds_name == "coco2017":
         cfg.TRAIN.DATASETS = ('coco_2017_train',)
-        cfg.MODEL.NUM_CLASSES = 80 - unkwn_nbr + 1
+        cfg.MODEL.NUM_CLASSES = 80 - unkwn_nbr
     elif ds_name == 'voc2007':
         cfg.TRAIN.DATASETS = ('voc_2007_trainval',)
-        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr + 1
+        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr
     elif ds_name == 'voc2012':
         cfg.TRAIN.DATASETS = ('voc_2012_trainval',)
-        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr + 1
+        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr
     else:
         raise ValueError("Unexpected args.dataset: {}".format(args.dataset))
+    cfg.MODEL.NUM_CLASSES_OPEN = cfg.MODEL.NUM_CLASSES + 1
     print("Number of classes : ", cfg.MODEL.NUM_CLASSES)
     cfg_from_file(args.cfg_file)
     if args.set_cfgs is not None:
