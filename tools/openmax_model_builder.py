@@ -143,7 +143,7 @@ def main():
         checkpoint = torch.load(load_name, map_location=lambda storage, loc: storage)
         net_utils.load_ckpt(model, checkpoint['model'])
         mapping, _ = model.detectron_weight_mapping
-        print("mapping")
+        print(mapping)
 
 
 if __name__ == '__main__':
