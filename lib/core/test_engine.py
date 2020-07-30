@@ -407,7 +407,7 @@ def get_roidb_and_dataset(dataset_name, proposal_file, ind_range, seed=None, unk
     """Get the roidb for the dataset specified in the global cfg. Optionally
     restrict it to a range of indices if ind_range is a pair of integers.
     """
-    print(dataset_name, proposal_file)
+    print(dataset_name, proposal_file, seed, unkwn_nbr, mode)
     dataset = JsonDataset(dataset_name, seed, unkwn_nbr, mode)
     if cfg.TEST.PRECOMPUTED_PROPOSALS:
         assert proposal_file, 'No proposal file given'

@@ -72,6 +72,7 @@ class JsonDataset(object):
         if self.seed != None and self.unkwn_nbr != None and self.mode != None:
             ann_fn, split_ids = make_annotations(DATASETS[name][ANN_FN], seed, unkwn_nbr)
             self.split_ids = split_ids
+            print(ann_fn[self.mode])
             self.COCO = COCO(ann_fn[self.mode])
         else:
             self.COCO = COCO(DATASETS[name][ANN_FN])
