@@ -102,6 +102,8 @@ if __name__ == '__main__':
     if args.set_cfgs is not None:
         merge_cfg_from_list(args.set_cfgs)
 
+    print(unkwn_nbr, seed, ds_name, ds_name)
+
     if ds_name == "coco2014":
         cfg.TEST.DATASETS = ('coco_2014_val',)
         cfg.MODEL.NUM_CLASSES = 80 - unkwn_nbr
@@ -124,7 +126,6 @@ if __name__ == '__main__':
         assert cfg.TEST.DATASETS, 'cfg.TEST.DATASETS shouldn\'t be empty'
     assert_and_infer_cfg()
 
-    print(unkwn_nbr, seed, ds_name, cfg.TEST.DATASETS)
 
     logger.info('Testing with config:')
     logger.info(pprint.pformat(cfg))
