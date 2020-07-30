@@ -103,7 +103,7 @@ if __name__ == '__main__':
     if args.set_cfgs is not None:
         merge_cfg_from_list(args.set_cfgs)
 
-    print(unkwn_nbr, seed)
+    print(unkwn_nbr, seed, mode)
 
     if ds_name == "coco2014":
         cfg.TEST.DATASETS = ('coco_2014_val',)
