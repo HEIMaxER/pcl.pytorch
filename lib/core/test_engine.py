@@ -313,7 +313,7 @@ def test_net(
     )
     model = initialize_model_from_cfg(args, gpu_id=gpu_id)
     num_images = len(roidb)
-    num_classes = cfg.MODEL.NUM_CLASSES
+    num_classes = cfg.MODEL.NUM_CLASSES+1
     all_boxes = {}
     timers = defaultdict(Timer)
     for i, entry in enumerate(roidb):
