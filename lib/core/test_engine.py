@@ -95,7 +95,7 @@ def get_inference_open_dataset(index, is_parent=True, unkwn_nbr = None, seed = N
             'each dataset'
         if not (dataset_name + '.pkl') in cfg.TEST.PROPOSAL_FILES[index]:
             proposal_file = os.path.join(cfg.TEST.PROPOSAL_FILES[index],
-                                         dataset_name + '.pkl')
+                                         dataset_name + '_' + unkwn_nbr + '_' +seed + '.pkl')
         else:
             proposal_file = cfg.TEST.PROPOSAL_FILES[index]
     else:
@@ -107,11 +107,11 @@ def run_threhold_inference(
         args, ind_range=None,
         multi_gpu_testing=False, gpu_id=0,
         check_expected_results=False,
-        unkwn_nbr = None, seed = None):
+        unkwn_nbr=None, seed=None, mode=None):
     parent_func, child_func = get_eval_functions()
     is_parent = ind_range is None
 
-    def result_getter(unkwn_nbr = None, seed = None):
+    def result_getter(unkwn_nbr=None, seed=None, mode=None):
         if is_parent:
             # Parent case:
             # In this case we're either running inference on the entire dataset in a
@@ -126,6 +126,7 @@ def run_threhold_inference(
                     dataset_name,
                     proposal_file,
                     output_dir,
+                    seed, unkwn_nbr, mode,
                     multi_gpu=multi_gpu_testing
                 )
                 all_results.update(results)
@@ -142,11 +143,12 @@ def run_threhold_inference(
                 dataset_name,
                 proposal_file,
                 output_dir,
+                seed, unkwn_nbr, mode,
                 ind_range=ind_range,
                 gpu_id=gpu_id
             )
 
-    all_results = result_getter()
+    all_results = result_getter(unkwn_nbr, seed, mode)
     if check_expected_results and is_parent:
         task_evaluation.check_expected_results(
             all_results,
@@ -216,10 +218,11 @@ def test_net_on_dataset(
         dataset_name,
         proposal_file,
         output_dir,
+        seed=None, unkwn_nbr=None, mode=None,
         multi_gpu=False,
         gpu_id=0):
     """Run inference on a dataset."""
-    dataset = JsonDataset(dataset_name)
+    dataset = JsonDataset(dataset_name, seed, unkwn_nbr, mode)
     test_timer = Timer()
     test_timer.tic()
     if multi_gpu:

@@ -76,6 +76,7 @@ if __name__ == '__main__':
     ds_info[0] = ds_info[0].split("_")
     seed = ds_info[0][-1]
     unkwn_nbr = int(ds_info[0][-2])
+    mode = ds_info[0][3]
     ds_name = ''.join(ds_info[0][0:3])
 
     model_name = args.load_ckpt.split('/')[-1]
@@ -102,7 +103,7 @@ if __name__ == '__main__':
     if args.set_cfgs is not None:
         merge_cfg_from_list(args.set_cfgs)
 
-    print(unkwn_nbr, seed, ds_name, ds_name)
+    print(unkwn_nbr, seed)
 
     if ds_name == "coco2014":
         cfg.TEST.DATASETS = ('coco_2014_val',)
@@ -149,4 +150,5 @@ if __name__ == '__main__':
         multi_gpu_testing=args.multi_gpu_testing,
         check_expected_results=True,
         unkwn_nbr = unkwn_nbr,
-        seed = seed)
+        seed = seed,
+        mode = mode)
