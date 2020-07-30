@@ -76,7 +76,7 @@ if __name__ == '__main__':
     ds_info[0] = ds_info[0].split("_")
     seed = ds_info[0][-1]
     unkwn_nbr = int(ds_info[0][-2])
-    ds_name = '_'.join(ds_info[0][0:2])
+    ds_name = '_'.join(ds_info[0][0:3])
 
     model_name = args.load_ckpt.split('/')[-1]
     if seed not in model_name.split('_') or str(unkwn_nbr) not in model_name.split('_'):
