@@ -102,7 +102,7 @@ def im_detect_bbox(model, im, target_scale, target_max_size, boxes=None):
         inputs['data'] = [torch.from_numpy(inputs['data'])]
         inputs['rois'] = [torch.from_numpy(inputs['rois'])]
         inputs['labels'] = [torch.from_numpy(inputs['labels'])]
-
+    print(inputs)
     return_dict = model(**inputs)
 
     # cls prob (activations after softmax)

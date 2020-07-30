@@ -237,7 +237,7 @@ class JsonDataset(object):
         id_field = 'indexes' if 'indexes' in proposals else 'ids'  # compat fix
         _sort_proposals(proposals, id_field)
         box_list = []
-        print(len([(a,b) for a,b in enumerate(roidb)]))
+        #print(len([(a,b) for a,b in enumerate(roidb)])) prints length of ROIdb and proposal files to spot if there hase been something wrong with proposal splitting for openset
         #print(len(proposals[id_field]))
         for i, entry in enumerate(roidb):
             if i % 2500 == 0:

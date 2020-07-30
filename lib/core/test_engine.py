@@ -330,9 +330,9 @@ def test_net(
             # Faster R-CNN type models generate proposals on-the-fly with an
             # in-network RPN; 1-stage models don't require proposals.
             box_proposals = None
-        print('entry', entry)
-        print('image', entry['image'])
-        print('boxes', entry['boxes'])
+        # print('entry', entry)
+        # print('image', entry['image'])
+        # print('boxes', entry['boxes'])
         im = cv2.imread(entry['image'])
         cls_boxes_i = im_detect_all(model, im, box_proposals, timers)
 
