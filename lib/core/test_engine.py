@@ -94,7 +94,6 @@ def get_inference_open_dataset(index, is_parent=True, unkwn_nbr = None, seed = N
             'If proposals are used, one proposal file must be specified for ' \
             'each dataset'
         if not (dataset_name + '.pkl') in cfg.TEST.PROPOSAL_FILES[index]:
-            print(dataset_name, unkwn_nbr, seed)
             proposal_file = os.path.join(cfg.TEST.PROPOSAL_FILES[index],
                                          dataset_name + '_' + str(unkwn_nbr) + '_' + str(seed)+ '.pkl')
         else:
@@ -113,13 +112,13 @@ def run_threhold_inference(
     is_parent = ind_range is None
 
     def result_getter(unkwn_nbr=None, seed=None, mode=None):
-        print('rti_rg', seed, unkwn_nbr, mode)
         if is_parent:
             # Parent case:
             # In this case we're either running inference on the entire dataset in a
             # single process or (if multi_gpu_testing is True) using this process to
             # launch subprocesses that each run inference on a range of the dataset
             all_results = {}
+            print("parent")
             for i in range(len(cfg.TEST.DATASETS)):
                 dataset_name, proposal_file = get_inference_open_dataset(i, True, unkwn_nbr, seed)
                 output_dir = args.output_dir
@@ -135,6 +134,7 @@ def run_threhold_inference(
 
             return all_results
         else:
+            print("child")
             # Subprocess child case:
             # In this case test_net was called via subprocess.Popen to execute on a
             # range of inputs on a single dataset
@@ -237,7 +237,6 @@ def test_net_on_dataset(
         )
     test_timer.toc()
     logger.info('Total inference time: {:.3f}s'.format(test_timer.average_time))
-    print("oui")
     roidb = dataset.get_roidb()
     num_images = len(roidb)
     num_classes = cfg.MODEL.NUM_CLASSES + 1
