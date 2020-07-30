@@ -121,7 +121,6 @@ def run_threhold_inference(
             for i in range(len(cfg.TEST.DATASETS)):
                 dataset_name, proposal_file = get_inference_open_dataset(i, True, unkwn_nbr, seed)
                 output_dir = args.output_dir
-                print("oui parent", str(parent_func))
                 results = parent_func(
                     args,
                     dataset_name,
@@ -233,7 +232,7 @@ def test_net_on_dataset(
         )
     else:
         all_boxes = test_net(
-            args, dataset_name, proposal_file, output_dir, gpu_id=gpu_id
+            args, dataset_name, proposal_file, output_dir, seed, unkwn_nbr, mode, gpu_id=gpu_id
         )
     test_timer.toc()
     logger.info('Total inference time: {:.3f}s'.format(test_timer.average_time))
