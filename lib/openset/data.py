@@ -287,7 +287,7 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
         trainval_path = '/'.join(trainval_path)
 
         test_path = proposal_path.copy()
-        test_path[-1][2] = 'trainval'
+        test_path[-1][2] = 'test'
         test_path[-1] = '_'.join(test_path[-1])
         test_path = '/'.join(test_path)
         try:
