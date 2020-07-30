@@ -136,7 +136,7 @@ def run_threhold_inference(
             # Subprocess child case:
             # In this case test_net was called via subprocess.Popen to execute on a
             # range of inputs on a single dataset
-            dataset_name, proposal_file = get_inference_open_dataset(0, unkwn_nbr, seed, is_parent=False)
+            dataset_name, proposal_file = get_inference_open_dataset(0, False, unkwn_nbr, seed)
             output_dir = args.output_dir
             return child_func(
                 args,
@@ -147,7 +147,7 @@ def run_threhold_inference(
                 ind_range=ind_range,
                 gpu_id=gpu_id
             )
-
+    print(unkwn_nbr, seed, mode)
     all_results = result_getter(unkwn_nbr, seed, mode)
     if check_expected_results and is_parent:
         task_evaluation.check_expected_results(
