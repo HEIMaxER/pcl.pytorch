@@ -278,6 +278,7 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
         test_path = '/'.join(test_path)
 
     else:
+        print("Proposals already split")
         proposal_path = proposal_file.split('/')
         proposal_path[-1] = proposal_path[-1].split('_')
 
@@ -290,7 +291,8 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
         test_path[-1][2] = 'trainval'
         test_path[-1] = '_'.join(test_path[-1])
         test_path = '/'.join(test_path)
-    print(test_path, trainval_path)
+        file_names = {'trainval': trainval_path, 'test': test_path}
+        return file_names
 
     try:
         with open(trainval_path, 'rb') as f:
@@ -313,7 +315,6 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
     new_test_path = '.'.join(new_test_path)
     file_names = {'trainval': new_trainval_path, 'test': new_test_path}
 
-    print(new_test_path, new_trainval_path)
 
     if os.path.exists(new_test_path) and os.path.exists(new_trainval_path):
         print("Proposals already sorted")
