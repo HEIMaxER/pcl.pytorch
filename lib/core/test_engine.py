@@ -118,10 +118,10 @@ def run_threhold_inference(
             # single process or (if multi_gpu_testing is True) using this process to
             # launch subprocesses that each run inference on a range of the dataset
             all_results = {}
-            print("parent")
             for i in range(len(cfg.TEST.DATASETS)):
                 dataset_name, proposal_file = get_inference_open_dataset(i, True, unkwn_nbr, seed)
                 output_dir = args.output_dir
+                print("oui parent", str(parent_func))
                 results = parent_func(
                     args,
                     dataset_name,
@@ -134,7 +134,6 @@ def run_threhold_inference(
 
             return all_results
         else:
-            print("child")
             # Subprocess child case:
             # In this case test_net was called via subprocess.Popen to execute on a
             # range of inputs on a single dataset
@@ -223,6 +222,7 @@ def test_net_on_dataset(
         multi_gpu=False,
         gpu_id=0):
     """Run inference on a dataset."""
+    print('tnod', seed, unkwn_nbr, mode)
     dataset = JsonDataset(dataset_name, seed, unkwn_nbr, mode)
     test_timer = Timer()
     test_timer.tic()
