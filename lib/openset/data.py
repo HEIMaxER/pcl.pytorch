@@ -276,6 +276,8 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
     test_path[-1] = '_'.join(test_path[-1])
     test_path = '/'.join(test_path)
 
+    print(test_path, trainval_path)
+
     try:
         with open(trainval_path, 'rb') as f:
             trainval_proposals = pickle.load(f)
@@ -296,6 +298,8 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
     new_test_path.append('pkl')
     new_test_path = '.'.join(new_test_path)
     file_names = {'trainval': new_trainval_path, 'test': new_test_path}
+
+    print(new_test_path, new_trainval_path)
 
     if os.path.exists(new_test_path) and os.path.exists(new_trainval_path):
         print("Proposals already sorted")

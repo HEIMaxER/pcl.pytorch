@@ -221,7 +221,6 @@ def test_net_on_dataset(
         multi_gpu=False,
         gpu_id=0):
     """Run inference on a dataset."""
-    print('tnod', seed, unkwn_nbr, mode)
     dataset = JsonDataset(dataset_name, seed, unkwn_nbr, mode)
     test_timer = Timer()
     test_timer.tic()
@@ -309,7 +308,6 @@ def test_net(
     """Run inference on all images in a dataset or over an index range of images
     in a dataset using a single GPU.
     """
-    print('tn', dataset_name, proposal_file, seed, unkwn_nbr, mode)
     roidb, dataset, start_ind, end_ind, total_num_images = get_roidb_and_dataset(
         dataset_name, proposal_file, ind_range, seed, unkwn_nbr, mode
     )
@@ -406,7 +404,6 @@ def get_roidb_and_dataset(dataset_name, proposal_file, ind_range, seed=None, unk
     """Get the roidb for the dataset specified in the global cfg. Optionally
     restrict it to a range of indices if ind_range is a pair of integers.
     """
-    print('grad', dataset_name, proposal_file, seed, unkwn_nbr, mode)
     dataset = JsonDataset(dataset_name, seed, unkwn_nbr, mode)
     if cfg.TEST.PRECOMPUTED_PROPOSALS:
         assert proposal_file, 'No proposal file given'
