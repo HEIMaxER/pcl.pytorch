@@ -76,7 +76,7 @@ if __name__ == '__main__':
     ds_info[0] = ds_info[0].split("_")
     seed = ds_info[0][-1]
     unkwn_nbr = int(ds_info[0][-2])
-    mode = ds_info[0][3]
+    mode = ds_info[0][2]
     ds_name = ''.join(ds_info[0][0:3])
 
     model_name = args.load_ckpt.split('/')[-1]

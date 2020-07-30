@@ -94,8 +94,9 @@ def get_inference_open_dataset(index, is_parent=True, unkwn_nbr = None, seed = N
             'If proposals are used, one proposal file must be specified for ' \
             'each dataset'
         if not (dataset_name + '.pkl') in cfg.TEST.PROPOSAL_FILES[index]:
+            print(dataset_name, unkwn_nbr, seed)
             proposal_file = os.path.join(cfg.TEST.PROPOSAL_FILES[index],
-                                         dataset_name + '_' + unkwn_nbr + '_' +seed + '.pkl')
+                                         dataset_name + '_' + unkwn_nbr + '_' + seed + '.pkl')
         else:
             proposal_file = cfg.TEST.PROPOSAL_FILES[index]
     else:
