@@ -139,12 +139,13 @@ def run_threhold_inference(
             # range of inputs on a single dataset
             dataset_name, proposal_file = get_inference_open_dataset(0, False, unkwn_nbr, seed)
             output_dir = args.output_dir
+            print('rti', seed, unkwn_nbr, mode)
             return child_func(
                 args,
                 dataset_name,
                 proposal_file,
                 output_dir,
-                seed, unkwn_nbr, mode,
+                seed=seed, unkwn_nbr=unkwn_nbr, mode=mode,
                 ind_range=ind_range,
                 gpu_id=gpu_id
             )
