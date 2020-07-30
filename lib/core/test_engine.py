@@ -120,7 +120,7 @@ def run_threhold_inference(
             # launch subprocesses that each run inference on a range of the dataset
             all_results = {}
             for i in range(len(cfg.TEST.DATASETS)):
-                dataset_name, proposal_file = get_inference_open_dataset(i, unkwn_nbr, seed)
+                dataset_name, proposal_file = get_inference_open_dataset(i, True, unkwn_nbr, seed)
                 output_dir = args.output_dir
                 results = parent_func(
                     args,
