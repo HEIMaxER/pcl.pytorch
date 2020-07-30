@@ -232,7 +232,7 @@ def test_net_on_dataset(
         )
     else:
         all_boxes = test_net(
-            args, dataset_name, proposal_file, output_dir, seed, unkwn_nbr, mode, gpu_id=gpu_id
+            args, dataset_name, proposal_file, output_dir, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, gpu_id=gpu_id
         )
     test_timer.toc()
     logger.info('Total inference time: {:.3f}s'.format(test_timer.average_time))
