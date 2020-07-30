@@ -81,14 +81,37 @@ def get_inference_dataset(index, is_parent=True):
 
     return dataset_name, proposal_file
 
+def get_inference_open_dataset(index, is_parent=True, unkwn_nbr = None, seed = None):
+    assert is_parent or len(cfg.TEST.DATASETS) == 1, \
+        'The child inference process can only work on a single dataset'
+
+    dataset_name = cfg.TEST.DATASETS[index]
+
+    if cfg.TEST.PRECOMPUTED_PROPOSALS:
+        assert is_parent or len(cfg.TEST.PROPOSAL_FILES) == 1, \
+            'The child inference process can only work on a single proposal file'
+        assert len(cfg.TEST.PROPOSAL_FILES) == len(cfg.TEST.DATASETS), \
+            'If proposals are used, one proposal file must be specified for ' \
+            'each dataset'
+        if not (dataset_name + '.pkl') in cfg.TEST.PROPOSAL_FILES[index]:
+            proposal_file = os.path.join(cfg.TEST.PROPOSAL_FILES[index],
+                                         dataset_name + '.pkl')
+        else:
+            proposal_file = cfg.TEST.PROPOSAL_FILES[index]
+    else:
+        proposal_file = None
+
+    return dataset_name, proposal_file
+
 def run_threhold_inference(
         args, ind_range=None,
         multi_gpu_testing=False, gpu_id=0,
-        check_expected_results=False):
+        check_expected_results=False,
+        unkwn_nbr = None, seed = None):
     parent_func, child_func = get_eval_functions()
     is_parent = ind_range is None
 
-    def result_getter():
+    def result_getter(unkwn_nbr = None, seed = None):
         if is_parent:
             # Parent case:
             # In this case we're either running inference on the entire dataset in a
@@ -96,7 +119,7 @@ def run_threhold_inference(
             # launch subprocesses that each run inference on a range of the dataset
             all_results = {}
             for i in range(len(cfg.TEST.DATASETS)):
-                dataset_name, proposal_file = get_inference_dataset(i)
+                dataset_name, proposal_file = get_inference_open_dataset(i, unkwn_nbr, seed)
                 output_dir = args.output_dir
                 results = parent_func(
                     args,
@@ -112,7 +135,7 @@ def run_threhold_inference(
             # Subprocess child case:
             # In this case test_net was called via subprocess.Popen to execute on a
             # range of inputs on a single dataset
-            dataset_name, proposal_file = get_inference_dataset(0, is_parent=False)
+            dataset_name, proposal_file = get_inference_open_dataset(0, is_parent=False, unkwn_nbr, seed)
             output_dir = args.output_dir
             return child_func(
                 args,

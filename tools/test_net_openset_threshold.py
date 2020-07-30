@@ -124,6 +124,8 @@ if __name__ == '__main__':
         assert cfg.TEST.DATASETS, 'cfg.TEST.DATASETS shouldn\'t be empty'
     assert_and_infer_cfg()
 
+    print(unkwn_nbr, seed, ds_name, cfg.TEST.DATASETS)
+
     logger.info('Testing with config:')
     logger.info(pprint.pformat(cfg))
 
@@ -144,5 +146,6 @@ if __name__ == '__main__':
     run_threhold_inference(args,
         ind_range=args.range,
         multi_gpu_testing=args.multi_gpu_testing,
-        check_expected_results=True)
-
+        check_expected_results=True,
+        unkwn_nbr = unkwn_nbr,
+        seed = seed)
