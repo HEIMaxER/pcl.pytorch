@@ -278,7 +278,6 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
         test_path = '/'.join(test_path)
 
     else:
-        print("Proposals already split")
         proposal_path = proposal_file.split('/')
         proposal_path[-1] = proposal_path[-1].split('_')
 
@@ -291,8 +290,18 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
         test_path[-1][2] = 'trainval'
         test_path[-1] = '_'.join(test_path[-1])
         test_path = '/'.join(test_path)
-        file_names = {'trainval': trainval_path, 'test': test_path}
-        return file_names
+        try:
+            with open(trainval_path, 'rb') as f:
+                trainval_proposals = pickle.load(f)
+                # loading basic proposal files
+            with open(test_path, 'rb') as f:
+                test_proposals = pickle.load(f)
+            print("Proposals already split")
+
+            file_names = {'trainval': trainval_path, 'test': test_path}
+            return file_names
+        except:
+            print("Refenced dataset doesn't have split proposal files") #TODO try to get original proposal file name to resplit it
 
     try:
         with open(trainval_path, 'rb') as f:
