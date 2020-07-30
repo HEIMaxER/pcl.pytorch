@@ -135,7 +135,7 @@ def run_threhold_inference(
             # Subprocess child case:
             # In this case test_net was called via subprocess.Popen to execute on a
             # range of inputs on a single dataset
-            dataset_name, proposal_file = get_inference_open_dataset(0, is_parent=False, unkwn_nbr, seed)
+            dataset_name, proposal_file = get_inference_open_dataset(0, unkwn_nbr, seed, is_parent=False)
             output_dir = args.output_dir
             return child_func(
                 args,
