@@ -149,6 +149,6 @@ if __name__ == '__main__':
         ind_range=args.range,
         multi_gpu_testing=args.multi_gpu_testing,
         check_expected_results=True,
-        unkwn_nbr = unkwn_nbr,
-        seed = seed,
-        mode = mode)
+        unkwn_nbr=unkwn_nbr,
+        seed=seed,
+        mode=mode)

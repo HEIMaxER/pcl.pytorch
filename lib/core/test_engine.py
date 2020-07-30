@@ -113,6 +113,7 @@ def run_threhold_inference(
     is_parent = ind_range is None
 
     def result_getter(unkwn_nbr=None, seed=None, mode=None):
+        print('rti_rg', seed, unkwn_nbr, mode)
         if is_parent:
             # Parent case:
             # In this case we're either running inference on the entire dataset in a
@@ -127,7 +128,7 @@ def run_threhold_inference(
                     dataset_name,
                     proposal_file,
                     output_dir,
-                    seed, unkwn_nbr, mode,
+                    seed=seed, unkwn_nbr=unkwn_nbr, mode=mode,
                     multi_gpu=multi_gpu_testing
                 )
                 all_results.update(results)
@@ -139,7 +140,6 @@ def run_threhold_inference(
             # range of inputs on a single dataset
             dataset_name, proposal_file = get_inference_open_dataset(0, False, unkwn_nbr, seed)
             output_dir = args.output_dir
-            print('rti', seed, unkwn_nbr, mode)
             return child_func(
                 args,
                 dataset_name,
@@ -237,7 +237,7 @@ def test_net_on_dataset(
         )
     test_timer.toc()
     logger.info('Total inference time: {:.3f}s'.format(test_timer.average_time))
-
+    print("oui")
     roidb = dataset.get_roidb()
     num_images = len(roidb)
     num_classes = cfg.MODEL.NUM_CLASSES + 1
