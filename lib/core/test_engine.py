@@ -148,7 +148,6 @@ def run_threhold_inference(
                 ind_range=ind_range,
                 gpu_id=gpu_id
             )
-    print(unkwn_nbr, seed, mode)
     all_results = result_getter(unkwn_nbr, seed, mode)
     if check_expected_results and is_parent:
         task_evaluation.check_expected_results(
@@ -306,13 +305,14 @@ def test_net(
         proposal_file,
         output_dir,
         ind_range=None,
+        seed=None, unkwn_nbr=None, mode=None,
         gpu_id=0):
     """Run inference on all images in a dataset or over an index range of images
     in a dataset using a single GPU.
     """
 
     roidb, dataset, start_ind, end_ind, total_num_images = get_roidb_and_dataset(
-        dataset_name, proposal_file, ind_range
+        dataset_name, proposal_file, ind_range, seed, unkwn_nbr, mode
     )
     model = initialize_model_from_cfg(args, gpu_id=gpu_id)
     num_images = len(roidb)
@@ -403,11 +403,11 @@ def initialize_model_from_cfg(args, gpu_id=0):
     return model
 
 
-def get_roidb_and_dataset(dataset_name, proposal_file, ind_range):
+def get_roidb_and_dataset(dataset_name, proposal_file, ind_range, seed=None, unkwn_nbr=None, mode=None):
     """Get the roidb for the dataset specified in the global cfg. Optionally
     restrict it to a range of indices if ind_range is a pair of integers.
     """
-    dataset = JsonDataset(dataset_name)
+    dataset = JsonDataset(dataset_name, seed, unkwn_nbr, mode)
     if cfg.TEST.PRECOMPUTED_PROPOSALS:
         assert proposal_file, 'No proposal file given'
         roidb = dataset.get_roidb(
