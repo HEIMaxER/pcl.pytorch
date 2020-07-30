@@ -261,21 +261,35 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
     :param unkwn_nbr: number of unknown classes
     :return: new proposal file name
     """
-    proposal_path = proposal_file.split('/')
-    proposal_path[-1] = proposal_path[-1].split('_')[:-1]
+    if seed not in proposal_file and unkwn_nbr not in proposal_file:
+        proposal_path = proposal_file.split('/')
+        proposal_path[-1] = proposal_path[-1].split('_')[:-1]
 
-    trainval_path = proposal_path.copy()
-    trainval_path[-1].append('trainval.pkl')
-    trainval_path[-1] = '_'.join(trainval_path[-1])
-    trainval_path = '/'.join(trainval_path)
+        trainval_path = proposal_path.copy()
+        trainval_path[-1].append('trainval.pkl')
+        trainval_path[-1] = '_'.join(trainval_path[-1])
+        trainval_path = '/'.join(trainval_path)
 
-    proposal_path[-1] = proposal_path[-1][:-1]                      #getting basic trainval and test proposal files
+        proposal_path[-1] = proposal_path[-1][:-1]                      #getting basic trainval and test proposal files
 
-    test_path = proposal_path.copy()
-    test_path[-1].append('test.pkl')
-    test_path[-1] = '_'.join(test_path[-1])
-    test_path = '/'.join(test_path)
+        test_path = proposal_path.copy()
+        test_path[-1].append('test.pkl')
+        test_path[-1] = '_'.join(test_path[-1])
+        test_path = '/'.join(test_path)
 
+    else:
+        proposal_path = proposal_file.split('/')
+        proposal_path[-1] = proposal_path[-1].split('_')
+
+        trainval_path = proposal_path.copy()
+        trainval_path[-1][2] = 'trainval'
+        trainval_path[-1] = '_'.join(trainval_path[-1])
+        trainval_path = '/'.join(trainval_path)
+
+        test_path = proposal_path.copy()
+        test_path[-1][2] = 'trainval'
+        test_path[-1] = '_'.join(test_path[-1])
+        test_path = '/'.join(test_path)
     print(test_path, trainval_path)
 
     try:
