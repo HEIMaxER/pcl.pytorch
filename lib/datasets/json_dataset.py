@@ -161,6 +161,7 @@ class JsonDataset(object):
             # Include proposals from a file
             self.debug_timer.tic()
             if self.seed != None and self.unkwn_nbr != None and self.mode !=None:
+                print(proposal_file)
                 proposal_file_names = split_proposals(proposal_file, self.split_ids, self.seed, self.unkwn_nbr)
                 proposal_file = proposal_file_names[self.mode]
             self._add_proposals_from_file(
