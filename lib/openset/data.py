@@ -309,12 +309,10 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
                                                                     #loading basic proposal files
         with open(test_path, 'rb') as f:
             test_proposals = pickle.load(f)
-    print(trainval_path, test_path)
     except:
         print("Proposal file dosen't exist")
-
+    print(trainval_path, test_path)
     new_trainval_path = trainval_path.split('.')[:-1]
-    print(trainval_path)
     new_trainval_path[-1] += '_' + str(unkwn_nbr) + '_' + str(seed)
     new_trainval_path.append('pkl')
     new_trainval_path = '.'.join(new_trainval_path)
