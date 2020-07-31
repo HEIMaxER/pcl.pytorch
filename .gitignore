@@ -10,3 +10,4 @@ Outputs/
 venv/
 env/
 .idea/
+oar_scripts/
