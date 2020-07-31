@@ -313,7 +313,7 @@ def test_net(
     )
     model = initialize_model_from_cfg(args, gpu_id=gpu_id)
     num_images = len(roidb)
-    num_classes = cfg.MODEL.NUM_CLASSES+1
+    num_classes = cfg.MODEL.NUM_CLASSES
     all_boxes = {}
     timers = defaultdict(Timer)
     for i, entry in enumerate(roidb):
@@ -330,12 +330,9 @@ def test_net(
             # Faster R-CNN type models generate proposals on-the-fly with an
             # in-network RPN; 1-stage models don't require proposals.
             box_proposals = None
-        # print('entry', entry)
-        # print('image', entry['image'])
-        # print('boxes', entry['boxes'])
+
         im = cv2.imread(entry['image'])
         cls_boxes_i = im_detect_all(model, im, box_proposals, timers)
-        exit()
         all_boxes[entry['image']] = cls_boxes_i
 
         if i % 10 == 0:  # Reduce log file size
@@ -359,11 +356,15 @@ def test_net(
     if 'train' in dataset_name:
         if ind_range is not None:
             det_name = 'discovery_range_%s_%s.pkl' % tuple(ind_range)
+        elif seed is not None and unkwn_nbr is not None:
+            det_name = 'discovery_{}_{}.pkl'.format(unkwn_nbr, seed)
         else:
             det_name = 'discovery.pkl'
     else:
         if ind_range is not None:
             det_name = 'detection_range_%s_%s.pkl' % tuple(ind_range)
+        elif seed is not None and unkwn_nbr is not None:
+            det_name = 'detections_{}_{}.pkl'.format(unkwn_nbr, seed)
         else:
             det_name = 'detections.pkl'
     det_file = os.path.join(output_dir, det_name)
