@@ -261,7 +261,6 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
     :param unkwn_nbr: number of unknown classes
     :return: new proposal file name
     """
-    print(proposal_file)
     if str(seed) not in proposal_file and str(unkwn_nbr) not in proposal_file:
         proposal_path = proposal_file.split('/')
         proposal_path[-1] = proposal_path[-1].split('_')[:-1]
@@ -277,8 +276,9 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
         test_path[-1].append('test.pkl')
         test_path[-1] = '_'.join(test_path[-1])
         test_path = '/'.join(test_path)
-
+        print(trainval_path, test_path)
     else:
+        print('non')
         proposal_path = proposal_file.split('/')
         proposal_path[-1] = proposal_path[-1].split('_')
 
@@ -312,7 +312,7 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
             test_proposals = pickle.load(f)
     except:
         print("Proposal file dosen't exist")
-    print(trainval_path, test_path)
+
     new_trainval_path = trainval_path.split('.')[:-1]
     new_trainval_path[-1] += '_' + str(unkwn_nbr) + '_' + str(seed)
     new_trainval_path.append('pkl')
