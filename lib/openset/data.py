@@ -261,7 +261,7 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
     :param unkwn_nbr: number of unknown classes
     :return: new proposal file name
     """
-    if seed not in proposal_file and unkwn_nbr not in proposal_file:
+    if str(seed) not in proposal_file and str(unkwn_nbr) not in proposal_file:
         proposal_path = proposal_file.split('/')
         proposal_path[-1] = proposal_path[-1].split('_')[:-1]
 
