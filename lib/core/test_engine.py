@@ -335,9 +335,6 @@ def test_net(
         # print('boxes', entry['boxes'])
         im = cv2.imread(entry['image'])
         cls_boxes_i = im_detect_all(model, im, box_proposals, timers)
-        print(cls_boxes_i)
-        print(cls_boxes_i['scores'].shape)
-        print(cls_boxes_i['boxes'].shape)
         exit()
         all_boxes[entry['image']] = cls_boxes_i
 
