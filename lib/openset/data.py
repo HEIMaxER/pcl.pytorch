@@ -267,14 +267,14 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
 
         trainval_path = proposal_path.copy()
         trainval_path[-1].append('trainval.pkl')
-        trainval_path[-1] = '_'.join(trainval_path[-1])
+        trainval_path[-1] = '_'.join(trainval_path[-1], str(unkwn_nbr), str(seed))
         trainval_path = '/'.join(trainval_path)
 
         proposal_path[-1] = proposal_path[-1][:-1]                      #getting basic trainval and test proposal files
 
         test_path = proposal_path.copy()
         test_path[-1].append('test.pkl')
-        test_path[-1] = '_'.join(test_path[-1])
+        test_path[-1] = '_'.join(test_path[-1], str(unkwn_nbr), str(seed))
         test_path = '/'.join(test_path)
 
     else:
@@ -314,7 +314,6 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
         print("Proposal file dosen't exist")
 
     new_trainval_path = trainval_path.split('.')[:-1]
-    print(trainval_path)
     new_trainval_path[-1] += '_' + str(unkwn_nbr) + '_' + str(seed)
     new_trainval_path.append('pkl')
     new_trainval_path = '.'.join(new_trainval_path)
