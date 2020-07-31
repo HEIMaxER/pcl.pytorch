@@ -261,9 +261,7 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
     :param unkwn_nbr: number of unknown classes
     :return: new proposal file name
     """
-    print(seed, unkwn_nbr, proposal_file)
-    if str(seed) not in proposal_file and str(unkwn_nbr) not in proposal_file:
-        print('oui')
+    if '_'+str(seed) not in proposal_file and str(unkwn_nbr) not in proposal_file:
         proposal_path = proposal_file.split('/')
         proposal_path[-1] = proposal_path[-1].split('_')[:-1]
 
@@ -279,7 +277,6 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
         test_path[-1] = '_'.join(test_path[-1])
         test_path = '/'.join(test_path)
     else:
-        print('non')
         proposal_path = proposal_file.split('/')
         proposal_path[-1] = proposal_path[-1].split('_')
 
