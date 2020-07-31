@@ -104,7 +104,6 @@ def im_detect_bbox(model, im, target_scale, target_max_size, boxes=None):
         inputs['labels'] = [torch.from_numpy(inputs['labels'])]
 
     return_dict = model(**inputs)
-    print(return_dict)
     # cls prob (activations after softmax)
     scores = return_dict['refine_score'][0].data.cpu().numpy().squeeze()
     for i in range(1, cfg.REFINE_TIMES):
