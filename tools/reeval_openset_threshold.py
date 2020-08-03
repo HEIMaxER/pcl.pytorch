@@ -13,7 +13,7 @@ import torch
 import _init_paths  # pylint: disable=unused-import
 from core.config import cfg, merge_cfg_from_file, merge_cfg_from_list, assert_and_infer_cfg
 from core.test_engine import empty_results, extend_results
-from core.test import box_results_for_corloc, box_results_with_nms_and_limit
+from core.test import box_results_for_corloc, box_results_with_nms_limit_and_openset_threshold
 from datasets.json_dataset import JsonDataset
 from datasets import task_evaluation
 import utils.logging
@@ -116,7 +116,7 @@ if __name__ == '__main__':
 
     for i, entry in enumerate(roidb):
         boxes = all_boxes[entry['image']]
-        print(boxes['scores'].shape)
+        print(entry)
         if test_corloc:
             _, _, cls_boxes_i = box_results_for_corloc(boxes['scores'], boxes['boxes'])
         else:
