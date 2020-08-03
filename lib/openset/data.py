@@ -261,7 +261,7 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
     :param unkwn_nbr: number of unknown classes
     :return: new proposal file name
     """
-    if '_'+str(seed) not in proposal_file and str(unkwn_nbr) not in proposal_file:
+    if '_'+str(seed) not in proposal_file and '_'+str(unkwn_nbr) not in proposal_file:
         proposal_path = proposal_file.split('/')
         proposal_path[-1] = proposal_path[-1].split('_')[:-1]
 
@@ -312,6 +312,7 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
         print("Proposal file dosen't exist")
 
     new_trainval_path = trainval_path.split('.')[:-1]
+    print(new_trainval_path,new_trainval_path[-1] )
     new_trainval_path[-1] += '_' + str(unkwn_nbr) + '_' + str(seed)
     new_trainval_path.append('pkl')
     new_trainval_path = '.'.join(new_trainval_path)
