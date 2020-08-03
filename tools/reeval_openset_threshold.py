@@ -17,6 +17,7 @@ from core.test import box_results_for_corloc, box_results_with_nms_limit_and_ope
 from datasets.json_dataset import JsonDataset
 from datasets import task_evaluation
 import utils.logging
+import itertools
 
 # OpenCL may be enabled by default in OpenCV3; disable it because it's not
 # thread safe and causes unwanted GPU memory allocations.
@@ -114,9 +115,11 @@ if __name__ == '__main__':
     final_boxes = empty_results(num_classes, num_images)
     test_corloc = 'train' in dataset_name
 
-    for i, entry in enumerate(roidb):
+    for k in roidb.keys()[0:10]:
+        print(roidb[k]['gt_classes'])
+
+    for i, entry in enumerate(roidb, ):
         boxes = all_boxes[entry['image']]
-        print(entry)
         if test_corloc:
             _, _, cls_boxes_i = box_results_for_corloc(boxes['scores'], boxes['boxes'])
         else:
