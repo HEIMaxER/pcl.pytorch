@@ -71,10 +71,6 @@ if __name__ == '__main__':
         args.output_dir = os.path.dirname(args.result_path)
         logger.info('Automatically set output directory to %s', args.output_dir)
 
-    model_name = args.load_ckpt.split('/')[-1]
-    if seed not in model_name.split('_') or str(unkwn_nbr) not in model_name.split('_'):
-        raise ValueError("Open dataset and model don't match.")
-
     if args.cfg_file is not None:
         merge_cfg_from_file(args.cfg_file)
     if args.set_cfgs is not None:
