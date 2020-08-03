@@ -113,9 +113,10 @@ if __name__ == '__main__':
     num_classes = cfg.MODEL.NUM_CLASSES + 1
     final_boxes = empty_results(num_classes, num_images)
     test_corloc = 'train' in dataset_name
-    print(boxes['scores'].shape)
+
     for i, entry in enumerate(roidb):
         boxes = all_boxes[entry['image']]
+        print(boxes['scores'].shape)
         if test_corloc:
             _, _, cls_boxes_i = box_results_for_corloc(boxes['scores'], boxes['boxes'])
         else:
