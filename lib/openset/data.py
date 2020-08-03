@@ -277,6 +277,7 @@ def split_proposals(proposal_file, ids, seed, unkwn_nbr):
         test_path[-1] = '_'.join(test_path[-1])
         test_path = '/'.join(test_path)
     else:
+        print('non')
         proposal_path = proposal_file.split('/')
         proposal_path[-1] = proposal_path[-1].split('_')
 
