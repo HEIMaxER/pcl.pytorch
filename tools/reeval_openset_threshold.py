@@ -115,7 +115,7 @@ if __name__ == '__main__':
     final_boxes = empty_results(num_classes, num_images)
     test_corloc = 'train' in dataset_name
 
-    for k in roidb.keys()[0:10]:
+    for k in range(10):
         print(roidb[k]['gt_classes'])
 
     for i, entry in enumerate(roidb, ):
