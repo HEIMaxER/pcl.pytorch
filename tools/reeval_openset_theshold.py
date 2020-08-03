@@ -44,6 +44,9 @@ def parse_args():
         help='set config keys, will overwrite config in the cfg_file.'
              ' See lib/core/config.py for all options',
         default=[], nargs='*')
+    parser.add_argument(
+        '--threshold',
+        help='Openset detection thershold', default=0.05, type=float)
 
     return parser.parse_args()
 
@@ -55,35 +58,46 @@ if __name__ == '__main__':
     logger.info('Called with args:')
     logger.info(args)
 
+    ds_info = args.dataset.split('.')
+    ds_info[0] = ds_info[0].split("_")
+    seed = ds_info[0][-1]
+    unkwn_nbr = int(ds_info[0][-2])
+    mode = ds_info[0][2]
+    ds_name = ''.join(ds_info[0][0:3])
+
     assert os.path.exists(args.result_path)
 
     if args.output_dir is None:
         args.output_dir = os.path.dirname(args.result_path)
         logger.info('Automatically set output directory to %s', args.output_dir)
 
+    model_name = args.load_ckpt.split('/')[-1]
+    if seed not in model_name.split('_') or str(unkwn_nbr) not in model_name.split('_'):
+        raise ValueError("Open dataset and model don't match.")
+
     if args.cfg_file is not None:
         merge_cfg_from_file(args.cfg_file)
     if args.set_cfgs is not None:
         merge_cfg_from_list(args.set_cfgs)
 
-    if args.dataset == "coco2014":
+    if ds_name == "coco2014":
         cfg.TEST.DATASETS = ('coco_2014_val',)
-        cfg.MODEL.NUM_CLASSES = 80
-    elif args.dataset == "coco2017":
+        cfg.MODEL.NUM_CLASSES = 80 - unkwn_nbr
+    elif ds_name == "coco2017":
         cfg.TEST.DATASETS = ('coco_2017_val',)
-        cfg.MODEL.NUM_CLASSES = 80
-    elif args.dataset == 'voc2007test':
+        cfg.MODEL.NUM_CLASSES = 80 - unkwn_nbr
+    elif ds_name == 'voc2007test':
         cfg.TEST.DATASETS = ('voc_2007_test',)
-        cfg.MODEL.NUM_CLASSES = 20
-    elif args.dataset == 'voc2012test':
+        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr
+    elif ds_name == 'voc2012test':
         cfg.TEST.DATASETS = ('voc_2012_test',)
-        cfg.MODEL.NUM_CLASSES = 20
-    elif args.dataset == 'voc2007trainval':
+        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr
+    elif ds_name == 'voc2007trainval':
         cfg.TEST.DATASETS = ('voc_2007_trainval',)
-        cfg.MODEL.NUM_CLASSES = 20
-    elif args.dataset == 'voc2012trainval':
+        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr
+    elif ds_name == 'voc2012trainval':
         cfg.TEST.DATASETS = ('voc_2012_trainval',)
-        cfg.MODEL.NUM_CLASSES = 20
+        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr
     else:  # For subprocess call
         assert cfg.TEST.DATASETS, 'cfg.TEST.DATASETS shouldn\'t be empty'
     assert_and_infer_cfg()
@@ -97,7 +111,7 @@ if __name__ == '__main__':
     all_boxes = results['all_boxes']
 
     dataset_name = cfg.TEST.DATASETS[0]
-    dataset = JsonDataset(dataset_name)
+    dataset = JsonDataset(dataset_name, seed, unkwn_nbr, mode)
     roidb = dataset.get_roidb()
     num_images = len(roidb)
     num_classes = cfg.MODEL.NUM_CLASSES + 1
@@ -108,9 +122,9 @@ if __name__ == '__main__':
         if test_corloc:
             _, _, cls_boxes_i = box_results_for_corloc(boxes['scores'], boxes['boxes'])
         else:
-            _, _, cls_boxes_i = box_results_with_nms_and_limit(boxes['scores'],
-                                                         boxes['boxes'])
+            _, _, cls_boxes_i = box_results_with_nms_limit_and_openset_threshold(boxes['scores'],
+                                                         boxes['boxes'], args.threshold)
         extend_results(i, final_boxes, cls_boxes_i)
-    results = task_evalreeval.pyuation.evaluate_all(
+    results = task_evaluation.evaluate_all(
         dataset, final_boxes, args.output_dir, test_corloc
     )

@@ -55,9 +55,6 @@ def parse_args():
         action='store_true')
     parser.add_argument(
         '--vis', dest='vis', help='visualize detections', action='store_true')
-    parser.add_argument(
-        '--thershold',
-        help='Openset detection thershold', default=0.05, type=float)
 
     return parser.parse_args()
 
@@ -145,7 +142,7 @@ if __name__ == '__main__':
             logger.info('Waiting for {} to exist...'.format(args.load_detectron))
             time.sleep(10)
 
-    run_threhold_inference(args,
+    run_open_dataset_inference(args,
         ind_range=args.range,
         multi_gpu_testing=args.multi_gpu_testing,
         check_expected_results=True,

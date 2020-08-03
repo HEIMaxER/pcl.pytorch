@@ -111,6 +111,6 @@ if __name__ == '__main__':
             _, _, cls_boxes_i = box_results_with_nms_and_limit(boxes['scores'],
                                                          boxes['boxes'])
         extend_results(i, final_boxes, cls_boxes_i)
-    results = task_evalreeval.pyuation.evaluate_all(
+    results = task_evaluation.evaluate_all(
         dataset, final_boxes, args.output_dir, test_corloc
     )

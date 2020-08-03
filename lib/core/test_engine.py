@@ -103,7 +103,7 @@ def get_inference_open_dataset(index, is_parent=True, unkwn_nbr = None, seed = N
 
     return dataset_name, proposal_file
 
-def run_threhold_inference(
+def run_open_dataset_inference(
         args, ind_range=None,
         multi_gpu_testing=False, gpu_id=0,
         check_expected_results=False,
