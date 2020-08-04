@@ -203,6 +203,7 @@ def _do_matlab_eval(json_dataset, salt, output_dir='output'):
 
 def voc_info(json_dataset):
     year = json_dataset.name[4:8]
+    print(json_dataset.name)
     image_set = json_dataset.name[9:]
     devkit_path = DATASETS[json_dataset.name][DEVKIT_DIR]
     assert os.path.exists(devkit_path), \
