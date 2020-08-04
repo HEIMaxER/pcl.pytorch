@@ -32,6 +32,7 @@ from datasets.dataset_catalog import DEVKIT_DIR
 from datasets.voc_eval import voc_eval
 from datasets.dis_eval import dis_eval
 from utils.io import save_object
+from openset.data import make_openset
 
 logger = logging.getLogger(__name__)
 
@@ -43,10 +44,10 @@ def evaluate_boxes(
     use_salt=True,
     cleanup=True,
     test_corloc=False,
-    use_matlab=False
+    use_matlab=False, seed=None, unkwn_nbr=None, mode=None
 ):
     salt = '_{}'.format(str(uuid.uuid4())) if use_salt else ''
-    filenames = _write_voc_results_files(json_dataset, all_boxes, salt)
+    filenames = _write_voc_results_files(json_dataset, all_boxes, salt, seed, unkwn_nbr, mode)
     if test_corloc:
         _eval_discovery(json_dataset, salt, output_dir)
     else:
@@ -60,10 +61,18 @@ def evaluate_boxes(
     return None
 
 
-def _write_voc_results_files(json_dataset, all_boxes, salt):
+def _write_voc_results_files(json_dataset, all_boxes, salt, seed=None, unkwn_nbr=None, mode=None):
     filenames = []
     image_set_path = voc_info(json_dataset)['image_set_path']
-    print(image_set_path)
+
+    if seed != None and unkwn_nbr != None and  mode != None:
+        path = image_set_path.split('/')
+        opensets_path = path[:-2].append("opensets")
+        opensets_path = '/'.join(opensets_path)
+        print('image_set_path', image_set_path)
+        print('opensets_path', opensets_path)
+        image_set_path = make_openset(image_set_path, opensets_path, unkwn_nbr, seed)+'/'+mode+'.txt'
+
     assert os.path.exists(image_set_path), \
         'Image set path does not exist: {}'.format(image_set_path)
     with open(image_set_path, 'r') as f:
@@ -203,7 +212,6 @@ def _do_matlab_eval(json_dataset, salt, output_dir='output'):
 
 def voc_info(json_dataset):
     year = json_dataset.name[4:8]
-    print(json_dataset.name)
     image_set = json_dataset.name[9:]
     devkit_path = DATASETS[json_dataset.name][DEVKIT_DIR]
     assert os.path.exists(devkit_path), \
