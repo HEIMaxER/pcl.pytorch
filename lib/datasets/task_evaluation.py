@@ -55,7 +55,6 @@ def evaluate_all(
     """Evaluate "all" tasks, where "all" includes box detection, instance
     segmentation, and keypoint detection.
     """
-    print(seed, unkwn_nbr, mode)
     all_results = evaluate_boxes(
         dataset, all_boxes, output_dir, test_corloc=test_corloc,
         use_matlab=use_matlab, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode
@@ -76,7 +75,6 @@ def evaluate_boxes(dataset, all_boxes, output_dir, test_corloc=False, use_matlab
     elif _use_voc_evaluator(dataset):
         # For VOC, always use salt and always cleanup because results are
         # written to the shared VOCdevkit results directory
-        print(seed, unkwn_nbr, mode)
         voc_eval = voc_dataset_evaluator.evaluate_boxes(
             dataset, all_boxes, output_dir, test_corloc=test_corloc,
             use_matlab=use_matlab, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode
