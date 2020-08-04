@@ -72,6 +72,7 @@ def _write_voc_results_files(json_dataset, all_boxes, salt):
     roidb = json_dataset.get_roidb()
     for i, entry in enumerate(roidb):
         index = os.path.splitext(os.path.split(entry['image'])[1])[0]
+        print(image_index[i])
         assert index == image_index[i]
     for cls_ind, cls in enumerate(json_dataset.classes):
         if cls == '__background__':
