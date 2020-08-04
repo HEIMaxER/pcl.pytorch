@@ -66,7 +66,9 @@ def _write_voc_results_files(json_dataset, all_boxes, salt, seed=None, unkwn_nbr
     image_set_path = voc_info(json_dataset)['image_set_path']
     if seed != None and unkwn_nbr != None and  mode != None:
         path = image_set_path.split('/')
-        opensets_path = path[:-2].append("opensets")
+        print(image_set_path)
+        opensets_path = path[:-2]
+        opensets_path.append("opensets")
         print(opensets_path)
         opensets_path = '/'.join(opensets_path)
         print('image_set_path', image_set_path)
