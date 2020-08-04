@@ -415,6 +415,9 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
                 cfg.TEST.BBOX_VOTE.VOTE_TH,
                 scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
             )
+
+        if not nms_dets:
+            print(nms_dets, type(nms_dets))
         cls_boxes[j] = nms_dets
     os_scores = []
     os_boxes = []
@@ -426,8 +429,8 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
 
     os_scores = np.array(os_scores)
     os_boxes = np.array(os_boxes)
-    print('os_boxes', os_boxes)
-    print('os_scores', os_scores)
+    # print('os_boxes', os_boxes)
+    # print('os_scores', os_scores)
     # if len(os_boxes) > 0 and len(os_scores) > 0:
     #     os_dets = np.hstack((os_boxes, os_scores[:, np.newaxis])).astype(np.float32, copy=False)
     #     if cfg.TEST.SOFT_NMS.ENABLED:
@@ -449,8 +452,6 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
     #             cfg.TEST.BBOX_VOTE.VOTE_TH,
     #             scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
     #         )
-    #     if not nms_dets:
-    #         print(nms_dets, type(nms_dets))
     #     cls_boxes.append(nms_dets)
     # else:
     #     cls_boxes.append(np.empty([1,1]))
