@@ -64,7 +64,7 @@ def evaluate_boxes(
 def _write_voc_results_files(json_dataset, all_boxes, salt, seed=None, unkwn_nbr=None, mode=None):
     filenames = []
     image_set_path = voc_info(json_dataset)['image_set_path']
-
+    print(seed, unkwn_nbr, mode)
     if seed != None and unkwn_nbr != None and  mode != None:
         path = image_set_path.split('/')
         opensets_path = path[:-2].append("opensets")
