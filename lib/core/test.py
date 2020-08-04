@@ -425,7 +425,7 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
 
     os_scores = []
     os_boxes = []
-    print('min : ', min(scores), 'max : ', max(scores))
+    print('min : ', min([min(scores[i]) for i in range(len(scores))]), 'max : ', max([max(scores[i]) for i in range(len(scores))]))
     for i in range(len(scores)):                 #looking for new objects
         if all(scores[i]) < threshold:
             os_scores.append(1-max(scores[i]))
