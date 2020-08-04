@@ -71,7 +71,7 @@ def _write_voc_results_files(json_dataset, all_boxes, salt, seed=None, unkwn_nbr
         opensets_path.append("opensets")
         print(opensets_path)
         opensets_path = '/'.join(opensets_path)
-        set_dir = '/'.path[:-1]
+        set_dir = '/'.join(path[:-1])
         print('set_dir', image_set_path)
         print('opensets_path', opensets_path)
         image_set_path = make_openset(set_dir, opensets_path, unkwn_nbr, seed)+'/'+mode+'.txt'
