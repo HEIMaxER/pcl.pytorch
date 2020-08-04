@@ -63,6 +63,7 @@ def evaluate_boxes(
 def _write_voc_results_files(json_dataset, all_boxes, salt):
     filenames = []
     image_set_path = voc_info(json_dataset)['image_set_path']
+    print(image_set_path)
     assert os.path.exists(image_set_path), \
         'Image set path does not exist: {}'.format(image_set_path)
     with open(image_set_path, 'r') as f:
