@@ -417,7 +417,6 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
                 scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
             )
         cls_boxes[j] = nms_dets
-
     os_scores = []
     os_boxes = []
     print('min : ', min([min(scores[i]) for i in range(len(scores))]), 'max : ', max([max(scores[i]) for i in range(len(scores))]))
@@ -428,27 +427,30 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
 
     print('os_scores', os_scores)
     print('os_boxes', os_boxes)
-    os_dets = np.hstack((os_boxes, os_scores[:, np.newaxis])).astype(np.float32, copy=False)
-    if cfg.TEST.SOFT_NMS.ENABLED:
-        nms_dets, _ = box_utils.soft_nms(
-            os_dets,
-            sigma=cfg.TEST.SOFT_NMS.SIGMA,
-            overlap_thresh=cfg.TEST.NMS,
-            score_thresh=0.0001,
-            method=cfg.TEST.SOFT_NMS.METHOD
-        )
+    if len(os_boxes) > 0 and len(os_scores) > 0:
+        os_dets = np.hstack((os_boxes, os_scores[:, np.newaxis])).astype(np.float32, copy=False)
+        if cfg.TEST.SOFT_NMS.ENABLED:
+            nms_dets, _ = box_utils.soft_nms(
+                os_dets,
+                sigma=cfg.TEST.SOFT_NMS.SIGMA,
+                overlap_thresh=cfg.TEST.NMS,
+                score_thresh=0.0001,
+                method=cfg.TEST.SOFT_NMS.METHOD
+            )
+        else:
+            keep = box_utils.nms(os_dets, cfg.TEST.NMS)
+            nms_dets = os_dets[keep, :]
+        # Refine the post-NMS boxes using bounding-box voting
+        if cfg.TEST.BBOX_VOTE.ENABLED:
+            nms_dets = box_utils.box_voting(
+                nms_dets,
+                os_dets,
+                cfg.TEST.BBOX_VOTE.VOTE_TH,
+                scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
+            )
+        cls_boxes.append(nms_dets)
     else:
-        keep = box_utils.nms(os_dets, cfg.TEST.NMS)
-        nms_dets = os_dets[keep, :]
-    # Refine the post-NMS boxes using bounding-box voting
-    if cfg.TEST.BBOX_VOTE.ENABLED:
-        nms_dets = box_utils.box_voting(
-            nms_dets,
-            os_dets,
-            cfg.TEST.BBOX_VOTE.VOTE_TH,
-            scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
-        )
-    cls_boxes.append(nms_dets)
+        cls_boxes.append([])
 
 
     # Limit to max_per_image detections **over all classes**
