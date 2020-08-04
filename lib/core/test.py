@@ -391,15 +391,16 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
     cls_boxes = [[] for _ in range(num_classes)]
     # Apply threshold on detection probabilities and apply NMS
     # Skip j = 0, because it's the background class
+    print('score thresh', cfg.TEST.SCORE_THRESH)
     for j in range(1, num_classes):
         inds = np.where(scores[:, j] > cfg.TEST.SCORE_THRESH)[0]
-        print(inds)
+        print('inds:', inds)
         scores_j = scores[inds, j]
-        print(scores_j)
+        print('scors:', scores_j)
         boxes_j = boxes[inds, :]
-        print(boxes_j)
+        print('boxes:', boxes_j)
         dets_j = np.hstack((boxes_j, scores_j[:, np.newaxis])).astype(np.float32, copy=False)
-        print(dets_j)
+        print('dets:', dets_j)
         if cfg.TEST.SOFT_NMS.ENABLED:
             nms_dets, _ = box_utils.soft_nms(
                 dets_j,
@@ -421,14 +422,14 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
             )
         cls_boxes[j] = nms_dets
 
-    new_objects_boxes = []
     os_scores = []
     os_boxes = []
     for i in range(len(scores)):                  #looking for new objects
         if all(scores[i]) < threshold:
             os_scores.append(1-max(scores[i]))
             os_boxes.append(boxes[i, :])
-
+    print('os_scores', os_scores)
+    print('os_boxes', os_boxes)
     os_dets = np.hstack((os_boxes, os_scores[:, np.newaxis])).astype(np.float32, copy=False)
     if cfg.TEST.SOFT_NMS.ENABLED:
         nms_dets, _ = box_utils.soft_nms(
