@@ -449,7 +449,7 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
                 cfg.TEST.BBOX_VOTE.VOTE_TH,
                 scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
             )
-        if nms_dets.shape[0] == 0:
+        if not nms_dets:
             print(nms_dets, type(nms_dets))
         cls_boxes.append(nms_dets)
     # else:
