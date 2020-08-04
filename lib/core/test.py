@@ -452,7 +452,7 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
             )
         cls_boxes.append(nms_dets)
     else:
-        cls_boxes.append(np.empty(0)
+        cls_boxes.append(np.empty(0))
     # Limit to max_per_image detections **over all classes**
     if cfg.TEST.DETECTIONS_PER_IM > 0:
         image_scores = np.hstack(
