@@ -392,6 +392,7 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
     # Apply threshold on detection probabilities and apply NMS
     # Skip j = 0, because it's the background class
     print('score thresh', cfg.TEST.SCORE_THRESH)
+    threshold = cfg.TEST.SCORE_THRESH*threshold
     for j in range(1, num_classes):
         inds = np.where(scores[:, j] > cfg.TEST.SCORE_THRESH)[0]
         print('inds:', inds)
@@ -424,10 +425,12 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
 
     os_scores = []
     os_boxes = []
-    for i in range(len(scores)):                  #looking for new objects
+    for i in range(len(scores)):                 #looking for new objects
+        print('scores', scores[i])
         if all(scores[i]) < threshold:
             os_scores.append(1-max(scores[i]))
             os_boxes.append(boxes[i, :])
+    print('min : ', min(scores), 'max : ', max(scores))
     print('os_scores', os_scores)
     print('os_boxes', os_boxes)
     os_dets = np.hstack((os_boxes, os_scores[:, np.newaxis])).astype(np.float32, copy=False)
