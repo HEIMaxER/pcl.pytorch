@@ -111,12 +111,9 @@ if __name__ == '__main__':
     dataset = JsonDataset(dataset_name, seed, unkwn_nbr, mode)
     roidb = dataset.get_roidb()
     num_images = len(roidb)
-    num_classes = cfg.MODEL.NUM_CLASSES + 1
+    num_classes = cfg.MODEL.NUM_CLASSES + 2
     final_boxes = empty_results(num_classes, num_images)
     test_corloc = 'train' in dataset_name
-
-    for k in range(10):
-        print(roidb[k]['gt_classes'])
 
     for i, entry in enumerate(roidb, ):
         boxes = all_boxes[entry['image']]
