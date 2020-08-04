@@ -416,57 +416,57 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
                 scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
             )
 
-        if nms_dets.shape[0] == 0:
-            print(nms_dets, type(nms_dets))
+        # if nms_dets.shape[0] == 0:
+        #     print(nms_dets, type(nms_dets))
         cls_boxes[j] = nms_dets
     os_scores = []
     os_boxes = []
 
     for i in range(len(scores)):                 #looking for new objects
         if max(scores[i]) < threshold:
-            os_scores.append(1-max(scores[i]))
+            os_scores.append((1-threshold)/(1-max(scores[i])))
             os_boxes.append(boxes[i, :])
 
     os_scores = np.array(os_scores)
     os_boxes = np.array(os_boxes)
-    # print('os_boxes', os_boxes)
-    # print('os_scores', os_scores)
-    # if len(os_boxes) > 0 and len(os_scores) > 0:
-    #     os_dets = np.hstack((os_boxes, os_scores[:, np.newaxis])).astype(np.float32, copy=False)
-    #     if cfg.TEST.SOFT_NMS.ENABLED:
-    #         nms_dets, _ = box_utils.soft_nms(
-    #             os_dets,
-    #             sigma=cfg.TEST.SOFT_NMS.SIGMA,
-    #             overlap_thresh=cfg.TEST.NMS,
-    #             score_thresh=0.0001,
-    #             method=cfg.TEST.SOFT_NMS.METHOD
-    #         )
-    #     else:
-    #         keep = box_utils.nms(os_dets, cfg.TEST.NMS)
-    #         nms_dets = os_dets[keep, :]
-    #     # Refine the post-NMS boxes using bounding-box voting
-    #     if cfg.TEST.BBOX_VOTE.ENABLED:
-    #         nms_dets = box_utils.box_voting(
-    #             nms_dets,
-    #             os_dets,
-    #             cfg.TEST.BBOX_VOTE.VOTE_TH,
-    #             scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
-    #         )
-    #     cls_boxes.append(nms_dets)
-    # else:
-    #     cls_boxes.append(np.empty([1,1]))
+    print('os_boxes', os_boxes)
+    print('os_scores', os_scores)
+    if len(os_boxes) > 0 and len(os_scores) > 0:
+        os_dets = np.hstack((os_boxes, os_scores[:, np.newaxis])).astype(np.float32, copy=False)
+        if cfg.TEST.SOFT_NMS.ENABLED:
+            nms_dets, _ = box_utils.soft_nms(
+                os_dets,
+                sigma=cfg.TEST.SOFT_NMS.SIGMA,
+                overlap_thresh=cfg.TEST.NMS,
+                score_thresh=0.0001,
+                method=cfg.TEST.SOFT_NMS.METHOD
+            )
+        else:
+            keep = box_utils.nms(os_dets, cfg.TEST.NMS)
+            nms_dets = os_dets[keep, :]
+        # Refine the post-NMS boxes using bounding-box voting
+        if cfg.TEST.BBOX_VOTE.ENABLED:
+            nms_dets = box_utils.box_voting(
+                nms_dets,
+                os_dets,
+                cfg.TEST.BBOX_VOTE.VOTE_TH,
+                scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
+            )
+        cls_boxes.append(nms_dets)
+    else:
+        cls_boxes.append([np.ndarray([])])
     # Limit to max_per_image detections **over all classes**
     if cfg.TEST.DETECTIONS_PER_IM > 0:
         image_scores = np.hstack(
-            [cls_boxes[j][:, -1] for j in range(1, num_classes)]
+            [cls_boxes[j][:, -1] for j in range(1, num_classes+1)]
         )
         if len(image_scores) > cfg.TEST.DETECTIONS_PER_IM:
             image_thresh = np.sort(image_scores)[-cfg.TEST.DETECTIONS_PER_IM]
-            for j in range(1, num_classes):
+            for j in range(1, num_classes+1):
                 keep = np.where(cls_boxes[j][:, -1] >= image_thresh)[0]
                 cls_boxes[j] = cls_boxes[j][keep, :]
 
-    im_results = np.vstack([cls_boxes[j] for j in range(1, num_classes)])
+    im_results = np.vstack([cls_boxes[j] for j in range(1, num_classes+1)])
     boxes = im_results[:, :-1]
     scores = im_results[:, -1]
     return scores, boxes, cls_boxes
