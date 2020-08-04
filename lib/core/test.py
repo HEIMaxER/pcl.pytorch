@@ -416,7 +416,7 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
                 scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
             )
 
-        if not nms_dets:
+        if nms_dets.shape[0] == 0:
             print(nms_dets, type(nms_dets))
         cls_boxes[j] = nms_dets
     os_scores = []
