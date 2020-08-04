@@ -391,7 +391,6 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
     cls_boxes = [[] for _ in range(num_classes)]
     # Apply threshold on detection probabilities and apply NMS
     # Skip j = 0, because it's the background class
-    os_threshold = cfg.TEST.SCORE_THRESH*threshold
     for j in range(1, num_classes):
         inds = np.where(scores[:, j] > cfg.TEST.SCORE_THRESH)[0]
         scores_j = scores[inds, j]
@@ -429,6 +428,8 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
 
     os_scores = np.array(os_scores)
     os_boxes = np.array(os_boxes)
+    print('os_boxes', os_boxes)
+    print('os_scores', os_scores)
     if len(os_boxes) > 0 and len(os_scores) > 0:
         os_dets = np.hstack((os_boxes, os_scores[:, np.newaxis])).astype(np.float32, copy=False)
         if cfg.TEST.SOFT_NMS.ENABLED:
@@ -453,9 +454,6 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
         cls_boxes.append(nms_dets)
     else:
         cls_boxes.append(np.array([]))
-
-    print('cls_box type :', type(cls_boxes))
-
 
     # Limit to max_per_image detections **over all classes**
     if cfg.TEST.DETECTIONS_PER_IM > 0:
