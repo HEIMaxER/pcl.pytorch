@@ -419,8 +419,6 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
     os_scores = []
     os_boxes = []
 
-    print(np.mean([np.mean(scores[j]) for j in range(len(scores))]))
-
     for i in range(len(scores)):                 #looking for new objects
         if max(scores[i]) < threshold:
             os_scores.append(1-max(scores[i]))
@@ -470,7 +468,7 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
                 keep = np.where(cls_boxes[j][:, -1] >= image_thresh)[0]
                 cls_boxes[j] = cls_boxes[j][keep, :]
 
-    im_results = np.vstack([cls_boxes[j] for j in range(1, num_classes+1)])
+    im_results = np.vstack([cls_boxes[j] for j in range(1, num_classes)])
     boxes = im_results[:, :-1]
     scores = im_results[:, -1]
     return scores, boxes, cls_boxes
