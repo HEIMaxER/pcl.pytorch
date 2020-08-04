@@ -427,11 +427,11 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
             os_scores.append(1-max(scores[i]))
             os_boxes.append(boxes[i, :])
 
-    print('os_scores', os_scores)
-    print('os_boxes', os_boxes)
+    print('os_scores', os_scores, 'type', type(os_scores))
+    print('os_boxes', os_boxes, 'type', type(os_boxes))
     if len(os_boxes) > 0 and len(os_scores) > 0:
-        print('boxes_j', boxes_j)
-        print('scores_j', scores_j)
+        print('boxes_j', boxes_j, 'type', type(boxes_j))
+        print('scores_j', scores_j, 'type', type(boxes_j))
         os_dets = np.hstack((os_boxes, os_scores[:, np.newaxis])).astype(np.float32, copy=False)
         if cfg.TEST.SOFT_NMS.ENABLED:
             nms_dets, _ = box_utils.soft_nms(
