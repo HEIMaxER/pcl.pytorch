@@ -164,7 +164,7 @@ def _do_python_eval(json_dataset, salt, output_dir='output', seed=None, unkwn_nb
 
     devkit_path = info['devkit_path']
     if seed != None and  unkwn_nbr != None and mode != None:
-        cachedir = os.path.join(devkit_path, 'annotations_cache_{}_{}_{}'.format((year, unkwn_nbr, seed)))
+        cachedir = os.path.join(devkit_path, 'annotations_cache_{}_{}_{}'.format(year, unkwn_nbr, seed))
     else:
         cachedir = os.path.join(devkit_path, 'annotations_cache_{}'.format(year))
     aps = []
