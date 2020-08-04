@@ -51,7 +51,7 @@ def evaluate_boxes(
     if test_corloc:
         _eval_discovery(json_dataset, salt, output_dir)
     else:
-        _do_python_eval(json_dataset, salt, output_dir)
+        _do_python_eval(json_dataset, salt, output_dir, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode)
         if use_matlab:
             _do_matlab_eval(json_dataset, salt, output_dir)
     if cleanup:
@@ -66,14 +66,10 @@ def _write_voc_results_files(json_dataset, all_boxes, salt, seed=None, unkwn_nbr
     image_set_path = voc_info(json_dataset)['image_set_path']
     if seed != None and unkwn_nbr != None and  mode != None:
         path = image_set_path.split('/')
-        print(image_set_path)
         opensets_path = path[:-2]
         opensets_path.append("opensets")
-        print(opensets_path)
         opensets_path = '/'.join(opensets_path)
         set_dir = '/'.join(path[:-1])
-        print('set_dir', image_set_path)
-        print('opensets_path', opensets_path)
         image_set_path = make_openset(set_dir, opensets_path, unkwn_nbr, seed)+'/'+mode+'.txt'
 
     assert os.path.exists(image_set_path), \
@@ -85,7 +81,6 @@ def _write_voc_results_files(json_dataset, all_boxes, salt, seed=None, unkwn_nbr
     roidb = json_dataset.get_roidb()
     for i, entry in enumerate(roidb):
         index = os.path.splitext(os.path.split(entry['image'])[1])[0]
-        print(image_index[i], index)
         assert index == image_index[i]
     for cls_ind, cls in enumerate(json_dataset.classes):
         if cls == '__background__':
@@ -154,13 +149,24 @@ def _eval_discovery(json_dataset, salt, output_dir='output'):
     logger.info('~~~~~~~~')
 
 
-def _do_python_eval(json_dataset, salt, output_dir='output'):
+def _do_python_eval(json_dataset, salt, output_dir='output', seed=None, unkwn_nbr=None, mode=None):
     info = voc_info(json_dataset)
     year = info['year']
     anno_path = info['anno_path']
     image_set_path = info['image_set_path']
+    if seed != None and unkwn_nbr != None and  mode != None:
+        path = image_set_path.split('/')
+        opensets_path = path[:-2]
+        opensets_path.append("opensets")
+        opensets_path = '/'.join(opensets_path)
+        set_dir = '/'.join(path[:-1])
+        image_set_path = make_openset(set_dir, opensets_path, unkwn_nbr, seed)+'/'+mode+'.txt'
+
     devkit_path = info['devkit_path']
-    cachedir = os.path.join(devkit_path, 'annotations_cache_{}'.format(year))
+    if seed != None and  unkwn_nbr != None and mode != None:
+        cachedir = os.path.join(devkit_path, 'annotations_cache_{}_{}_{}'.format((year, unkwn_nbr, seed)))
+    else:
+        cachedir = os.path.join(devkit_path, 'annotations_cache_{}'.format(year))
     aps = []
     # The PASCAL VOC metric changed in 2010
     use_07_metric = True if int(year) < 2010 else False
