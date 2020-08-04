@@ -47,6 +47,7 @@ def evaluate_boxes(
     use_matlab=False, seed=None, unkwn_nbr=None, mode=None
 ):
     salt = '_{}'.format(str(uuid.uuid4())) if use_salt else ''
+    print(seed, unkwn_nbr, mode)
     filenames = _write_voc_results_files(json_dataset, all_boxes, salt, seed, unkwn_nbr, mode)
     if test_corloc:
         _eval_discovery(json_dataset, salt, output_dir)
