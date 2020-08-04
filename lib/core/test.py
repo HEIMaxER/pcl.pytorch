@@ -425,12 +425,12 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
 
     os_scores = []
     os_boxes = []
+    print('min : ', min(scores), 'max : ', max(scores))
     for i in range(len(scores)):                 #looking for new objects
-        print('scores', scores[i])
         if all(scores[i]) < threshold:
             os_scores.append(1-max(scores[i]))
             os_boxes.append(boxes[i, :])
-    print('min : ', min(scores), 'max : ', max(scores))
+
     print('os_scores', os_scores)
     print('os_boxes', os_boxes)
     os_dets = np.hstack((os_boxes, os_scores[:, np.newaxis])).astype(np.float32, copy=False)
