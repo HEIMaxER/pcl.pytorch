@@ -425,13 +425,11 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
     for i in range(len(scores)):                 #looking for new objects
         if max(scores[i]) < threshold:
             os_scores.append(1-max(scores[i]))
-            os_boxes.append(list(boxes[i, :]))
+            os_boxes.append(boxes[i, :])
 
-    print('os_scores', os_scores, 'type', type(os_scores))
-    print('os_boxes', os_boxes, 'type', type(os_boxes))
+    os_scores = np.array(os_scores)
+    os_boxes = np.array(os_boxes)
     if len(os_boxes) > 0 and len(os_scores) > 0:
-        print('boxes_j', boxes_j, 'type', type(boxes_j))
-        print('scores_j', scores_j, 'type', type(boxes_j))
         os_dets = np.hstack((os_boxes, os_scores[:, np.newaxis])).astype(np.float32, copy=False)
         if cfg.TEST.SOFT_NMS.ENABLED:
             nms_dets, _ = box_utils.soft_nms(
@@ -453,14 +451,16 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
                 scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
             )
         cls_boxes.append(nms_dets)
-    # else:
-        # cls_boxes.append([])
+    else:
+        cls_boxes.append(np.array([]))
+
+    print('cls_box type :', type(cls_boxes))
 
 
     # Limit to max_per_image detections **over all classes**
     if cfg.TEST.DETECTIONS_PER_IM > 0:
         image_scores = np.hstack(
-            [cls_boxes[j][:, -1] for j in range(1, num_classes)]
+            [cls_boxes[j][:, -1] for j in range(1, num_classes+1)]
         )
         if len(image_scores) > cfg.TEST.DETECTIONS_PER_IM:
             image_thresh = np.sort(image_scores)[-cfg.TEST.DETECTIONS_PER_IM]
@@ -468,7 +468,7 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
                 keep = np.where(cls_boxes[j][:, -1] >= image_thresh)[0]
                 cls_boxes[j] = cls_boxes[j][keep, :]
 
-    im_results = np.vstack([cls_boxes[j] for j in range(1, num_classes)])
+    im_results = np.vstack([cls_boxes[j] for j in range(1, num_classes+1)])
     boxes = im_results[:, :-1]
     scores = im_results[:, -1]
     return scores, boxes, cls_boxes
