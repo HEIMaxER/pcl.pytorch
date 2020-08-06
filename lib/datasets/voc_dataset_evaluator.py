@@ -44,7 +44,7 @@ def evaluate_boxes(
     use_salt=True,
     cleanup=True,
     test_corloc=False,
-    use_matlab=False, seed=None, unkwn_nbr=None, mode=None, threshold=None
+    use_matlab=True, seed=None, unkwn_nbr=None, mode=None, threshold=None
 ):
     salt = '_{}'.format(str(uuid.uuid4())) if use_salt else ''
     filenames = _write_voc_results_files(json_dataset, all_boxes, salt, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode)
