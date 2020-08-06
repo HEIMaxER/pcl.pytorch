@@ -148,7 +148,7 @@ def voc_eval(detpath,
     # extract gt objects for this class
     class_recs = {}
     npos = 0
-    if classname == 'unkown':
+    if classname == 'unknown':
         print('YES YES YES')
         unkwn_cls = get_voc07_unknown_classes(seed, unkwn_nbr)
         for imagename in imagenames:
