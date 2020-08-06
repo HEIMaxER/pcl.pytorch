@@ -182,8 +182,7 @@ def voc_eval(detpath,
 
     # sort by confidence
     sorted_ind = np.argsort(-confidence)
-    if BB.size == 0:
-        print(BB, type(BB))
+    if not BB.size == 0:
         BB = BB[sorted_ind, :]
     image_ids = [image_ids[x] for x in sorted_ind]
 
