@@ -60,7 +60,6 @@ def voc_ap(rec, prec, use_07_metric=False):
         # 11 point metric
         ap = 0.
         for t in np.arange(0., 1.1, 0.1):
-            print('rec', rec, 't', t)
             if np.sum(rec >= t) == 0:
                 p = 0
             else:
@@ -149,7 +148,6 @@ def voc_eval(detpath,
     class_recs = {}
     npos = 0
     if classname == 'unknown':
-        print('YES YES YES')
         unkwn_cls = get_voc07_unknown_classes(seed, unkwn_nbr)
         for imagename in imagenames:
             R = [obj for obj in recs[imagename] if obj['name'] in unkwn_cls]
