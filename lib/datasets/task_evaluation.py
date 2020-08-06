@@ -50,14 +50,14 @@ logger = logging.getLogger(__name__)
 
 
 def evaluate_all(
-    dataset, all_boxes, output_dir, test_corloc=False, use_matlab=False, seed=None, unkwn_nbr=None, mode=None
+    dataset, all_boxes, output_dir, test_corloc=False, use_matlab=False, seed=None, unkwn_nbr=None, mode=None, threshold=None
 ):
     """Evaluate "all" tasks, where "all" includes box detection, instance
     segmentation, and keypoint detection.
     """
     all_results = evaluate_boxes(
         dataset, all_boxes, output_dir, test_corloc=test_corloc,
-        use_matlab=use_matlab, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode
+        use_matlab=use_matlab, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=threshold
     )
     logger.info('Evaluating bounding boxes is done!')
     return all_results
