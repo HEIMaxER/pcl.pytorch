@@ -23,6 +23,7 @@
 """Python implementation of the PASCAL VOC devkit's AP evaluation code."""
 
 from six.moves import cPickle
+from openset.data import get_voc07_unknown_classes
 import logging
 import numpy as np
 import os
@@ -90,7 +91,7 @@ def voc_eval(detpath,
              classname,
              cachedir,
              ovthresh=0.5,
-             use_07_metric=False):
+             use_07_metric=False, seed=None, unkwn_nbr=None):
     """rec, prec, ap = voc_eval(detpath,
                                 annopath,
                                 imagesetfile,
@@ -147,15 +148,29 @@ def voc_eval(detpath,
     # extract gt objects for this class
     class_recs = {}
     npos = 0
-    for imagename in imagenames:
-        R = [obj for obj in recs[imagename] if obj['name'] == classname]
-        bbox = np.array([x['bbox'] for x in R])
-        difficult = np.array([x['difficult'] for x in R]).astype(np.bool)
-        det = [False] * len(R)
-        npos = npos + sum(~difficult)
-        class_recs[imagename] = {'bbox': bbox,
-                                 'difficult': difficult,
-                                 'det': det}
+    if classname == 'unkown':
+        print('YES YES YES')
+        unkwn_cls = get_voc07_unknown_classes(seed, unkwn_nbr)
+        for imagename in imagenames:
+            R = [obj for obj in recs[imagename] if obj['name'] in unkwn_cls]
+            bbox = np.array([x['bbox'] for x in R])
+            difficult = np.array([x['difficult'] for x in R]).astype(np.bool)
+            det = [False] * len(R)
+            npos = npos + sum(~difficult)
+            class_recs[imagename] = {'bbox': bbox,
+                                     'difficult': difficult,
+                                     'det': det}
+    else:
+
+        for imagename in imagenames:
+            R = [obj for obj in recs[imagename] if obj['name'] == classname]
+            bbox = np.array([x['bbox'] for x in R])
+            difficult = np.array([x['difficult'] for x in R]).astype(np.bool)
+            det = [False] * len(R)
+            npos = npos + sum(~difficult)
+            class_recs[imagename] = {'bbox': bbox,
+                                     'difficult': difficult,
+                                     'det': det}
 
     # read dets
     detfile = detpath.format(classname)

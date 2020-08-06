@@ -184,7 +184,7 @@ def _do_python_eval(json_dataset, salt, output_dir='output', seed=None, unkwn_nb
             json_dataset, salt).format(cls)
         rec, prec, ap = voc_eval(
             filename, anno_path, image_set_path, cls, cachedir, ovthresh=0.5,
-            use_07_metric=use_07_metric)
+            use_07_metric=use_07_metric, seed=seed, unkwn_nbr=unkwn_nbr)
         aps += [ap]
         logger.info('AP for {} = {:.4f}'.format(cls, ap))
         res_file = os.path.join(output_dir, cls + '_pr.pkl')
