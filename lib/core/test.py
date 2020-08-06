@@ -391,10 +391,6 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
     cls_boxes = [[] for _ in range(num_classes)]
     # Apply threshold on detection probabilities and apply NMS
     # Skip j = 0, because it's the background class
-    print(num_classes)
-    print('range')
-    for j in range(1, num_classes):
-        print(j)
     for j in range(1, num_classes):
         inds = np.where(scores[:, j] > cfg.TEST.SCORE_THRESH)[0]
         scores_j = scores[inds, j]
