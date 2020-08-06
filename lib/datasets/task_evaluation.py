@@ -50,7 +50,7 @@ logger = logging.getLogger(__name__)
 
 
 def evaluate_all(
-    dataset, all_boxes, output_dir, test_corloc=False, use_matlab=False, seed=None, unkwn_nbr=None, mode=None, threshold=None
+    dataset, all_boxes, output_dir, test_corloc=False, use_matlab=True, seed=None, unkwn_nbr=None, mode=None, threshold=None
 ):
     """Evaluate "all" tasks, where "all" includes box detection, instance
     segmentation, and keypoint detection.
@@ -63,7 +63,7 @@ def evaluate_all(
     return all_results
 
 
-def evaluate_boxes(dataset, all_boxes, output_dir, test_corloc=False, use_matlab=False, seed=None, unkwn_nbr=None, mode=None, threshold=None):
+def evaluate_boxes(dataset, all_boxes, output_dir, test_corloc=False, use_matlab=True, seed=None, unkwn_nbr=None, mode=None, threshold=None):
     """Evaluate bounding box detection."""
     logger.info('Evaluating detections')
     not_comp = not cfg.TEST.COMPETITION_MODE
