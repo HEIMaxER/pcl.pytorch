@@ -84,6 +84,7 @@ def evaluate_boxes(dataset, all_boxes, output_dir, test_corloc=False, use_matlab
         raise NotImplementedError(
             'No evaluator for dataset: {}'.format(dataset.name)
         )
+    ds_name = dataset.name+'_'+str(unkwn_nbr)+'_'+str(seed)
     return OrderedDict([(dataset.name, box_results)])
 
 
