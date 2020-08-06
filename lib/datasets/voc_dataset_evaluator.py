@@ -44,14 +44,14 @@ def evaluate_boxes(
     use_salt=True,
     cleanup=True,
     test_corloc=False,
-    use_matlab=False, seed=None, unkwn_nbr=None, mode=None
+    use_matlab=False, seed=None, unkwn_nbr=None, mode=None, threshold=threshold
 ):
     salt = '_{}'.format(str(uuid.uuid4())) if use_salt else ''
     filenames = _write_voc_results_files(json_dataset, all_boxes, salt, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode)
     if test_corloc:
         _eval_discovery(json_dataset, salt, output_dir)
     else:
-        _do_python_eval(json_dataset, salt, output_dir, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode)
+        _do_python_eval(json_dataset, salt, output_dir, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=threshold)
         if use_matlab:
             _do_matlab_eval(json_dataset, salt, output_dir)
     if cleanup:
@@ -150,7 +150,7 @@ def _eval_discovery(json_dataset, salt, output_dir='output'):
     logger.info('~~~~~~~~')
 
 
-def _do_python_eval(json_dataset, salt, output_dir='output', seed=None, unkwn_nbr=None, mode=None):
+def _do_python_eval(json_dataset, salt, output_dir='output', seed=None, unkwn_nbr=None, mode=None, threshold=None):
     info = voc_info(json_dataset)
     year = info['year']
     anno_path = info['anno_path']
@@ -164,8 +164,10 @@ def _do_python_eval(json_dataset, salt, output_dir='output', seed=None, unkwn_nb
         image_set_path = make_openset(set_dir, opensets_path, unkwn_nbr, seed)+'/'+mode+'.txt'
 
     devkit_path = info['devkit_path']
-    if seed != None and  unkwn_nbr != None and mode != None:
-        cachedir = os.path.join(devkit_path, 'annotations_cache_{}_{}_{}_{}'.format(year, unkwn_nbr, seed, args.threshold))
+    if seed != None and  unkwn_nbr != None and mode != None and threshold != None:
+        cachedir = os.path.join(devkit_path, 'annotations_cache_{}_{}_{}_{}'.format(year, unkwn_nbr, seed, threshold))
+    elif seed != None and  unkwn_nbr != None and mode != None:
+        cachedir = os.path.join(devkit_path, 'annotations_cache_{}_{}_{}'.format(year, unkwn_nbr, seed))
     else:
         cachedir = os.path.join(devkit_path, 'annotations_cache_{}'.format(year))
     aps = []

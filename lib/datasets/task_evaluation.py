@@ -63,7 +63,7 @@ def evaluate_all(
     return all_results
 
 
-def evaluate_boxes(dataset, all_boxes, output_dir, test_corloc=False, use_matlab=False, seed=None, unkwn_nbr=None, mode=None):
+def evaluate_boxes(dataset, all_boxes, output_dir, test_corloc=False, use_matlab=False, seed=None, unkwn_nbr=None, mode=None, threshold=threshold):
     """Evaluate bounding box detection."""
     logger.info('Evaluating detections')
     not_comp = not cfg.TEST.COMPETITION_MODE
@@ -77,7 +77,7 @@ def evaluate_boxes(dataset, all_boxes, output_dir, test_corloc=False, use_matlab
         # written to the shared VOCdevkit results directory
         voc_eval = voc_dataset_evaluator.evaluate_boxes(
             dataset, all_boxes, output_dir, test_corloc=test_corloc,
-            use_matlab=use_matlab, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode
+            use_matlab=use_matlab, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=threshold
         )
         box_results = _voc_eval_to_box_results(voc_eval)
     else:
