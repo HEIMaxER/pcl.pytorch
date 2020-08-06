@@ -53,6 +53,7 @@ def evaluate_boxes(
     else:
         _do_python_eval(json_dataset, salt, output_dir, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=threshold)
         if use_matlab:
+            print('matlab')
             _do_matlab_eval(json_dataset, salt, output_dir)
     if cleanup:
         for filename in filenames:
