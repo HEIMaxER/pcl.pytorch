@@ -59,6 +59,7 @@ def voc_ap(rec, prec, use_07_metric=False):
         # 11 point metric
         ap = 0.
         for t in np.arange(0., 1.1, 0.1):
+            print('rec', rec, 't', t)
             if np.sum(rec >= t) == 0:
                 p = 0
             else:
@@ -214,6 +215,7 @@ def voc_eval(detpath,
     # compute precision recall
     fp = np.cumsum(fp)
     tp = np.cumsum(tp)
+    print('tp', tp, 'npos', npos)
     rec = tp / float(npos)
     # avoid divide by zero in case the first detection matches a difficult
     # ground truth
