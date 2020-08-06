@@ -84,7 +84,6 @@ def _write_voc_results_files(json_dataset, all_boxes, salt, seed=None, unkwn_nbr
         assert index == image_index[i]
     for cls_ind, cls in enumerate(json_dataset.classes):
         if cls == '__background__':
-            print(cls_ind, cls)
             continue
         logger.info('Writing VOC results for: {}'.format(cls))
         filename = _get_voc_results_file_template(json_dataset,
@@ -178,7 +177,6 @@ def _do_python_eval(json_dataset, salt, output_dir='output', seed=None, unkwn_nb
         os.mkdir(output_dir)
     for _, cls in enumerate(json_dataset.classes):
         if cls == '__background__':
-            print(_, cls)
             continue
         filename = _get_voc_results_file_template(
             json_dataset, salt).format(cls)
@@ -188,7 +186,6 @@ def _do_python_eval(json_dataset, salt, output_dir='output', seed=None, unkwn_nb
         aps += [ap]
         logger.info('AP for {} = {:.4f}'.format(cls, ap))
         res_file = os.path.join(output_dir, cls + '_pr.pkl')
-        print('res_file', res_file)
         save_object({'rec': rec, 'prec': prec, 'ap': ap}, res_file)
     logger.info('Mean AP = {:.4f}'.format(np.mean(aps)))
     logger.info('~~~~~~~~')
