@@ -88,7 +88,7 @@ def get_voc07_unknown_classes(seed, unkwn_nbr):
     class_names = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable',
                    'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
     comb = list(combinations(class_names, unkwn_nbr))
-    return list(comb[seed])
+    return list(comb[int(seed)])
 
 def make_annotations(annotaion_fn, seed, unkwn_nbr):
     """
