@@ -466,6 +466,97 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
     scores = im_results[:, -1]
     return scores, boxes, cls_boxes
 
+def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshold=None):  # NOTE: support single-batch
+    """Returns bounding-box detection results by thresholding on scores and
+    applying non-maximum suppression (NMS).
+
+    `boxes` has shape (#detections, 4 * #classes), where each row represents
+    a list of predicted bounding boxes for each of the object classes in the
+    dataset (including the background class). The detections in each row
+    originate from the same object proposal.
+
+    `scores` has shape (#detection, #classes), where each row represents a list
+    of object detection confidence scores for each of the object classes in the
+    dataset (including the background class). `scores[i, j]`` corresponds to the
+    box at `boxes[i, j * 4:(j + 1) * 4]`.
+    """
+    num_classes = cfg.MODEL.NUM_CLASSES + 1
+    cls_boxes = [[] for _ in range(num_classes)]
+    # Apply threshold on detection probabilities and apply NMS
+    # Skip j = 0, because it's the background class
+    for j in range(1, num_classes):
+        inds = np.where(scores[:, j] > cfg.TEST.SCORE_THRESH)[0]
+        scores_j = scores[inds, j]
+        boxes_j = boxes[inds, :]
+        dets_j = np.hstack((boxes_j, scores_j[:, np.newaxis])).astype(np.float32, copy=False)
+        if cfg.TEST.SOFT_NMS.ENABLED:
+            nms_dets, _ = box_utils.soft_nms(
+                dets_j,
+                sigma=cfg.TEST.SOFT_NMS.SIGMA,
+                overlap_thresh=cfg.TEST.NMS,
+                score_thresh=0.0001,
+                method=cfg.TEST.SOFT_NMS.METHOD
+            )
+        else:
+            keep = box_utils.nms(dets_j, cfg.TEST.NMS)
+            nms_dets = dets_j[keep, :]
+        # Refine the post-NMS boxes using bounding-box voting
+        if cfg.TEST.BBOX_VOTE.ENABLED:
+            nms_dets = box_utils.box_voting(
+                nms_dets,
+                dets_j,
+                cfg.TEST.BBOX_VOTE.VOTE_TH,
+                scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
+            )
+
+        cls_boxes[j] = nms_dets
+    os_scores = []
+    os_boxes = []
+    for i in range(len(scores)):                 #looking for new objects
+        if max(scores[i]) < threshold:
+            os_scores.append((1-max(scores[i])/(1-threshold)))
+            os_boxes.append(boxes[i, :])
+
+    os_scores = np.array(os_scores)
+    os_boxes = np.array(os_boxes)
+    if len(os_boxes) > 0 and len(os_scores) > 0:
+        os_dets = np.hstack((os_boxes, os_scores[:, np.newaxis])).astype(np.float32, copy=False)
+        if cfg.TEST.SOFT_NMS.ENABLED:
+            nms_dets, _ = box_utils.soft_nms(
+                os_dets,
+                sigma=cfg.TEST.SOFT_NMS.SIGMA,
+                overlap_thresh=cfg.TEST.NMS,
+                score_thresh=0.0001,
+                method=cfg.TEST.SOFT_NMS.METHOD
+            )
+        else:
+            keep = box_utils.nms(os_dets, cfg.TEST.NMS)
+            nms_dets = os_dets[keep, :]
+        # Refine the post-NMS boxes using bounding-box voting
+        if cfg.TEST.BBOX_VOTE.ENABLED:
+            nms_dets = box_utils.box_voting(
+                nms_dets,
+                os_dets,
+                cfg.TEST.BBOX_VOTE.VOTE_TH,
+                scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
+            )
+        cls_boxes.append(nms_dets)
+    else:
+        cls_boxes.append(np.empty(0))
+    # Limit to max_per_image detections **over all classes**
+    if cfg.TEST.DETECTIONS_PER_IM > 0:
+        image_scores = np.hstack(
+            [cls_boxes[j][:, -1] for j in range(1, num_classes)]
+        )
+        if len(image_scores) > cfg.TEST.DETECTIONS_PER_IM:
+            image_thresh = np.sort(image_scores)[-cfg.TEST.DETECTIONS_PER_IM]
+            for j in range(1, num_classes):
+                keep = np.where(cls_boxes[j][:, -1] >= image_thresh)[0]
+                cls_boxes[j] = cls_boxes[j][keep, :]
+
+    detected_class_ids = [j for j in range(1, num_classes) if len(cls_boxes[j])>0]
+    return detected_class_ids
+
 def _get_rois_blob(im_rois, im_scale):
     """Converts RoIs into network inputs.
 
