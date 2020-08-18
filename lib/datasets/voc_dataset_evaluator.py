@@ -29,13 +29,79 @@ import uuid
 from core.config import cfg
 from datasets.dataset_catalog import DATASETS
 from datasets.dataset_catalog import DEVKIT_DIR
-from datasets.voc_eval import voc_eval
+from datasets.voc_eval import voc_eval, f1_classification_score
 from datasets.dis_eval import dis_eval
 from utils.io import save_object
 from openset.data import make_openset
 
 logger = logging.getLogger(__name__)
 
+def eval_classification(json_dataset,
+    all_boxes,
+    output_dir,
+    use_salt=True,
+    cleanup=True,
+    test_corloc=False,
+    use_matlab=True, seed=None, unkwn_nbr=None, mode=None, threshold=None):
+
+    salt = '_{}'.format(str(uuid.uuid4())) if use_salt else ''
+    filenames = _write_voc_results_files(json_dataset, all_boxes, salt, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode)
+    info = voc_info(json_dataset)
+    year = info['year']
+    anno_path = info['anno_path']
+    image_set_path = info['image_set_path']
+    if seed != None and unkwn_nbr != None and mode != None:
+        path = image_set_path.split('/')
+        opensets_path = path[:-2]
+        opensets_path.append("opensets")
+        opensets_path = '/'.join(opensets_path)
+        set_dir = '/'.join(path[:-1])
+        image_set_path = make_openset(set_dir, opensets_path, unkwn_nbr, seed) + '/' + mode + '.txt'
+
+    devkit_path = info['devkit_path']
+    if seed != None and unkwn_nbr != None and mode != None and threshold != None:
+        cachedir = os.path.join(devkit_path, 'annotations_cache_{}_{}_{}_{}'.format(year, unkwn_nbr, seed, threshold))
+    elif seed != None and unkwn_nbr != None and mode != None:
+        cachedir = os.path.join(devkit_path, 'annotations_cache_{}_{}_{}'.format(year, unkwn_nbr, seed))
+    else:
+        cachedir = os.path.join(devkit_path, 'annotations_cache_{}'.format(year))
+    f1s = []
+    # The PASCAL VOC metric changed in 2010
+    use_07_metric = True if int(year) < 2010 else False
+    logger.info('VOC07 metric? ' + ('Yes' if use_07_metric else 'No'))
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
+    for _, cls in enumerate(json_dataset.classes):
+        if cls == '__background__':
+            continue
+        filename = _get_voc_results_file_template(json_dataset, salt).format(cls)
+        precision, recall, f1 = f1_classification_score(filename, anno_path, image_set_path, cls, cachedir, ovthresh=0.5,
+            use_07_metric=use_07_metric, seed=seed, unkwn_nbr=unkwn_nbr)
+        f1s += [f1]
+        logger.info('f1 score for {} = {:.4f}'.format(cls, f1))
+        res_file = os.path.join(output_dir, cls + '_classification_pr.pkl')
+        save_object({'pre': precision, 'prec': recall, 'f1': f1}, res_file)
+
+
+    logger.info('Mean f1 = {:.4f}'.format(np.mean(f1s)))
+    logger.info('~~~~~~~~')
+    logger.info('Results:')
+    for f1 in f1s:
+        logger.info('{:.3f}'.format(f1))
+    logger.info('{:.3f}'.format(np.mean(f1s)))
+    logger.info('~~~~~~~~')
+    logger.info('')
+    logger.info('----------------------------------------------------------')
+    logger.info('Results computed with the **unofficial** Python eval code.')
+    logger.info('Results should be very close to the official MATLAB code.')
+    logger.info('Use `./tools/reval.py --matlab ...` for your paper.')
+    logger.info('-- Thanks, The Management')
+    logger.info('----------------------------------------------------------')
+
+    if cleanup:
+        for filename in filenames:
+            shutil.copy(filename, output_dir)
+            os.remove(filename)
 
 def evaluate_boxes(
     json_dataset,
@@ -186,6 +252,7 @@ def _do_python_eval(json_dataset, salt, output_dir='output', seed=None, unkwn_nb
             use_07_metric=use_07_metric, seed=seed, unkwn_nbr=unkwn_nbr)
         aps += [ap]
         logger.info('AP for {} = {:.4f}'.format(cls, ap))
+        print('rec : ', rec, 'prec : ', prec)
         res_file = os.path.join(output_dir, cls + '_pr.pkl')
         save_object({'rec': rec, 'prec': prec, 'ap': ap}, res_file)
     logger.info('Mean AP = {:.4f}'.format(np.mean(aps)))

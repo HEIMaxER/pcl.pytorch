@@ -491,6 +491,8 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
     for i in range(len(max_class_scores)):
         if max_class_scores[i] > 0.5:
             detected_class_ids.append(i)
+    if detected_class_ids == []:
+        detected_class_ids = [num_classes+1]
     #     scores_j = scores[inds, j]
     #     boxes_j = boxes[inds, :]
     #     dets_j = np.hstack((boxes_j, scores_j[:, np.newaxis])).astype(np.float32, copy=False)

@@ -240,5 +240,13 @@ def voc_eval(detpath,
 
     return rec, prec, ap
 
-def f1_classification_score():
-    pass
+def f1_classification_score(detpath,
+             annopath,
+             imagesetfile,
+             classname,
+             cachedir,
+             ovthresh=0.5,
+             use_07_metric=False, seed=None, unkwn_nbr=None):
+
+
+    return precision, recall, f1
