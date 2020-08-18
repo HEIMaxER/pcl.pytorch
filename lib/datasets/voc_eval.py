@@ -239,3 +239,6 @@ def voc_eval(detpath,
     ap = voc_ap(rec, prec, use_07_metric)
 
     return rec, prec, ap
+
+def f1_classification_score():
+    pass

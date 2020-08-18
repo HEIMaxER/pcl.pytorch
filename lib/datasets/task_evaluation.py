@@ -214,3 +214,8 @@ def _empty_box_results():
             ]
         )
     })
+
+def evaluate_classification(
+        dataset, detected_class_ids, output_dir, test_corloc=False, use_matlab=True, seed=None, unkwn_nbr=None, mode=None, threshold=None
+    ):
+    pass

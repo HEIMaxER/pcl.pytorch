@@ -57,7 +57,7 @@ if __name__ == '__main__':
     logger.info('Called with args:')
     logger.info(args)
 
-    if len(args.dataset.split("_")) >= :
+    if len(args.dataset.split("_")) >= 2:
         ds_info = args.dataset.split('.')
         ds_info[0] = ds_info[0].split("_")
         seed = ds_info[0][-1]
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     roidb = dataset.get_roidb()
     num_images = len(roidb)
     num_classes = cfg.MODEL.NUM_CLASSES + 2
-    class_labls = []
+    detected_classes = []
     test_corloc = 'train' in dataset_name
 
     for i, entry in enumerate(roidb, ):
@@ -126,7 +126,8 @@ if __name__ == '__main__':
         else:
             detected_class_ids = class_detection_with_nms_limit_and_openset_threshold(boxes['scores'],
                                                          boxes['boxes'], args.threshold)
-        class_labls.append(detected_class_ids)
-    results = task_evaluation.evaluate_all(
-        dataset, final_boxes, args.output_dir, test_corloc, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=args.threshold
+        detected_classes.append(detected_class_ids)
+    print('detected_classes', detected_classes)
+    results = task_evaluation.evaluate_classification(
+        dataset, detected_classes, args.output_dir, test_corloc, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=args.threshold
     )
