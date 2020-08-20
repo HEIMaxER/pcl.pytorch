@@ -229,9 +229,6 @@ def voc_eval(detpath,
     # compute precision recall
     fp = np.cumsum(fp)
     tp = np.cumsum(tp)
-    print('classe : ', classname)
-    print('True positives : ', np.sum(tp), np.sum(tp)/nd)
-    print('False positives : ', np.sum(fp), np.sum(fp)/nd)
     rec = tp / float(npos)
     # avoid divide by zero in case the first detection matches a difficult
     # ground truth
