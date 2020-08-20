@@ -74,7 +74,7 @@ def eval_classification(json_dataset,
     for _, cls in enumerate(json_dataset.classes):
         if cls == '__background__':
             continue
-        filename = _get_voc_results_file_template(json_dataset, salt).format(cls)
+        filename = _get_voc_results_file_template(json_dataset, salt, classification=True).format(cls)
         precision, recall, f1 = f1_classification_score(filename, anno_path, image_set_path, cls, cachedir, ovthresh=0.5,
             use_07_metric=use_07_metric, seed=seed, unkwn_nbr=unkwn_nbr)
         f1s += [f1]
@@ -205,11 +205,7 @@ def _write_voc_results_classification_files(json_dataset, detected_class_ids, sa
                     continue
                 # the VOCdevkit expects 1-based indices
                 print(dets)
-                # for k in range(dets.shape[0]):
-                    # f.write('{:s} {:.3f} {:.1f} {:.1f} {:.1f} {:.1f}\n'.
-                    #         format(index, dets[k, -1],
-                    #                dets[k, 0] + 1, dets[k, 1] + 1,
-                    #                dets[k, 2] + 1, dets[k, 3] + 1))
+                f.write('{:s} {:.3f} {:.1f} {:.1f} {:.1f} {:.1f}\n'.format(index, dets))
     return filenames
 
 
