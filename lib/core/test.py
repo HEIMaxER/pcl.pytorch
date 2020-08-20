@@ -567,10 +567,9 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
                 cls_boxes[j] = cls_boxes[j][keep, :]
     detected_class_ids = []
     im_results = np.vstack([cls_boxes[j] for j in range(1, num_classes)])
-    print([len(cls_boxes[j]) for j in range(1, num_classes)])
     boxes = im_results[:, :-1]
     scores = im_results[:, -1]
-    return detected_class_ids
+    return detected_class_ids, np.mean([len(cls_boxes[j]) for j in range(1, num_classes)])
 
 def _get_rois_blob(im_rois, im_scale):
     """Converts RoIs into network inputs.

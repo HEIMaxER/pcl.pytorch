@@ -4,6 +4,7 @@ import cv2
 import os
 import pprint
 from six.moves import cPickle as pickle
+import numpy as np
 
 import torch
 
@@ -121,12 +122,15 @@ if __name__ == '__main__':
 
     for i, entry in enumerate(roidb, ):
         boxes = all_boxes[entry['image']]
+        mean = []
         if test_corloc:
-            detected_class_ids = class_detection_with_nms_limit_and_openset_threshold(boxes['scores'], boxes['boxes'])
+            detected_class_ids, _ = class_detection_with_nms_limit_and_openset_threshold(boxes['scores'], boxes['boxes'])
         else:
-            detected_class_ids = class_detection_with_nms_limit_and_openset_threshold(boxes['scores'],
+            detected_class_ids, _ = class_detection_with_nms_limit_and_openset_threshold(boxes['scores'],
                                                          boxes['boxes'], args.threshold)
+        mean.append(_)
         detected_classes.append(detected_class_ids)
+    print("mean", np.mean(mean))
     results = task_evaluation.evaluate_classification(
         dataset, detected_classes, args.output_dir, test_corloc, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=args.threshold
     )
