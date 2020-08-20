@@ -552,9 +552,9 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
                 cfg.TEST.BBOX_VOTE.VOTE_TH,
                 scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
             )
-        cls_boxes.append(nms_dets)
+        cls_boxes.insert(num_classes, nms_dets)
     else:
-        cls_boxes.append(np.empty(0))
+        cls_boxes.insert(num_classes, np.zeros([1, 5]))
     # Limit to max_per_image detections **over all classes**
     if cfg.TEST.DETECTIONS_PER_IM > 0:
         image_scores = np.hstack(
@@ -565,8 +565,8 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
             for j in range(1, num_classes):
                 keep = np.where(cls_boxes[j][:, -1] >= image_thresh)[0]
                 cls_boxes[j] = cls_boxes[j][keep, :]
-    detected_class = [0 for i in range(1, num_classes)]
-    for j in range(1, num_classes):
+    detected_class = [0 for i in range(1, num_classes+1)]
+    for j in range(1, num_classes+1):
         if len(cls_boxes[j]) > 5:
             detected_class[j-1] = 1
     return detected_class
