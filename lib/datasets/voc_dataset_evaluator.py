@@ -188,17 +188,19 @@ def _write_voc_results_classification_files(json_dataset, detected_class_ids, sa
         index = os.path.splitext(os.path.split(entry['image'])[1])[0]
         assert index == image_index[i]
     for cls_ind, cls in enumerate(json_dataset.classes):
-        print(cls, cls_ind)
         if cls == '__background__':
             continue
         logger.info('Writing VOC results for: {}'.format(cls))
         filename = _get_voc_results_file_template(json_dataset,
                                                   salt, classification=True).format(cls)
-        print(filename)
+
         filenames.append(filename)
         assert len(detected_class_ids[cls_ind + 1]) == len(image_index)
         with open(filename, 'wt') as f:
-            print(detected_class_ids[cls_ind + 1])
+            if cls == 'unknown':
+                print(cls, cls_ind)
+                print(filename)
+                print(detected_class_ids[cls_ind + 1])
             for im_ind, index in enumerate(image_index):
                 dets = detected_class_ids[cls_ind + 1][im_ind]
                 if type(dets) == list:
