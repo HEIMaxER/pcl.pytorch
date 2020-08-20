@@ -124,9 +124,9 @@ if __name__ == '__main__':
         boxes = all_boxes[entry['image']]
         mean = []
         if test_corloc:
-            detected_class_i, _ = class_detection_with_nms_limit_and_openset_threshold(boxes['scores'], boxes['boxes'])
+            detected_class_i = class_detection_with_nms_limit_and_openset_threshold(boxes['scores'], boxes['boxes'])
         else:
-            detected_class_i, _ = class_detection_with_nms_limit_and_openset_threshold(boxes['scores'],
+            detected_class_i = class_detection_with_nms_limit_and_openset_threshold(boxes['scores'],
                                                          boxes['boxes'], args.threshold)
         extend_results(i, detected_classes, detected_class_i)
     print("size detectedclasses", len(detected_classes), print(len(detected_classes[0])))
