@@ -349,4 +349,4 @@ def f1_classification_score(detpath,
 
     f1 = 2*((precision*recall)/(precision+recall))
 
-    return f1, tp, fp, all_p, f1
+    return f1, tp, fp, all_p
