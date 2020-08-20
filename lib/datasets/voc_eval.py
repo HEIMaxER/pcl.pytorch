@@ -323,20 +323,15 @@ def f1_classification_score(detpath,
                                      'difficult': difficult,
                                      'det': det}
 
-    print(imagenames[0], type(imagenames[0]))
     # read dets
     detfile = detpath.format(cls)
     with open(detfile, 'r') as f:
         lines = f.readlines()
 
     splitlines = [x.strip().split(' ') for x in lines]
-    image_ids = [x[0] for x in splitlines]
-    print(image_ids[0], type(image_ids[0]))
-    detection = np.array([int(str(x[1])) for x in splitlines])
-    print(detection)
     result_dict = {}
-    for k in range(len(image_ids)):
-        result_dict[image_ids[k]] = detection[k]
+    for x in splitlines:
+        result_dict[x[0]] = int(float(x[1]))
 
     all_p = len(imagenames)
     tp = 0
