@@ -566,7 +566,6 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
                 keep = np.where(cls_boxes[j][:, -1] >= image_thresh)[0]
                 cls_boxes[j] = cls_boxes[j][keep, :]
     detected_class = [0 for i in range(1, num_classes+1)]
-    print(num_classes+1)
     for j in range(1, num_classes+1):
         if len(cls_boxes[j]) > 5:
             detected_class[j-1] = 1
