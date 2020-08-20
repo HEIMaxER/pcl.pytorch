@@ -43,7 +43,8 @@ def eval_classification(json_dataset,
     cleanup=True,
     test_corloc=False,
     use_matlab=True, seed=None, unkwn_nbr=None, mode=None, threshold=None):
-
+    salt = '_{}'.format(str(uuid.uuid4())) if use_salt else ''
+    filenames = _write_voc_results_classification_files(json_dataset, detected_class_ids, salt, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode)
     salt = '_{}'.format(str(uuid.uuid4())) if use_salt else ''
     info = voc_info(json_dataset)
     year = info['year']
@@ -70,15 +71,15 @@ def eval_classification(json_dataset,
     logger.info('VOC07 metric? ' + ('Yes' if use_07_metric else 'No'))
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
-    for cls_info in enumerate(json_dataset.classes):
-        if cls_info[1] == '__background__':
+    for _, cls in enumerate(json_dataset.classes):
+        if cls == '__background__':
             continue
-        filename = _get_voc_results_file_template(json_dataset, salt).format(cls_info[1])
-        precision, recall, f1 = f1_classification_score(filename, anno_path, image_set_path, cls_info, cachedir, ovthresh=0.5,
+        filename = _get_voc_results_file_template(json_dataset, salt).format(cls)
+        precision, recall, f1 = f1_classification_score(filename, anno_path, image_set_path, cls, cachedir, ovthresh=0.5,
             use_07_metric=use_07_metric, seed=seed, unkwn_nbr=unkwn_nbr)
         f1s += [f1]
-        logger.info('f1 score for {} = {:.4f}'.format(cls_info[1], f1))
-        res_file = os.path.join(output_dir, cls_info[1] + '_classification_pr.pkl')
+        logger.info('f1 score for {} = {:.4f}'.format(cls, f1))
+        res_file = os.path.join(output_dir, cls + '_classification_pr.pkl')
         save_object({'pre': precision, 'prec': recall, 'f1': f1}, res_file)
 
 
@@ -166,14 +167,62 @@ def _write_voc_results_files(json_dataset, all_boxes, salt, seed=None, unkwn_nbr
                                    dets[k, 2] + 1, dets[k, 3] + 1))
     return filenames
 
+def _write_voc_results_classification_files(json_dataset, detected_class_ids, salt, seed=None, unkwn_nbr=None, mode=None, classification=False):
+    filenames = []
+    image_set_path = voc_info(json_dataset)['image_set_path']
+    if seed != None and unkwn_nbr != None and  mode != None:
+        path = image_set_path.split('/')
+        opensets_path = path[:-2]
+        opensets_path.append("opensets")
+        opensets_path = '/'.join(opensets_path)
+        set_dir = '/'.join(path[:-1])
+        image_set_path = make_openset(set_dir, opensets_path, unkwn_nbr, seed)+'/'+mode+'.txt'
 
-def _get_voc_results_file_template(json_dataset, salt):
+    assert os.path.exists(image_set_path), \
+        'Image set path does not exist: {}'.format(image_set_path)
+    with open(image_set_path, 'r') as f:
+        image_index = [x.strip() for x in f.readlines()]
+    # Sanity check that order of images in json dataset matches order in the
+    # image set
+    roidb = json_dataset.get_roidb()
+    for i, entry in enumerate(roidb):
+        index = os.path.splitext(os.path.split(entry['image'])[1])[0]
+        assert index == image_index[i]
+    for cls_ind, cls in enumerate(json_dataset.classes):
+        if cls == '__background__':
+            continue
+        logger.info('Writing VOC results for: {}'.format(cls))
+        filename = _get_voc_results_file_template(json_dataset,
+                                                  salt, classification=True).format(cls)
+        filenames.append(filename)
+        assert len(detected_class_ids[cls_ind + 1]) == len(image_index)
+        with open(filename, 'wt') as f:
+            for im_ind, index in enumerate(image_index):
+                dets = detected_class_ids[cls_ind + 1][im_ind]
+                if type(dets) == list:
+                    assert len(dets) == 0, \
+                        'dets should be numpy.ndarray or empty list'
+                    continue
+                # the VOCdevkit expects 1-based indices
+                for k in range(dets.shape[0]):
+                    print(dets)
+                    f.write('{:s} {:.3f} {:.1f} {:.1f} {:.1f} {:.1f}\n'.
+                            format(index, dets[k, -1],
+                                   dets[k, 0] + 1, dets[k, 1] + 1,
+                                   dets[k, 2] + 1, dets[k, 3] + 1))
+    return filenames
+
+
+def _get_voc_results_file_template(json_dataset, salt, classification=False):
     info = voc_info(json_dataset)
     year = info['year']
     image_set = info['image_set']
     devkit_path = info['devkit_path']
     # VOCdevkit/results/VOC2007/Main/<comp_id>_det_test_aeroplane.txt
-    filename = 'comp4' + salt + '_det_' + image_set + '_{:s}.txt'
+    if classification:
+        filename = 'comp4' + salt + '_cls_' + image_set + '_{:s}.txt'
+    else:
+        filename = 'comp4' + salt + '_det_' + image_set + '_{:s}.txt'
     dirname = os.path.join(devkit_path, 'results', 'VOC' + year, 'Main')
     if not os.path.exists(dirname):
         os.makedirs(dirname)

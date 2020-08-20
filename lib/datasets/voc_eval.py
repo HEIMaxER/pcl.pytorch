@@ -240,7 +240,7 @@ def voc_eval(detpath,
 def f1_classification_score(detpath,
              annopath,
              imagesetfile,
-             cls_info,
+             cls,
              cachedir,
              ovthresh=0.5,
              use_07_metric=False, seed=None, unkwn_nbr=None):
@@ -300,7 +300,7 @@ def f1_classification_score(detpath,
     # extract gt objects for this class
     class_recs = {}
     npos = 0
-    if cls_info[1] == 'unknown':
+    if cls == 'unknown':
         unkwn_cls = get_voc07_unknown_classes(seed, unkwn_nbr)
         for imagename in imagenames:
             R = [obj for obj in recs[imagename] if obj['name'] in unkwn_cls]
@@ -314,7 +314,7 @@ def f1_classification_score(detpath,
     else:
 
         for imagename in imagenames:
-            R = [obj for obj in recs[imagename] if obj['name'] == classname]
+            R = [obj for obj in recs[imagename] if obj['name'] == cls]
             bbox = np.array([x['bbox'] for x in R])
             difficult = np.array([x['difficult'] for x in R]).astype(np.bool)
             det = [False] * len(R)
@@ -324,7 +324,7 @@ def f1_classification_score(detpath,
                                      'det': det}
 
     # read dets
-    detfile = detpath.format(classname)
+    detfile = detpath.format(cls)
     with open(detfile, 'r') as f:
         lines = f.readlines()
 
