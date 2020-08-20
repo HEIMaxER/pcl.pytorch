@@ -117,7 +117,7 @@ if __name__ == '__main__':
     roidb = dataset.get_roidb()
     num_images = len(roidb)
     num_classes = cfg.MODEL.NUM_CLASSES + 2
-    detected_classes = empty_results(num_classes + 1, num_images)
+    detected_classes = empty_results(num_classes, num_images)
     test_corloc = 'train' in dataset_name
 
     for i, entry in enumerate(roidb, ):
