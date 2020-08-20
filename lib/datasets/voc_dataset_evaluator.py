@@ -204,7 +204,6 @@ def _write_voc_results_classification_files(json_dataset, detected_class_ids, sa
                     continue
                 # the VOCdevkit expects 1-based indices
                 f.write('{:s} {:.3f}\n'.format(index, dets))
-        print(filename)
     return filenames
 
 
