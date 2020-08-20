@@ -218,4 +218,14 @@ def _empty_box_results():
 def evaluate_classification(
         dataset, detected_class_ids, output_dir, test_corloc=False, use_matlab=True, seed=None, unkwn_nbr=None, mode=None, threshold=None
     ):
-    pass
+    if _use_voc_evaluator(dataset):
+        class_eval = voc_dataset_evaluator.eval_classification(
+            dataset, detected_class_ids, output_dir, test_corloc=test_corloc,
+            use_matlab=use_matlab, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=threshold
+        )
+    else:
+        raise NotImplementedError(
+            'No evaluator for dataset: {}'.format(dataset.name)
+        )
+    ds_name = dataset.name+ '_classification' + '_' + str(unkwn_nbr) + '_' + str(seed)
+    return OrderedDict([(ds_name, class_eval)])
