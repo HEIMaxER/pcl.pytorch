@@ -335,5 +335,7 @@ def f1_classification_score(detpath,
     detection = np.array([int(x[1]) for x in splitlines])
     print(detection)
     pass
+    all_p = len(imagenames)
+    tp = 0
 
     # return precision, recall, f1

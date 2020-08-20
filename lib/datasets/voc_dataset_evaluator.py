@@ -204,8 +204,7 @@ def _write_voc_results_classification_files(json_dataset, detected_class_ids, sa
                         'dets should be numpy.ndarray or empty list'
                     continue
                 # the VOCdevkit expects 1-based indices
-                print(dets)
-                f.write('{:s} {:.3f} {:.1f} {:.1f} {:.1f} {:.1f}\n'.format(index, dets))
+                f.write('{:s} {:.3f}\n'.format(index, dets))
     return filenames
 
 
