@@ -336,7 +336,6 @@ def f1_classification_score(detpath,
     all_p = len(imagenames)
     tp = 0
     fp = 0
-    print(result_dict.keys())
     for imagename in imagenames:
         if result_dict[imagename] == 1:
             tp += 1
