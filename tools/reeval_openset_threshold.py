@@ -124,6 +124,7 @@ if __name__ == '__main__':
                                                          boxes['boxes'], args.threshold)
         extend_results(i, final_boxes, cls_boxes_i)
     print(len(final_boxes))
+    print(final_boxes[0])
     results = task_evaluation.evaluate_all(
         dataset, final_boxes, args.output_dir, test_corloc, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=args.threshold
     )
