@@ -130,7 +130,7 @@ if __name__ == '__main__':
                                                          boxes['boxes'], args.threshold)
         extend_results(i, detected_classes, detected_class_i)
     print("size detectedclasses", len(detected_classes), print(len(detected_classes[0])))
-    print(detected_classes[0])
+    print(detected_classes[1])
     results = task_evaluation.evaluate_classification(
         dataset, detected_classes, args.output_dir, test_corloc, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=args.threshold
     )
