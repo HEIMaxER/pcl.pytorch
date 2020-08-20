@@ -336,13 +336,12 @@ def f1_classification_score(detpath,
     all_p = len(imagenames)
     tp = 0
     fp = 0
-
-    for imagename in imagenames:
-        if result_dict[imagename] == 1:
-            tp += 1
-        else:
-            fp += 1
-
+    if result_dict != {}:
+        for imagename in imagenames:
+            if result_dict[imagename] == 1:
+                tp += 1
+            else:
+                fp += 1
 
     precision = tp / (fp+tp)
     recall = tp/ all_p
