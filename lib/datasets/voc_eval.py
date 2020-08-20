@@ -332,7 +332,7 @@ def f1_classification_score(detpath,
     splitlines = [x.strip().split(' ') for x in lines]
     image_ids = [x[0] for x in splitlines]
     print(image_ids[0], type(image_ids[0]))
-    detection = np.array([int(x[1]) for x in splitlines])
+    detection = np.array([int(str(x[1])) for x in splitlines])
     print(detection)
     result_dict = {}
     for k in range(len(image_ids)):

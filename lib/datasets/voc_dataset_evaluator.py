@@ -79,7 +79,7 @@ def eval_classification(json_dataset,
         f1s += [f1]
         logger.info('f1 score for {} = {:.4f}'.format(cls, f1))
         res_file = os.path.join(output_dir, cls + '_classification_pr.pkl')
-        save_object({'pre': precision, 'prec': recall, 'f1': f1}, res_file)
+        # save_object({'pre': precision, 'prec': recall, 'f1': f1}, res_file)
 
 
     logger.info('Mean f1 = {:.4f}'.format(np.mean(f1s)))
