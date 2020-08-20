@@ -453,7 +453,7 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
     # Limit to max_per_image detections **over all classes**
     if cfg.TEST.DETECTIONS_PER_IM > 0:
         image_scores = np.hstack(
-            [cls_boxes[j][:, -1] for j in range(1, num_classes)]
+            [cls_boxes[j][:, -1] for j in range(1, num_classes+1)]
         )
         if len(image_scores) > cfg.TEST.DETECTIONS_PER_IM:
             image_thresh = np.sort(image_scores)[-cfg.TEST.DETECTIONS_PER_IM]
@@ -461,7 +461,7 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
                 keep = np.where(cls_boxes[j][:, -1] >= image_thresh)[0]
                 cls_boxes[j] = cls_boxes[j][keep, :]
 
-    im_results = np.vstack([cls_boxes[j] for j in range(1, num_classes)])
+    im_results = np.vstack([cls_boxes[j] for j in range(1, num_classes+1)])
     boxes = im_results[:, :-1]
     scores = im_results[:, -1]
     return scores, boxes, cls_boxes
@@ -565,8 +565,8 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
             for j in range(1, num_classes):
                 keep = np.where(cls_boxes[j][:, -1] >= image_thresh)[0]
                 cls_boxes[j] = cls_boxes[j][keep, :]
-    detected_class = [0 for i in range(num_classes)]
-    for j in range(1, num_classes+1):
+    detected_class = [0 for i in range(1, num_classes)]
+    for j in range(1, num_classes):
         if len(cls_boxes[j]) > 5:
             detected_class[j-1] = 1
     return detected_class
