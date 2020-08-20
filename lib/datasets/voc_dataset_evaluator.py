@@ -74,7 +74,7 @@ def eval_classification(json_dataset,
         if cls == '__background__':
             continue
         filename = _get_voc_results_file_template(json_dataset, salt, classification=True).format(cls)
-        precision, recall, f1 = f1_classification_score(filename, anno_path, image_set_path, cls, cachedir, ovthresh=0.5,
+        f1, _, _, _ = f1_classification_score(filename, anno_path, image_set_path, cls, cachedir, ovthresh=0.5,
             use_07_metric=use_07_metric, seed=seed, unkwn_nbr=unkwn_nbr)
         f1s += [f1]
         logger.info('f1 score for {} = {:.4f}'.format(cls, f1))

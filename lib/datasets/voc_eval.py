@@ -334,8 +334,24 @@ def f1_classification_score(detpath,
     print(image_ids[0], type(image_ids[0]))
     detection = np.array([int(x[1]) for x in splitlines])
     print(detection)
-    pass
+    result_dict = {}
+    for k in range(len(image_ids)):
+        result_dict[image_ids[k]] = detection[k]
+
     all_p = len(imagenames)
     tp = 0
+    fp = 0
 
-    # return precision, recall, f1
+    for imagename in imagenames:
+        if result_dict[imagenames] == 1:
+            tp += 1
+        else:
+            fp += 1
+
+
+    precision = tp / (fp+tp)
+    recall = tp/ all_p
+
+    f1 = 2*((precision*recall)/(precision+recall))
+
+    return f1, tp, fp, all_p, f1
