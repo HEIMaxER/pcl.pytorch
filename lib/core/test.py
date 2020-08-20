@@ -450,7 +450,7 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
             )
         cls_boxes.append(nms_dets)
     else:
-        cls_boxes.append(np.zeros([1,1]))
+        cls_boxes.append(np.zeros([1,5]))
     print("2", len(cls_boxes))
     for k in range(1, num_classes+1):
         print(k)
