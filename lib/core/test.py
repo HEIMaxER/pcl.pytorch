@@ -564,14 +564,14 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
             for j in range(1, num_classes+1):
                 keep = np.where(cls_boxes[j][:, -1] >= image_thresh)[0]
                 cls_boxes[j] = cls_boxes[j][keep, :]
+    m = len(cls_boxes[-1])
     detected_class = [0 for i in range(num_classes+1)]
     for j in range(1, num_classes):
         if len(cls_boxes[j]) > 5:
             detected_class[j] = 1
     if len(cls_boxes[-1]) > 7:
         detected_class[-1] = 1
-    print(detected_class[-1])
-    return detected_class
+    return detected_class, m
 
 def _get_rois_blob(im_rois, im_scale):
     """Converts RoIs into network inputs.
