@@ -495,7 +495,9 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
     #     detected_class_ids = [num_classes+1]
     num_box = scores.shape[0]
     class_scores = np.sum(scores, axis=0)
-    print(class_scores.shape, type(class_scores))
+    final_scores = [x/num_box for x in scores]
+    print(final_scores)
+    print(final_scores.shape, type(final_scores))
 
     # cls_boxes = [[] for _ in range(num_classes)]
     # for j in range(1, num_classes):
