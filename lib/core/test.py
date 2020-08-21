@@ -569,6 +569,8 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
     for j in range(1, num_classes):
         if len(cls_boxes[j]) > 5:
             detected_class[j] = 1
+    if len(cls_boxes[-1]) > 1:
+        detected_class[-1] = 1
     return detected_class
 
 def _get_rois_blob(im_rois, im_scale):
