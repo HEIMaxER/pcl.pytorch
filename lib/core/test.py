@@ -496,8 +496,13 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
     num_box = scores.shape[0]
     class_scores = np.sum(scores, axis=0)
     final_scores = [x/num_box for x in scores[0]]
-    print(final_scores)
-    print(final_scores.shape, type(final_scores))
+    detected_class = [0 for _ in range(num_classes+1)]
+    for i in range(1, num_classes):
+        if final_scores[i] > cfg.TEST.SCORE_THRESH:
+            detected_class[i]=1
+    if final_scores.all() < threshold:
+        detected_class[-1] = 1
+
 
     # cls_boxes = [[] for _ in range(num_classes)]
     # for j in range(1, num_classes):
@@ -575,7 +580,7 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
     #         detected_class[j] = 1
     # if len(cls_boxes[-1]) > 1:
     #     detected_class[-1] = 1
-    # return detected_class
+    return detected_class, np.mean(final_scores)
 
 def _get_rois_blob(im_rois, im_scale):
     """Converts RoIs into network inputs.
