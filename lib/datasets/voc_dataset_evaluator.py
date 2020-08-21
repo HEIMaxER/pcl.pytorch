@@ -284,6 +284,7 @@ def _write_voc_results_classification_files(json_dataset, detected_class_ids, sa
         with open(filename, 'wt') as f:
             for im_ind, index in enumerate(image_index):
                 dets = detected_class_ids[cls_ind + 1][im_ind]
+                print(dets)
                 if type(dets) == list:
                     assert len(dets) == 0, \
                         'dets should be numpy.ndarray or empty list'
