@@ -303,26 +303,12 @@ def f1_classification_score(detpath,
     if cls == 'unknown':
         unkwn_cls = get_voc07_unknown_classes(seed, unkwn_nbr)
         for imagename in imagenames:
-            R = [obj for obj in recs[imagename] if obj['name'] in unkwn_cls]
-            bbox = np.array([x['bbox'] for x in R])
-            difficult = np.array([x['difficult'] for x in R]).astype(np.bool)
-            det = [False] * len(R)
-            npos = npos + sum(~difficult)
-            class_recs[imagename] = {'bbox': bbox,
-                                     'difficult': difficult,
-                                     'det': det}
-    else:
+            cls_names = [imagename for obj in recs[imagename] if obj['name'] in unkwn_cls]
 
         for imagename in imagenames:
-            R = [obj for obj in recs[imagename] if obj['name'] == cls]
-            bbox = np.array([x['bbox'] for x in R])
-            difficult = np.array([x['difficult'] for x in R]).astype(np.bool)
-            det = [False] * len(R)
-            npos = npos + sum(~difficult)
-            class_recs[imagename] = {'bbox': bbox,
-                                     'difficult': difficult,
-                                     'det': det}
+            cls_names = [imagename for obj in recs[imagename] if obj['name'] == cls]
 
+    cls_names = np.unique(cls_names)
     # read dets
     detfile = detpath.format(cls)
     with open(detfile, 'r') as f:
@@ -333,10 +319,12 @@ def f1_classification_score(detpath,
     for x in splitlines:
         result_dict[x[0]] = int(float(x[1]))
 
-    all_p = len(imagenames)
+    all_p = len(cls_names)
     tp = 0
     fp = 0
-    for imagename in imagenames:
+    for imagename in cls_names:
+        if cls == 'unknown':
+            print(result_dict[imagename])
         if result_dict[imagename] == 1:
             tp += 1
         else:
@@ -344,8 +332,12 @@ def f1_classification_score(detpath,
 
     precision = tp / (fp+tp)
     recall = tp/ all_p
+    print('len cls names', len(cls_names))
+    print('len set', len(imagenames))
     print('precision', precision)
     print('recall', recall)
+    if tp != 0:
+
     f1 = 2*((precision*recall)/(precision+recall))
 
     return f1, tp, fp, all_p
