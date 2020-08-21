@@ -73,6 +73,8 @@ def eval_classification(json_dataset,
     true_positives = 0
     false_positives = 0
     all_positives = 0
+    prec = []
+    rec = []
     for _, cls in enumerate(json_dataset.classes):
         if cls == '__background__':
             continue
@@ -89,6 +91,8 @@ def eval_classification(json_dataset,
         else:
             precision = 0
             recall = 0
+        prec.append(precision)
+        rec.append(recall)
         logger.info('f1 score for {} = {:.4f}'.format(cls, f1))
         logger.info('precision score for {} = {:.4f}'.format(cls, precision))
         logger.info('recall score for {} = {:.4f}'.format(cls, recall))
@@ -100,6 +104,8 @@ def eval_classification(json_dataset,
     macro_f1 = 2 * ((macro_precision * macro_recall) / (macro_precision + macro_recall))
 
     logger.info('Average f1 = {:.4f}'.format(np.mean(f1s)))
+    logger.info('Average precision = {:.4f}'.format(np.mean(prec)))
+    logger.info('Average recall = {:.4f}'.format(np.mean(rec)))
     logger.info('Macro f1 = {:.4f}'.format(np.mean(macro_f1)))
     logger.info('~~~~~~~~')
     logger.info('Results:')
