@@ -304,7 +304,7 @@ def f1_classification_score(detpath,
         unkwn_cls = get_voc07_unknown_classes(seed, unkwn_nbr)
         for imagename in imagenames:
             cls_names = [imagename for obj in recs[imagename] if obj['name'] in unkwn_cls]
-
+    else:
         for imagename in imagenames:
             cls_names = [imagename for obj in recs[imagename] if obj['name'] == cls]
 
