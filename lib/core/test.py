@@ -464,7 +464,7 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
     im_results = np.vstack([cls_boxes[j] for j in range(1, num_classes+1)])
     boxes = im_results[:, :-1]
     scores = im_results[:, -1]
-    print(cls_boxes[0])
+    print(cls_boxes[1])
     return scores, boxes, cls_boxes
 
 def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshold=None):  # NOTE: support single-batch
@@ -570,7 +570,7 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
     for j in range(1, num_classes+1):
         if len(cls_boxes[j]) > 5:
             detected_class[j-1] = 1
-    print(detected_class[0])
+    print(detected_class[1])
     return detected_class
 
 def _get_rois_blob(im_rois, im_scale):
