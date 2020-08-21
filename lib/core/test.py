@@ -490,7 +490,7 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
         for i in range(1, num_classes):
             if final_scores[i] > 2.9865425796581848e-05/2:
                 detected_class[i] = 1
-            if final_scores[i] > (2.9865425796581848e-05/2)*2:
+            if final_scores[i] > (2.9865425796581848e-05/2)*threshold:
                 ukn = 0
         if ukn == 1:
             detected_class[-1] = 1
