@@ -526,8 +526,8 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
         os_scores = []
         os_boxes = []
         for i in range(len(scores)):  # looking for new objects
-            if max(scores[i]) < 2.9865425796581848e-05:
-                os_scores.append((1 - max(scores[i]) / (1 - 2.9865425796581848e-05)))
+            if max(scores[i]) < threshold:
+                os_scores.append((1 - max(scores[i]) / (1 - threshold)))
                 os_boxes.append(boxes[i, :])
 
         os_scores = np.array(os_scores)
