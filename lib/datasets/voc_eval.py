@@ -344,7 +344,8 @@ def f1_classification_score(detpath,
 
     precision = tp / (fp+tp)
     recall = tp/ all_p
-
+    print('precision', precision)
+    print('recall', recall)
     f1 = 2*((precision*recall)/(precision+recall))
 
     return f1, tp, fp, all_p
