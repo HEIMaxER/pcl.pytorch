@@ -324,7 +324,6 @@ def voc_eval_random(detpath,
     x3 = []
     x4 = []
     for i in range(len(BB)):
-        print(BB[i])
         x1.append(BB[i,0])
         x2.append(BB[i,1])
         x3.append(BB[i,2])
