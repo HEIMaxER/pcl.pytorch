@@ -7,6 +7,7 @@ import pprint
 import sys
 import time
 from six.moves import cPickle as pickle
+import numpy as np
 
 import torch
 
@@ -116,13 +117,16 @@ if __name__ == '__main__':
     test_corloc = 'train' in dataset_name
 
     for i, entry in enumerate(roidb, ):
+        mean = []
         boxes = all_boxes[entry['image']]
         if test_corloc:
             _, _, cls_boxes_i = box_results_for_corloc(boxes['scores'], boxes['boxes'])
         else:
-            _, _, cls_boxes_i = box_results_with_nms_limit_and_openset_threshold(boxes['scores'],
+            _, _, cls_boxes_i, box_cnt = box_results_with_nms_limit_and_openset_threshold(boxes['scores'],
                                                          boxes['boxes'], args.threshold)
+        mean.append(box_cnt)
         extend_results(i, final_boxes, cls_boxes_i)
+    print('mean', np.mean(mean))
     results = task_evaluation.evaluate_all(
         dataset, final_boxes, args.output_dir, test_corloc, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=args.threshold
     )
