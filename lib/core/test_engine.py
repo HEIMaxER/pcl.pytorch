@@ -454,7 +454,6 @@ def extend_results(index, all_res, im_res):
     index.
     """
     # Skip cls_idx 0 (__background__)
+    print(0, im_res[0])
     for cls_idx in range(1, len(im_res)):
-        if cls_idx == len(im_res)-1:
-            print(cls_idx, im_res[cls_idx])
         all_res[cls_idx][index] = im_res[cls_idx]
