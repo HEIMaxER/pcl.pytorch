@@ -156,7 +156,7 @@ def eval_random(json_dataset,
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
     for _, cls in enumerate(json_dataset.classes):
-        if cls == '__background__':
+        if cls == '__background__' or cls == 'unknown':
             continue
         filename = _get_voc_results_file_template(
             json_dataset, salt).format(cls)
