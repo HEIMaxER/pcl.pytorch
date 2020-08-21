@@ -462,8 +462,7 @@ def f1_classification_score(detpath,
     for x in splitlines:
         result_dict[x[0]] = int(float(x[1]))
 
-    if cls == 'unknown':
-        print(result_dict)
+
     all_p = len(cls_names)
     tp = 0
     fp = 0

@@ -554,7 +554,6 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
         cls_boxes.append(nms_dets)
     else:
         cls_boxes.append(np.zeros([1, 5]))
-
     # Limit to max_per_image detections **over all classes**
     if cfg.TEST.DETECTIONS_PER_IM > 0:
         image_scores = np.hstack(
@@ -571,6 +570,7 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
             detected_class[j] = 1
     if len(cls_boxes[-1]) > 7:
         detected_class[-1] = 1
+    print(detected_class[-1])
     return detected_class
 
 def _get_rois_blob(im_rois, im_scale):
