@@ -326,13 +326,12 @@ def f1_classification_score(detpath,
     all_p = len(cls_names)
     tp = 0
     fp = 0
-    for imagename in cls_names:
-        if cls == 'unknown':
-            print(result_dict[imagename])
+    for imagename in imagenames:
         if result_dict[imagename] == 1:
-            tp += 1
-        else:
-            fp += 1
+            if imagename in cls_names:
+                tp += 1
+            else:
+                fp += 1
 
     print('len cls names', len(cls_names))
     print('len set', len(imagenames))

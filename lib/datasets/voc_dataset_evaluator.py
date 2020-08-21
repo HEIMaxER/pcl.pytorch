@@ -70,19 +70,35 @@ def eval_classification(json_dataset,
     logger.info('VOC07 metric? ' + ('Yes' if use_07_metric else 'No'))
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
+    true_positives = 0
+    false_positives = 0
+    all_positives = 0
     for _, cls in enumerate(json_dataset.classes):
         if cls == '__background__':
             continue
         filename = _get_voc_results_file_template(json_dataset, salt, classification=True).format(cls)
-        f1, _, _, _ = f1_classification_score(filename, anno_path, image_set_path, cls, cachedir, ovthresh=0.5,
+        f1, tp, fp, all_p = f1_classification_score(filename, anno_path, image_set_path, cls, cachedir, ovthresh=0.5,
             use_07_metric=use_07_metric, seed=seed, unkwn_nbr=unkwn_nbr)
+        true_positives += tp
+        false_positives += fp
+        all_positives += all_p
         f1s += [f1]
+        if tp != 0:
+            precision = tp / (fp + tp)
+            recall = tp / all_p
+        else:
+            precision = 0
+            recall = 0
         logger.info('f1 score for {} = {:.4f}'.format(cls, f1))
         res_file = os.path.join(output_dir, cls + '_classification_pr.pkl')
-        # save_object({'pre': precision, 'prec': recall, 'f1': f1}, res_file)
+        save_object({'pre': precision, 'rec': recall, 'f1': f1}, res_file)
 
+    macro_precision = true_positives / (false_positives + true_positives)
+    macro_recall = true_positives / all_positives
+    macro_f1 = 2 * ((macro_precision * macro_recall) / (macro_precision + macro_recall))
 
-    logger.info('Mean f1 = {:.4f}'.format(np.mean(f1s)))
+    logger.info('Average f1 = {:.4f}'.format(np.mean(f1s)))
+    logger.info('Macro f1 = {:.4f}'.format(np.mean(macro_f1)))
     logger.info('~~~~~~~~')
     logger.info('Results:')
     for f1 in f1s:
