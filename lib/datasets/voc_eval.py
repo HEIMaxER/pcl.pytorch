@@ -300,15 +300,19 @@ def f1_classification_score(detpath,
     # extract gt objects for this class
     class_recs = {}
     npos = 0
+    cls_names = []
     if cls == 'unknown':
         unkwn_cls = get_voc07_unknown_classes(seed, unkwn_nbr)
         for imagename in imagenames:
-            cls_names = [imagename for obj in recs[imagename] if obj['name'] in unkwn_cls]
+            for obj in recs[imagename]:
+                if obj['name'] in unkwn_cls and imagename not in cls_names:
+                    cls_names.append(imagename)
     else:
         for imagename in imagenames:
-            cls_names = [imagename for obj in recs[imagename] if obj['name'] == cls]
+            for obj in recs[imagename]:
+                if obj['name'] == cls and imagename not in cls_names:
+                    cls_names.append(imagename)
 
-    cls_names = np.unique(cls_names)
     # read dets
     detfile = detpath.format(cls)
     with open(detfile, 'r') as f:
