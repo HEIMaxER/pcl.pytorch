@@ -499,7 +499,7 @@ def class_detection_with_nms_limit_and_openset_threshold(scores, boxes, threshol
     detected_class = [0 for _ in range(num_classes+1)]
     ukn = 1
     for i in range(1, num_classes):
-        if final_scores[i] > cfg.TEST.SCORE_THRESH:
+        if final_scores[i] > cfg.TEST.SCORE_THRESH/2:
             detected_class[i] = 1
         if final_scores[i] > threshold:
             ukn = 0
