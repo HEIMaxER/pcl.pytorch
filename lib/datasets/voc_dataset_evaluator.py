@@ -90,6 +90,8 @@ def eval_classification(json_dataset,
             precision = 0
             recall = 0
         logger.info('f1 score for {} = {:.4f}'.format(cls, f1))
+        logger.info('precision score for {} = {:.4f}'.format(cls, precision))
+        logger.info('recall score for {} = {:.4f}'.format(cls, recall))
         res_file = os.path.join(output_dir, cls + '_classification_pr.pkl')
         save_object({'pre': precision, 'rec': recall, 'f1': f1}, res_file)
 
