@@ -122,17 +122,14 @@ if __name__ == '__main__':
     num_classes = cfg.MODEL.NUM_CLASSES + 2
     detected_classes = empty_results(num_classes, num_images)
     test_corloc = 'train' in dataset_name
-    mean = []
     for i, entry in enumerate(roidb, ):
         boxes = all_boxes[entry['image']]
         if test_corloc:
             detected_class_i = class_detection_with_nms_limit_and_openset_threshold(boxes['scores'], boxes['boxes'])
         else:
-            detected_class_i, m = class_detection_with_nms_limit_and_openset_threshold(boxes['scores'],
+            detected_class_i = class_detection_with_nms_limit_and_openset_threshold(boxes['scores'],
                                                          boxes['boxes'], args.threshold, args.eval)
-        mean.append(m)
         extend_results(i, detected_classes, detected_class_i)
-    print('mean', np.mean(mean))
     results = task_evaluation.evaluate_classification(
         dataset, detected_classes, args.output_dir, test_corloc, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=args.threshold
     )
