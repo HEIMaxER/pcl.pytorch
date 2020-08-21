@@ -330,15 +330,17 @@ def f1_classification_score(detpath,
         else:
             fp += 1
 
-    precision = tp / (fp+tp)
-    recall = tp/ all_p
     print('len cls names', len(cls_names))
     print('len set', len(imagenames))
     print('precision', precision)
     print('recall', recall)
     if tp != 0:
+        precision = tp / (fp + tp)
+        recall = tp / all_p
         f1 = 2*((precision*recall)/(precision+recall))
     else:
+        precision = 0
+        recall = 0
         f1 = 0
 
     return f1, tp, fp, all_p
