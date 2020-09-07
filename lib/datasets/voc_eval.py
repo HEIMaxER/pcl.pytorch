@@ -319,15 +319,7 @@ def voc_eval_random(detpath,
     image_ids = [x[0] for x in splitlines]
     confidence = np.array([float(x[1]) for x in splitlines])
     BB = np.array([[float(z) for z in x[2:]] for x in splitlines])
-    x1 = []
-    x2 = []
-    x3 = []
-    x4 = []
-    for i in range(len(BB)):
-        x1.append(BB[i,0])
-        x2.append(BB[i,1])
-        x3.append(BB[i,2])
-        x4.append(BB[i,3])
+
     # sort by confidence
     sorted_ind = np.argsort(-confidence)
     if not BB.size == 0:
@@ -340,8 +332,7 @@ def voc_eval_random(detpath,
     fp = np.zeros(nd)
     for d in range(nd):
         R = class_recs[image_ids[d]]
-        bb = [np.random.uniform(min(x1), max(x1)), np.random.uniform(min(x2), max(x2)), np.random.uniform(min(x3), max(x3)), np.random.uniform(min(x4), max(x4))]
-        # bb = BB[d, :].astype(float)
+        bb = BB[d, :].astype(float)
         ovmax = -np.inf
         BBGT = R['bbox'].astype(float)
 
