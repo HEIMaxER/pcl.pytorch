@@ -46,9 +46,6 @@ def parse_args():
         help='set config keys, will overwrite config in the cfg_file.'
              ' See lib/core/config.py for all options',
         default=[], nargs='*')
-    parser.add_argument(
-        '--threshold',
-        help='Openset detection thershold', default=0.05, type=float)
 
     return parser.parse_args()
 
@@ -59,10 +56,6 @@ if __name__ == '__main__':
     args = parse_args()
     logger.info('Called with args:')
     logger.info(args)
-
-    ds_info = args.dataset.split('.')
-    ds_info[0] = ds_info[0].split("_")
-    ds_name = ''.join(ds_info[0][0:3])
 
     assert os.path.exists(args.result_path)
 
@@ -75,24 +68,24 @@ if __name__ == '__main__':
     if args.set_cfgs is not None:
         merge_cfg_from_list(args.set_cfgs)
 
-    if ds_name == "coco2014":
+    if args.dataset == "coco2014":
         cfg.TEST.DATASETS = ('coco_2014_val',)
-        cfg.MODEL.NUM_CLASSES = 80 - unkwn_nbr
-    elif ds_name == "coco2017":
+        cfg.MODEL.NUM_CLASSES = 80
+    elif args.dataset == "coco2017":
         cfg.TEST.DATASETS = ('coco_2017_val',)
-        cfg.MODEL.NUM_CLASSES = 80 - unkwn_nbr
-    elif ds_name == 'voc2007test':
+        cfg.MODEL.NUM_CLASSES = 80
+    elif args.dataset == 'voc2007test':
         cfg.TEST.DATASETS = ('voc_2007_test',)
-        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr
-    elif ds_name == 'voc2012test':
+        cfg.MODEL.NUM_CLASSES = 20
+    elif args.dataset == 'voc2012test':
         cfg.TEST.DATASETS = ('voc_2012_test',)
-        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr
-    elif ds_name == 'voc2007trainval':
+        cfg.MODEL.NUM_CLASSES = 20
+    elif args.dataset == 'voc2007trainval':
         cfg.TEST.DATASETS = ('voc_2007_trainval',)
-        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr
-    elif ds_name == 'voc2012trainval':
+        cfg.MODEL.NUM_CLASSES = 20
+    elif args.dataset == 'voc2012trainval':
         cfg.TEST.DATASETS = ('voc_2012_trainval',)
-        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr
+        cfg.MODEL.NUM_CLASSES = 20
     else:  # For subprocess call
         assert cfg.TEST.DATASETS, 'cfg.TEST.DATASETS shouldn\'t be empty'
     assert_and_infer_cfg()
@@ -109,7 +102,7 @@ if __name__ == '__main__':
     dataset = JsonDataset(dataset_name)
     roidb = dataset.get_roidb()
     num_images = len(roidb)
-    num_classes = cfg.MODEL.NUM_CLASSES + 2
+    num_classes = cfg.MODEL.NUM_CLASSES + 1
     final_boxes = empty_results(num_classes, num_images)
     test_corloc = 'train' in dataset_name
     nbr_boxes = []
@@ -123,6 +116,6 @@ if __name__ == '__main__':
         nbr_boxes.append(nbr)
         extend_results(i, final_boxes, cls_boxes_i)
     print('Mean nbr_boxes : ', np.mean(nbr_boxes))
-    results = task_evaluation.evaluate_random(
-        dataset, final_boxes, args.output_dir, test_corloc, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=args.threshold
+    results = task_evaluation.evaluate_all(
+        dataset, final_boxes, args.output_dir, test_corloc, threshold=args.threshold
     )
