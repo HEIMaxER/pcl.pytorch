@@ -460,6 +460,7 @@ def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold): 
     for j in range(1, num_classes):
         inds = np.where(scores[:, j] > cfg.TEST.SCORE_THRESH)[0]
         scores_j = scores[inds, j]
+        print('scores:', type(scores_j), scores_j.shape)
         boxes_j = boxes[inds, :]
         dets_j = np.hstack((boxes_j, scores_j[:, np.newaxis])).astype(np.float32, copy=False)
         if cfg.TEST.SOFT_NMS.ENABLED:
