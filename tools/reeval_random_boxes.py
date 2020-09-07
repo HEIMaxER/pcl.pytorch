@@ -115,14 +115,17 @@ if __name__ == '__main__':
     num_classes = cfg.MODEL.NUM_CLASSES + 2
     final_boxes = empty_results(num_classes, num_images)
     test_corloc = 'train' in dataset_name
+    nbr_boxes = []
     for i, entry in enumerate(roidb, ):
         boxes = all_boxes[entry['image']]
         if test_corloc:
             _, _, cls_boxes_i = box_results_for_corloc(boxes['scores'], boxes['boxes'])
         else:
-            _, _, cls_boxes_i = random_box_results_with_nms_limit(boxes['scores'],
+            _, _, cls_boxes_i, nbr = random_box_results_with_nms_limit(boxes['scores'],
                                                          boxes['boxes'], args.threshold)
+        nbr_boxes.append(nbr)
         extend_results(i, final_boxes, cls_boxes_i)
+    print('Mean nbr_boxes : ', np.mean(nbr_boxes))
     results = task_evaluation.evaluate_random(
         dataset, final_boxes, args.output_dir, test_corloc, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=args.threshold
     )
