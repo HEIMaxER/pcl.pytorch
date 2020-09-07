@@ -62,9 +62,6 @@ if __name__ == '__main__':
 
     ds_info = args.dataset.split('.')
     ds_info[0] = ds_info[0].split("_")
-    seed = ds_info[0][-1]
-    unkwn_nbr = int(ds_info[0][-2])
-    mode = ds_info[0][2]
     ds_name = ''.join(ds_info[0][0:3])
 
     assert os.path.exists(args.result_path)
@@ -109,7 +106,7 @@ if __name__ == '__main__':
     all_boxes = results['all_boxes']
 
     dataset_name = cfg.TEST.DATASETS[0]
-    dataset = JsonDataset(dataset_name, seed, unkwn_nbr, mode)
+    dataset = JsonDataset(dataset_name)
     roidb = dataset.get_roidb()
     num_images = len(roidb)
     num_classes = cfg.MODEL.NUM_CLASSES + 2
