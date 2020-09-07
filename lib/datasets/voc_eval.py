@@ -142,7 +142,6 @@ def voc_eval(detpath,
     else:
         # load
         with open(cachefile, 'rb') as f:
-            print(cachefile)
             recs = cPickle.load(f)
 
     # extract gt objects for this class
