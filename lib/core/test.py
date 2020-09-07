@@ -393,10 +393,12 @@ def random_box_results_with_nms_limit(scores, boxes):  # NOTE: support single-ba
     cls_boxes = [[] for _ in range(num_classes)]
     # Apply threshold on detection probabilities and apply NMS
     # Skip j = 0, because it's the background class
-    len_inds = []
     for j in range(1, num_classes):
-        inds = np.where(scores[:, j] > cfg.TEST.SCORE_THRESH)[0]
-        len_inds.append(len(inds))
+        # if rd.random() < 15/20:
+        #     box_nbr = 0
+        # else:
+        box_nbr = rd.randint(0, 420)
+        inds = np.random.choice(scores.shape[0], box_nbr)
         scores_j = scores[inds, j]
         boxes_j = boxes[inds, :]
         dets_j = np.hstack((boxes_j, scores_j[:, np.newaxis])).astype(np.float32, copy=False)
@@ -435,7 +437,7 @@ def random_box_results_with_nms_limit(scores, boxes):  # NOTE: support single-ba
     im_results = np.vstack([cls_boxes[j] for j in range(1, num_classes)])
     boxes = im_results[:, :-1]
     scores = im_results[:, -1]
-    return scores, boxes, cls_boxes, np.mean(len_inds)
+    return scores, boxes, cls_boxes
 
 def box_results_with_nms_limit_and_openset_threshold(scores, boxes, threshold):  # NOTE: support single-batch
     """Returns bounding-box detection results by thresholding on scores and
