@@ -440,12 +440,10 @@ def f1_classification_score(detpath,
     # extract gt objects for this class
     class_recs = {}
     npos = 0
-    all_p = 0   #object count
     if classname == 'unknown':
         unkwn_cls = get_voc07_unknown_classes(seed, unkwn_nbr)
         for imagename in imagenames:
             R = [obj for obj in recs[imagename] if obj['name'] in unkwn_cls]
-            all_p += len(R)
             bbox = np.array([x['bbox'] for x in R])
             difficult = np.array([x['difficult'] for x in R]).astype(np.bool)
             det = [False] * len(R)
@@ -457,7 +455,6 @@ def f1_classification_score(detpath,
 
         for imagename in imagenames:
             R = [obj for obj in recs[imagename] if obj['name'] == classname]
-            all_p += len(R)
             bbox = np.array([x['bbox'] for x in R])
             difficult = np.array([x['difficult'] for x in R]).astype(np.bool)
             det = [False] * len(R)
