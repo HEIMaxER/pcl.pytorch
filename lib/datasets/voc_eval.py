@@ -382,7 +382,7 @@ def f1_classification_score(detpath,
              imagesetfile,
              classname,
              cachedir,
-             ovthresh=0.5,
+             ovthresh=0.25,
              use_07_metric=False, seed=None, unkwn_nbr=None):
     """rec, prec, ap = voc_eval(detpath,
                                     annopath,
