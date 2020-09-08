@@ -47,9 +47,6 @@ def parse_args():
     parser.add_argument(
         '--threshold',
         help='Openset detection thershold', default=0.05, type=float)
-    parser.add_argument(
-        '--eval',
-        help='Type of evaluation, 0 on global score, 1 for box score analysis', default=0, type=int)
 
     return parser.parse_args()
 
@@ -128,7 +125,7 @@ if __name__ == '__main__':
             detected_class_i = class_detection_with_nms_limit_and_openset_threshold(boxes['scores'], boxes['boxes'])
         else:
             detected_class_i = class_detection_with_nms_limit_and_openset_threshold(boxes['scores'],
-                                                         boxes['boxes'], args.threshold, args.eval)
+                                                         boxes['boxes'], args.threshold)
         extend_results(i, detected_classes, detected_class_i)
     results = task_evaluation.evaluate_classification(
         dataset, detected_classes, args.output_dir, test_corloc, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=args.threshold
