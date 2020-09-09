@@ -70,7 +70,7 @@ if __name__ == '__main__':
         unkwn_nbr = None
         mode = None
         ds_name = args.dataset
-
+    print(seed+':')
     assert os.path.exists(args.result_path)
 
     if args.output_dir is None:

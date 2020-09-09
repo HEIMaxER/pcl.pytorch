@@ -65,7 +65,9 @@ def eval_classification(json_dataset,
         cachedir = os.path.join(devkit_path, 'annotations_cache_{}_{}_{}'.format(year, unkwn_nbr, seed))
     else:
         cachedir = os.path.join(devkit_path, 'annotations_cache_{}'.format(year))
-    f1s = []
+    f1s = {'50': [],
+           '25': [],
+           '10': []}
     # The PASCAL VOC metric changed in 2010
     use_07_metric = True if int(year) < 2010 else False
     # logger.info('VOC07 metric? ' + ('Yes' if use_07_metric else 'No'))
@@ -95,7 +97,7 @@ def eval_classification(json_dataset,
             true_positives[k] += TPS[k]
             false_positives[k] += FPS[k]
             all_positives += all_p
-            f1s += F1S[k]
+            f1s[k] += F1S[k]
             if TPS[k] != 0:
                 precision = TPS[k] / (FPS[k] + TPS[k])
                 recall = TPS[k] / all_p
