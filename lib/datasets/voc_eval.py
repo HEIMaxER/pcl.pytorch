@@ -452,7 +452,6 @@ def f1_classification_score(detpath,
                                      'difficult': difficult,
                                      'det': det}
     else:
-
         for imagename in imagenames:
             R = [obj for obj in recs[imagename] if obj['name'] == classname]
             bbox = np.array([x['bbox'] for x in R])

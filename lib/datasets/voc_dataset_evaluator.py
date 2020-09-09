@@ -79,7 +79,7 @@ def eval_classification(json_dataset,
     for _, cls in enumerate(json_dataset.classes):
         if cls == '__background__':
             continue
-        filename = _get_voc_results_file_template(json_dataset, salt, classification=True).format(cls)
+        filename = _get_voc_results_file_template(json_dataset, salt).format(cls)
         f1, tp, fp, all_p = f1_classification_score(filename, anno_path, image_set_path, cls, cachedir, ovthresh=0.5,
             use_07_metric=use_07_metric, seed=seed, unkwn_nbr=unkwn_nbr)
         true_positives += tp
@@ -294,16 +294,13 @@ def _write_voc_results_classification_files(json_dataset, detected_class_ids, sa
     return filenames
 
 
-def _get_voc_results_file_template(json_dataset, salt, classification=False):
+def _get_voc_results_file_template(json_dataset, salt):
     info = voc_info(json_dataset)
     year = info['year']
     image_set = info['image_set']
     devkit_path = info['devkit_path']
     # VOCdevkit/results/VOC2007/Main/<comp_id>_det_test_aeroplane.txt
-    if classification:
-        filename = 'comp4' + salt + '_cls_' + image_set + '_{:s}.txt'
-    else:
-        filename = 'comp4' + salt + '_det_' + image_set + '_{:s}.txt'
+    filename = 'comp4' + salt + '_det_' + image_set + '_{:s}.txt'
     dirname = os.path.join(devkit_path, 'results', 'VOC' + year, 'Main')
     if not os.path.exists(dirname):
         os.makedirs(dirname)
