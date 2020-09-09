@@ -92,8 +92,8 @@ def eval_classification(json_dataset,
             use_07_metric=use_07_metric, seed=seed, unkwn_nbr=unkwn_nbr)
         for k  in F1S.keys():
             logger.info('IoU threshold '+k + ':')
-            true_positives += TPS[k]
-            false_positives += FPS[k]
+            true_positives[k] += TPS[k]
+            false_positives[k] += FPS[k]
             all_positives += all_p
             f1s += F1S[k]
             if TPS[k] != 0:
