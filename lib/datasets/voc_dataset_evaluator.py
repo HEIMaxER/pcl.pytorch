@@ -97,7 +97,7 @@ def eval_classification(json_dataset,
             true_positives[k] += TPS[k]
             false_positives[k] += FPS[k]
             all_positives += all_p
-            f1s[k] += F1S[k]
+            f1s[k].append(F1S[k])
             if TPS[k] != 0:
                 precision = TPS[k] / (FPS[k] + TPS[k])
                 recall = TPS[k] / all_p
