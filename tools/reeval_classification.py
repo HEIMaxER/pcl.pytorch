@@ -85,24 +85,26 @@ if __name__ == '__main__':
 
     if ds_name == "coco2014":
         cfg.TEST.DATASETS = ('coco_2014_val',)
-        cfg.MODEL.NUM_CLASSES = 80 - unkwn_nbr
+        cfg.MODEL.NUM_CLASSES = 80
     elif ds_name == "coco2017":
         cfg.TEST.DATASETS = ('coco_2017_val',)
-        cfg.MODEL.NUM_CLASSES = 80 - unkwn_nbr
+        cfg.MODEL.NUM_CLASSES = 80
     elif ds_name == 'voc2007test':
         cfg.TEST.DATASETS = ('voc_2007_test',)
-        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr
+        cfg.MODEL.NUM_CLASSES = 20
     elif ds_name == 'voc2012test':
         cfg.TEST.DATASETS = ('voc_2012_test',)
-        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr
+        cfg.MODEL.NUM_CLASSES = 20
     elif ds_name == 'voc2007trainval':
         cfg.TEST.DATASETS = ('voc_2007_trainval',)
-        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr
+        cfg.MODEL.NUM_CLASSES = 20
     elif ds_name == 'voc2012trainval':
         cfg.TEST.DATASETS = ('voc_2012_trainval',)
-        cfg.MODEL.NUM_CLASSES = 20 - unkwn_nbr
+        cfg.MODEL.NUM_CLASSES = 20
     else:  # For subprocess call
         assert cfg.TEST.DATASETS, 'cfg.TEST.DATASETS shouldn\'t be empty'
+    if unkwn_nbr != None:
+        cfg.MODEL.NUM_CLASSES -= unkwn_nbr
     assert_and_infer_cfg()
 
     # logger.info('Re-evaluation with config:')
