@@ -53,7 +53,7 @@ def parse_args():
 
 if __name__ == '__main__':
 
-    # logger = utils.logging.setup_logging(__name__)
+    logger = utils.logging.setup_logging(__name__)
     args = parse_args()
     # logger.info('Called with args:')
     # logger.info(args)
