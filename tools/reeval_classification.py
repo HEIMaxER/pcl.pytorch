@@ -11,7 +11,7 @@ import torch
 import _init_paths  # pylint: disable=unused-import
 from core.config import cfg, merge_cfg_from_file, merge_cfg_from_list, assert_and_infer_cfg
 from core.test_engine import empty_results, extend_results
-from core.test import class_detection_with_nms_limit_and_openset_threshold
+from core.test import box_results_with_nms_limit_and_openset_threshold, box_results_for_corloc
 
 
 from datasets.json_dataset import JsonDataset
@@ -128,5 +128,5 @@ if __name__ == '__main__':
                                                                                  boxes['boxes'], args.threshold)
         extend_results(i, final_boxes, cls_boxes_i)
     results = task_evaluation.evaluate_classification(
-        dataset, detected_classes, args.output_dir, test_corloc, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=args.threshold
+        dataset, final_boxes, args.output_dir, test_corloc, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=args.threshold
     )
