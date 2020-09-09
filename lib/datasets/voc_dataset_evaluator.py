@@ -37,13 +37,15 @@ from openset.data import make_openset
 logger = logging.getLogger(__name__)
 
 def eval_classification(json_dataset,
-    detected_class_ids,
+    all_boxes,
     output_dir,
     use_salt=True,
     cleanup=True,
     test_corloc=False,
-    use_matlab=True, seed=None, unkwn_nbr=None, mode=None, threshold=None):
+    use_matlab=True, seed=None, unkwn_nbr=None, mode=None, threshold=None
+):
     salt = '_{}'.format(str(uuid.uuid4())) if use_salt else ''
+    filenames = _write_voc_results_files(json_dataset, all_boxes, salt, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode)
     info = voc_info(json_dataset)
     year = info['year']
     anno_path = info['anno_path']
