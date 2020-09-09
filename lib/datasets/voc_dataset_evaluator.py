@@ -122,7 +122,6 @@ def eval_classification(json_dataset,
         logger.info('Average precision = {:.4f}'.format(np.mean(prec[k])))
         logger.info('Average recall = {:.4f}'.format(np.mean(rec[k])))
         logger.info('Macro f1 = {:.4f}'.format(np.mean(macro_f1)))
-        logger.info('~~~~~~~~')
 
 
 def eval_random(json_dataset,
