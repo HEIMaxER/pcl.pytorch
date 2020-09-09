@@ -44,7 +44,6 @@ def eval_classification(json_dataset,
     test_corloc=False,
     use_matlab=True, seed=None, unkwn_nbr=None, mode=None, threshold=None):
     salt = '_{}'.format(str(uuid.uuid4())) if use_salt else ''
-    filenames = _write_voc_results_classification_files(json_dataset, detected_class_ids, salt, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode)
     info = voc_info(json_dataset)
     year = info['year']
     anno_path = info['anno_path']
