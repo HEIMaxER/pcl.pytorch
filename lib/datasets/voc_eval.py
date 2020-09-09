@@ -519,10 +519,8 @@ def f1_classification_score(detpath,
             fp[d] = 1.
 
     # compute precision recall
-    fp = np.cumsum(fp)
-    tp = np.cumsum(tp)
-    print('tp', tp)
-    print('fp', fp)
+    fp = np.cumsum(fp)[-1]
+    tp = np.cumsum(tp)[-1]
     if tp != 0:
         rec = tp / float(npos)
         # avoid divide by zero in case the first detection matches a difficult
