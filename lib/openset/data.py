@@ -144,9 +144,9 @@ def make_annotations(annotaion_fn, seed, unkwn_nbr):
 
 
     if os.path.exists(new_test_path) and os.path.exists(new_trainval_path):
-        print("Openset already exists")
-        print(new_trainval_path)
-        print(new_test_path)
+        # print("Openset already exists")
+        # print(new_trainval_path)
+        # print(new_test_path)
         with open(new_trainval_path) as json_file:
             os_trainval_annotations = json.load(json_file)
 

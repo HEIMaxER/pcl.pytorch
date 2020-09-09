@@ -68,59 +68,60 @@ def eval_classification(json_dataset,
     f1s = []
     # The PASCAL VOC metric changed in 2010
     use_07_metric = True if int(year) < 2010 else False
-    logger.info('VOC07 metric? ' + ('Yes' if use_07_metric else 'No'))
+    # logger.info('VOC07 metric? ' + ('Yes' if use_07_metric else 'No'))
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
-    true_positives = 0
-    false_positives = 0
+    true_positives = {'50': 0,
+           '25': 0,
+           '10': 0}
+    false_positives = {'50': 0,
+           '25': 0,
+           '10': 0}
     all_positives = 0
-    prec = []
-    rec = []
+    prec = {'50': [],
+           '25': [],
+           '10': []}
+    rec = {'50': [],
+           '25': [],
+           '10': []}
     for _, cls in enumerate(json_dataset.classes):
         if cls == '__background__':
             continue
         filename = _get_voc_results_file_template(json_dataset, salt).format(cls)
-        f1, tp, fp, all_p = f1_classification_score(filename, anno_path, image_set_path, cls, cachedir, ovthresh=0.5,
+        F1S, TPS, FPS, all_p = f1_classification_score(filename, anno_path, image_set_path, cls, cachedir, ovthresh=0.5,
             use_07_metric=use_07_metric, seed=seed, unkwn_nbr=unkwn_nbr)
-        true_positives += tp
-        false_positives += fp
-        all_positives += all_p
-        f1s += [f1]
-        if tp != 0:
-            precision = tp / (fp + tp)
-            recall = tp / all_p
-        else:
-            precision = 0
-            recall = 0
-        prec.append(precision)
-        rec.append(recall)
-        logger.info('f1 score for {} = {:.4f}'.format(cls, f1))
-        logger.info('precision score for {} = {:.4f}'.format(cls, precision))
-        logger.info('recall score for {} = {:.4f}'.format(cls, recall))
-        res_file = os.path.join(output_dir, cls + '_classification_pr.pkl')
-        save_object({'pre': precision, 'rec': recall, 'f1': f1}, res_file)
+        for k  in F1S.keys():
+            logger.info('IoU threshold '+k + ':')
+            true_positives += TPS[k]
+            false_positives += FPS[k]
+            all_positives += all_p
+            f1s += F1S[k]
+            if TPS[k] != 0:
+                precision = TPS[k] / (FPS[k] + TPS[k])
+                recall = TPS[k] / all_p
+            else:
+                precision = 0
+                recall = 0
+            prec[k].append(precision)
+            rec[k].append(recall)
+            logger.info('f1 score for {} = {:.4f}'.format(cls, F1S[k]))
+            logger.info('precision score for {} = {:.4f}'.format(cls, precision))
+            logger.info('recall score for {} = {:.4f}'.format(cls, recall))
+            res_file = os.path.join(output_dir, cls + '_classification_pr.pkl')
+            save_object({'pre': precision, 'rec': recall, 'f1': F1S[k]}, res_file)
 
-    macro_precision = true_positives / (false_positives + true_positives)
-    macro_recall = true_positives / all_positives
-    macro_f1 = 2 * ((macro_precision * macro_recall) / (macro_precision + macro_recall))
+    for k in true_positives.keys():
+        logger.info('IoU threshold ' + k + ':')
+        macro_precision = true_positives[k] / (false_positives[k] + true_positives[k])
+        macro_recall = true_positives[k] / all_positives
+        macro_f1 = 2 * ((macro_precision * macro_recall) / (macro_precision + macro_recall))
 
-    logger.info('Average f1 = {:.4f}'.format(np.mean(f1s)))
-    logger.info('Average precision = {:.4f}'.format(np.mean(prec)))
-    logger.info('Average recall = {:.4f}'.format(np.mean(rec)))
-    logger.info('Macro f1 = {:.4f}'.format(np.mean(macro_f1)))
-    logger.info('~~~~~~~~')
-    logger.info('Results:')
-    for f1 in f1s:
-        logger.info('{:.3f}'.format(f1))
-    logger.info('{:.3f}'.format(np.mean(f1s)))
-    logger.info('~~~~~~~~')
-    logger.info('')
-    logger.info('----------------------------------------------------------')
-    logger.info('Results computed with the **unofficial** Python eval code.')
-    logger.info('Results should be very close to the official MATLAB code.')
-    logger.info('Use `./tools/reval.py --matlab ...` for your paper.')
-    logger.info('-- Thanks, The Management')
-    logger.info('----------------------------------------------------------')
+        logger.info('Average f1 = {:.4f}'.format(np.mean(f1s[k])))
+        logger.info('Average precision = {:.4f}'.format(np.mean(prec[k])))
+        logger.info('Average recall = {:.4f}'.format(np.mean(rec[k])))
+        logger.info('Macro f1 = {:.4f}'.format(np.mean(macro_f1)))
+        logger.info('~~~~~~~~')
+
 
 def eval_random(json_dataset,
     all_boxes,

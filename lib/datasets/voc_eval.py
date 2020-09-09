@@ -480,8 +480,12 @@ def f1_classification_score(detpath,
 
     # go down dets and mark TPs and FPs
     nd = len(image_ids)
-    tp = np.zeros(nd)
-    fp = np.zeros(nd)
+    tp_10 = np.zeros(nd)
+    tp_25 = np.zeros(nd)
+    tp_50 = np.zeros(nd)
+    fp_10 = np.zeros(nd)
+    fp_25 = np.zeros(nd)
+    fp_50 = np.zeros(nd)
     for d in range(nd):
         R = class_recs[image_ids[d]]
         bb = BB[d, :].astype(float)
@@ -508,29 +512,70 @@ def f1_classification_score(detpath,
             ovmax = np.max(overlaps)
             jmax = np.argmax(overlaps)
 
-        if ovmax > ovthresh:
+        if ovmax > 0.5:
             if not R['difficult'][jmax]:
                 if not R['det'][jmax]:
-                    tp[d] = 1.
+                    tp_50[d] = 1.
+                    tp_25[d] = 1.
+                    tp_10[d] = 1.
                     R['det'][jmax] = 1
                 else:
-                    fp[d] = 1.
+                    fp_50[d] = 1.
+                    fp_25[d] = 1.
+                    fp_10[d] = 1.
+        elif ovmax > 0.25 and ovmax <= 0.5:
+            fp_50[d] = 1.
+            if not R['difficult'][jmax]:
+                if not R['det'][jmax]:
+                    tp_25[d] = 1.
+                    tp_10[d] = 1.
+                    R['det'][jmax] = 1
+                else:
+                    fp_25[d] = 1.
+                    fp_10[d] = 1.
+        elif ovmax > 0.1 and ovmax <= 0.25:
+            fp_50[d] = 1.
+            fp_25[d] = 1.
+            if not R['difficult'][jmax]:
+                if not R['det'][jmax]:
+                    tp_10[d] = 1.
+                    R['det'][jmax] = 1
+                else:
+                    fp_10[d] = 1.
         else:
-            fp[d] = 1.
+            fp_50[d] = 1.
+            fp_25[d] = 1.
+            fp_10[d] = 1.
 
     # compute precision recall
-    fp = np.cumsum(fp)[-1]
-    tp = np.cumsum(tp)[-1]
-    if tp != 0:
-        rec = tp / float(npos)
-        # avoid divide by zero in case the first detection matches a difficult
-        # ground truth
-        prec = tp / np.maximum(tp + fp, np.finfo(np.float64).eps)
-        f1 = 2*((prec*rec)/(prec+rec))
-    else:
-        f1 = 0
+    fp_50 = np.cumsum(fp_50)[-1]
+    fp_25 = np.cumsum(fp_25)[-1]
+    fp_10 = np.cumsum(fp_10)[-1]
+    tp_50 = np.cumsum(tp_50)[-1]
+    tp_25 = np.cumsum(tp_25)[-1]
+    tp_10 = np.cumsum(tp_10)[-1]
 
-    return f1, tp, fp, float(npos)
+    FPS = {'50': fp_50,
+           '25': fp_25,
+           '10': fp_10}
+    TPS = {'50': tp_50,
+           '25': tp_25,
+           '10': tp_10}
+    F1S= {}
+    for k in FPS.keys():
+        tp = TPS[k]
+        fp = FPS[k]
+        if tp != 0:
+            rec = tp / float(npos)
+            # avoid divide by zero in VOC07 metric? Yes case the first detection matches a difficult
+            # ground truth
+            prec = tp / np.maximum(tp + fp, np.finfo(np.float64).eps)
+            f1 = 2*((prec*rec)/(prec+rec))
+        else:
+            f1 = 0
+        F1S[k] = f1
+
+    return F1S, TPS, FPS, float(npos)
 
 
 def f1_classification_score_boxes(detpath,

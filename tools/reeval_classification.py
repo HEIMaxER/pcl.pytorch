@@ -53,10 +53,10 @@ def parse_args():
 
 if __name__ == '__main__':
 
-    logger = utils.logging.setup_logging(__name__)
+    # logger = utils.logging.setup_logging(__name__)
     args = parse_args()
-    logger.info('Called with args:')
-    logger.info(args)
+    # logger.info('Called with args:')
+    # logger.info(args)
 
     if len(args.dataset.split("_")) >= 2:
         ds_info = args.dataset.split('.')
@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     if args.output_dir is None:
         args.output_dir = os.path.dirname(args.result_path)
-        logger.info('Automatically set output directory to %s', args.output_dir)
+        # logger.info('Automatically set output directory to %s', args.output_dir)
 
     if args.cfg_file is not None:
         merge_cfg_from_file(args.cfg_file)
@@ -104,12 +104,12 @@ if __name__ == '__main__':
         assert cfg.TEST.DATASETS, 'cfg.TEST.DATASETS shouldn\'t be empty'
     assert_and_infer_cfg()
 
-    logger.info('Re-evaluation with config:')
-    logger.info(pprint.pformat(cfg))
+    # logger.info('Re-evaluation with config:')
+    # logger.info(pprint.pformat(cfg))
 
     with open(args.result_path, 'rb') as f:
         results = pickle.load(f)
-        logger.info('Loading results from {}.'.format(args.result_path))
+        # logger.info('Loading results from {}.'.format(args.result_path))
     all_boxes = results['all_boxes']
 
     dataset_name = cfg.TEST.DATASETS[0]
