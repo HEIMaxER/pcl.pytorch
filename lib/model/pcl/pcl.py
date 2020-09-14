@@ -46,7 +46,6 @@ def PCL(boxes, cls_prob, im_labels, cls_prob_new):
 
 def _get_top_ranking_propoals(probs):
     """Get top ranking proposals by k-means"""
-    print('NUM_KMEANS_CLUSTER', cfg.TRAIN.NUM_KMEANS_CLUSTER)
     kmeans = KMeans(n_clusters=cfg.TRAIN.NUM_KMEANS_CLUSTER,
         random_state=cfg.RNG_SEED).fit(probs)
     high_score_label = np.argmax(kmeans.cluster_centers_)
@@ -144,7 +143,6 @@ def _get_proposal_clusters(all_rois, proposals, im_labels, cls_prob):
     labels = gt_labels[gt_assignment, 0]
     cls_loss_weights = gt_scores[gt_assignment, 0]
 
-    print('FG_THRESH',cfg.TRAIN.FG_THRESH)
     # Select foreground RoIs as those with >= FG_THRESH overlap
     fg_inds = np.where(max_overlaps >= cfg.TRAIN.FG_THRESH)[0]
 
