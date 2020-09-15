@@ -140,9 +140,6 @@ class roi_2mlp_head(nn.Module):
         return detectron_weight_mapping, []
 
     def forward(self, x, rois):
-        print("roi_2mlp_head")
-        print('X input', x.shape)
-        print('rois', rois.shape)
         x = self.roi_xform(
             x, rois,
             method=cfg.FAST_RCNN.ROI_XFORM_METHOD,
@@ -154,6 +151,45 @@ class roi_2mlp_head(nn.Module):
         x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)
         x = F.relu(self.fc2(x), inplace=True)
         print("output", x.shape)
+        return x
+
+class roi_2mlp_head_with_sim(nn.Module):
+    def __init__(self, dim_in, roi_xform_func, spatial_scale, k):
+        super().__init__()
+        self.dim_in = dim_in
+        self.roi_xform = roi_xform_func
+        self.spatial_scale = spatial_scale
+        self.dim_out = hidden_dim = 4096
+
+        roi_size = cfg.FAST_RCNN.ROI_XFORM_RESOLUTION
+        self.fc1 = nn.Linear(dim_in * roi_size**2, hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, hidden_dim)
+
+        # self._init_modules()
+
+    # def _init_modules(self):
+
+    def detectron_weight_mapping(self):
+        detectron_weight_mapping = {
+            'fc1.weight': 'fc6_w',
+            'fc1.bias': 'fc6_b',
+            'fc2.weight': 'fc7_w',
+            'fc2.bias': 'fc7_b'
+        }
+        return detectron_weight_mapping, []
+
+    def forward(self, x, rois):
+        x = self.roi_xform(
+            x, rois,
+            method=cfg.FAST_RCNN.ROI_XFORM_METHOD,
+            resolution=cfg.FAST_RCNN.ROI_XFORM_RESOLUTION,
+            spatial_scale=self.spatial_scale,
+            sampling_ratio=cfg.FAST_RCNN.ROI_XFORM_SAMPLING_RATIO
+        )
+        batch_size = x.size(0)
+        x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)
+        x = F.relu(self.fc2(x), inplace=True)
+        torch.argsort(x, dim=1, descending=True)
         return x
 
 

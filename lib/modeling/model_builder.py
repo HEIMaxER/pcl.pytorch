@@ -165,6 +165,9 @@ class Generalized_RCNN(nn.Module):
             return_dict['mil_score'] = mil_score
             return_dict['refine_score'] = refine_score
 
+        print("return dict")
+        print(return_dict)
+
         return return_dict
 
     def roi_feature_transform(self, blobs_in, rois, method='RoIPoolF',
@@ -226,7 +229,7 @@ class Generalized_RCNN(nn.Module):
         return_dict['losses'][key] = value
 
 
-class Finetuned_RCNN(nn.Module):
+class Sim_RCNN(nn.Module):
     def __init__(self):
         super().__init__()
 
