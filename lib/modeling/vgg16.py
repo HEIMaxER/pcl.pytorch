@@ -225,8 +225,7 @@ def freeze_params(m):
 
 def rank_stat(x, K):
     batch_size = x.size(0)
-    print(batch_size, K)
-    feature_ranking = np.zeros(batch_size, K)
+    feature_ranking = np.zeros((batch_size, K))
 
     for i in range(batch_size):
         ids = list(range(x.size(1)))
