@@ -192,7 +192,7 @@ class roi_2mlp_head_with_sim(nn.Module):
         x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)
         x = F.relu(self.fc2(x), inplace=True)
 
-        feature_ranking = np.argsort(x.cpu(), axis=1)
+        feature_ranking = np.argsort(x.clone().detach().cpu().numpy(), axis=1)
         N = feature_ranking.shape[0]-1
         if not self.strict_sim:
             for i in range(batch_size):
