@@ -15,8 +15,8 @@ def BCE_loss(box_cls_scores, sim_mat):
     print("box scores shape : ", box_cls_scores.shape)
     for i in range(M):
         for j in range(M):
-            cls_score_i = box_cls_scores[i][0, :].resize(-1, 1)
-            cls_score_j = box_cls_scores[j][0, :]
+            cls_score_i = box_cls_scores[i].resize(-1, 1)
+            cls_score_j = box_cls_scores[j]
 
             cls_score_i = cls_score_i.clamp(1e-6, 1 - 1e-6)
             cls_score_j = cls_score_j.clamp(1e-6, 1 - 1e-6)
