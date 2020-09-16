@@ -212,3 +212,23 @@ def freeze_params(m):
     """
     for p in m.parameters():
         p.requires_grad = False
+
+
+def arg_sort(batch_size, x, K):
+    feature_ranking = np.zeros(batch_size, K)
+
+    for i in range(batch_size):
+        ids = list(range(x.size(1)))
+        j = 0
+
+        while j < K:
+            max_id = 0
+            m = -99999999
+            for id in ids:
+                if x[i][id] > m:
+                    m = x[i][j]
+                    max_id = id
+            ids.remove(id)
+            feature_ranking[i][j] = id
+            j += 1
+    return feature_ranking
