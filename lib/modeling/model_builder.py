@@ -17,6 +17,7 @@ import modeling.pcl_heads as pcl_heads
 import utils.blob as blob_utils
 import utils.net as net_utils
 import utils.vgg_weights_helper as vgg_utils
+import openset.cluster_loss as cluster_loss
 
 logger = logging.getLogger(__name__)
 
@@ -165,9 +166,6 @@ class Generalized_RCNN(nn.Module):
             return_dict['mil_score'] = mil_score
             return_dict['refine_score'] = refine_score
 
-        print("return dict")
-        print(return_dict)
-
         return return_dict
 
     def roi_feature_transform(self, blobs_in, rois, method='RoIPoolF',
@@ -230,8 +228,10 @@ class Generalized_RCNN(nn.Module):
 
 
 class Sim_RCNN(nn.Module):
-    def __init__(self):
+    def __init__(self, sim_dim=5, strict_sim=True, sim_eval=0):
         super().__init__()
+
+        self.sim_eval = sim_eval
 
         # For cache
         self.mapping_to_detectron = None
@@ -241,7 +241,7 @@ class Sim_RCNN(nn.Module):
         self.Conv_Body = get_func(cfg.MODEL.CONV_BODY)()
 
         self.Box_Head = get_func(cfg.FAST_RCNN.ROI_BOX_HEAD)(
-            self.Conv_Body.dim_out, self.roi_feature_transform, self.Conv_Body.spatial_scale)
+            self.Conv_Body.dim_out, self.roi_feature_transform, self.Conv_Body.spatial_scale, sim_dim, strict_sim)
         self.Box_MIL_Outs = pcl_heads.mil_outputs(
             self.Box_Head.dim_out, cfg.MODEL.NUM_CLASSES)
         self.Box_Refine_Outs = pcl_heads.refine_outputs(
@@ -281,7 +281,7 @@ class Sim_RCNN(nn.Module):
         if not self.training:
             return_dict['blob_conv'] = blob_conv
 
-        box_feat = self.Box_Head(blob_conv, rois)
+        box_feat, sim_mat = self.Box_Head(blob_conv, rois)
         mil_score = self.Box_MIL_Outs(box_feat)
         refine_score = self.Box_Refine_Outs(box_feat)
 
@@ -292,6 +292,19 @@ class Sim_RCNN(nn.Module):
             im_cls_score = mil_score.sum(dim=0, keepdim=True)
             loss_im_cls = pcl_heads.mil_losses(im_cls_score, labels)
             return_dict['losses']['loss_im_cls'] = loss_im_cls
+
+            if self.sim_eval == 0:
+                clust_loss = cluster_loss.BCE_loss(mil_score, sim_mat)
+                return_dict['losses']['cluster_loss_mil'] = clust_loss
+            elif self.sim_eval == 1:
+                clust_loss = cluster_loss.BCE_loss(refine_score, sim_mat)
+                return_dict['losses']['cluster_loss_refine'] = clust_loss
+            elif self.sim_eval == 2:
+                clust_loss_1 = cluster_loss.BCE_loss(mil_score, sim_mat)
+                return_dict['losses']['cluster_loss_mil'] = clust_loss_1
+                clust_loss_2 = cluster_loss.BCE_loss(refine_score, sim_mat)
+                return_dict['losses']['cluster_loss_refine'] = clust_loss_2
+
 
             # refinement loss
             boxes = rois.data.cpu().numpy()

@@ -8,6 +8,7 @@ import torch.nn.functional as F
 from core.config import cfg
 import nn as mynn
 import utils.net as net_utils
+import numpy as np
 
 
 class dilated_conv5_body(nn.Module):
@@ -150,16 +151,17 @@ class roi_2mlp_head(nn.Module):
         batch_size = x.size(0)
         x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)
         x = F.relu(self.fc2(x), inplace=True)
-        print("output", x.shape)
         return x
 
 class roi_2mlp_head_with_sim(nn.Module):
-    def __init__(self, dim_in, roi_xform_func, spatial_scale, k):
+    def __init__(self, dim_in, roi_xform_func, spatial_scale, k=5, strict_sim=True):
         super().__init__()
         self.dim_in = dim_in
         self.roi_xform = roi_xform_func
         self.spatial_scale = spatial_scale
         self.dim_out = hidden_dim = 4096
+        self.sim_dim = k
+        self.strict_sim = strict_sim
 
         roi_size = cfg.FAST_RCNN.ROI_XFORM_RESOLUTION
         self.fc1 = nn.Linear(dim_in * roi_size**2, hidden_dim)
@@ -189,8 +191,20 @@ class roi_2mlp_head_with_sim(nn.Module):
         batch_size = x.size(0)
         x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)
         x = F.relu(self.fc2(x), inplace=True)
-        torch.argsort(x, dim=1, descending=True)
-        return x
+
+        feature_ranking = torch.argsort(x, dim=1, descending=True)
+        if not self.strict_sim:
+            for i in range(batch_size):
+                feature_ranking[i] = torch.sort(feature_ranking[i][:self.sim_dim-1])  #if feature ranking doesn't have to be strictly equal, top k feature positions are sorted for easier checking
+
+        sim_mat = torch.zeros(batch_size, batch_size)
+        for i in range(batch_size):
+            for j in range(i, batch_size):
+                if feature_ranking[i][:self.sim_dim-1] == feature_ranking[j][:self.sim_dim-1]:
+                    sim_mat[i][j] = 1
+                    sim_mat[j][i] = 1
+
+        return x, sim_mat
 
 
 def freeze_params(m):

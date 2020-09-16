@@ -25,7 +25,7 @@ from core.config import cfg, cfg_from_file, cfg_from_list, assert_and_infer_cfg
 from openset.data import make_openset
 from datasets.roidb import combined_roidb_for_training
 from roi_data.loader import RoiDataLoader, MinibatchSampler, BatchSampler, collate_minibatch
-from modeling.model_builder import Finetuned_RCNN
+from modeling.model_builder import Sim_RCNN
 from utils.detectron_weight_helper import load_detectron_weight
 from utils.logging import setup_logging
 from utils.timer import Timer
@@ -123,6 +123,17 @@ def parse_args():
     parser.add_argument(
         '--use_tfboard', help='Use tensorflow tensorboard to log training info',
         action='store_true')
+
+    parser.add_argument(
+        '--strict_sim', help='Use tensorflow tensorboard to log training info',
+        default=True, type=bool)
+    parser.add_argument(
+        '--sim_rank', help='Use tensorflow tensorboard to log training info',
+        default=5, type=int)
+    parser.add_argument(
+        '--cluster_loss', help='Use tensorflow tensorboard to log training info',
+        default=0, type=int)
+
 
     return parser.parse_args()
 
@@ -272,7 +283,7 @@ def main():
     dataiterator = iter(dataloader)
 
     ### Model ###
-    pcl = Finetuned_RCNN()
+    pcl = Sim_RCNN(args.sim_rank, args.strict_sim, args.cluster_loss)
 
     if cfg.CUDA:
         pcl.cuda()
