@@ -19,9 +19,6 @@ def BCE_loss(box_cls_scores, sim_mat):
             cls_score_i = box_cls_scores[i].clone().detach().cpu().numpy().resize(19, 1)
             cls_score_j = box_cls_scores[j].clone().detach().cpu().numpy()
 
-            cls_score_i = cls_score_i.clamp(1e-6, 1 - 1e-6).clone().detach().cpu().numpy()
-            cls_score_j = cls_score_j.clamp(1e-6, 1 - 1e-6).clone().detach().cpu().numpy()
-
             loss -= sim_mat[i][j].clone().detach().cpu().numpy() * np.log(cls_score_i * cls_score_j) + (1 - sim_mat[i][j]) * np.log(1 - cls_score_i * cls_score_j)
 
     loss *= (1/M**2)
