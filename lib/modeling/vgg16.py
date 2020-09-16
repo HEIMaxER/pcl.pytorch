@@ -192,18 +192,27 @@ class roi_2mlp_head_with_sim(nn.Module):
         x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)
         x = F.relu(self.fc2(x), inplace=True)
 
-        feature_ranking = np.argsort(x.clone().detach().cpu().numpy(), axis=1)
-        N = feature_ranking.shape[0]-1
-        if not self.strict_sim:
-            for i in range(batch_size):
-                feature_ranking[i] = np.sort(feature_ranking[i][N-self.sim_dim:])  #if feature ranking doesn't have to be strictly equal, top k feature positions are sorted for easier checking
+        feature_ranking = rank_stat(x, self.sim_dim)
 
         sim_mat = torch.zeros(batch_size, batch_size, device='cuda')
         for i in range(batch_size):
             for j in range(i, batch_size):
-                if (feature_ranking[i][N-self.sim_dim:] == feature_ranking[j][N-self.sim_dim:]).all():
+                if (feature_ranking[i] == feature_ranking[j]).all():
                     sim_mat[i][j] = 1
                     sim_mat[j][i] = 1
+
+        # feature_ranking = np.argsort(x.clone().detach().cpu().numpy(), axis=1)
+        # N = feature_ranking.shape[0]-1
+        # if not self.strict_sim:
+        #     for i in range(batch_size):
+        #         feature_ranking[i] = np.sort(feature_ranking[i][N-self.sim_dim:])  #if feature ranking doesn't have to be strictly equal, top k feature positions are sorted for easier checking
+        #
+        # sim_mat = torch.zeros(batch_size, batch_size, device='cuda')
+        # for i in range(batch_size):
+        #     for j in range(i, batch_size):
+        #         if (feature_ranking[i][N-self.sim_dim:] == feature_ranking[j][N-self.sim_dim:]).all():
+        #             sim_mat[i][j] = 1
+        #             sim_mat[j][i] = 1
         return x, sim_mat
 
 
@@ -214,7 +223,8 @@ def freeze_params(m):
         p.requires_grad = False
 
 
-def arg_sort(batch_size, x, K):
+def rank_stat(x, K):
+    batch_size = x.size(0)
     feature_ranking = np.zeros(batch_size, K)
 
     for i in range(batch_size):
@@ -226,9 +236,9 @@ def arg_sort(batch_size, x, K):
             m = -99999999
             for id in ids:
                 if x[i][id] > m:
-                    m = x[i][j]
+                    m = x[i][id]
                     max_id = id
-            ids.remove(id)
-            feature_ranking[i][j] = id
+            ids.remove(max_id)
+            feature_ranking[i][j] = max_id
             j += 1
     return feature_ranking
