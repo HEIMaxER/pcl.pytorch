@@ -11,7 +11,8 @@ import utils.net as net_utils
 def BCE_loss(box_cls_scores, sim_mat):
     M =  box_cls_scores.size(0)
     loss = torch.zeros(1)
-
+    print("sim mat shape : ", sim_mat.shape)
+    print("box scores shape : ", box_cls_scores.shape)
     for i in range(M):
         for j in range(M):
             cls_score_i = box_cls_scores[i]
