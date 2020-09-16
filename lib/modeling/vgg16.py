@@ -192,10 +192,10 @@ class roi_2mlp_head_with_sim(nn.Module):
         x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)
         x = F.relu(self.fc2(x), inplace=True)
 
-        feature_ranking = torch.argsort(x, dim=1, descending=True)
+        feature_ranking = np.argsort(x.numpy(), dim=1, descending=True)
         if not self.strict_sim:
             for i in range(batch_size):
-                feature_ranking[i] = torch.sort(feature_ranking[i][:self.sim_dim-1])  #if feature ranking doesn't have to be strictly equal, top k feature positions are sorted for easier checking
+                feature_ranking[i] = np.sort(feature_ranking[i][:self.sim_dim-1])  #if feature ranking doesn't have to be strictly equal, top k feature positions are sorted for easier checking
 
         sim_mat = torch.zeros(batch_size, batch_size)
         for i in range(batch_size):
