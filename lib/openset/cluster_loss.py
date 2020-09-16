@@ -15,11 +15,11 @@ def BCE_loss(box_cls_scores, sim_mat):
     print("box scores shape : ", box_cls_scores.shape)
     for i in range(M):
         for j in range(M):
-            cls_score_i = box_cls_scores[i].resize(19, 1)
-            cls_score_j = box_cls_scores[j]
+            cls_score_i = box_cls_scores[i].resize(19, 1).to('cuda')
+            cls_score_j = box_cls_scores[j].to('cuda')
 
-            cls_score_i = cls_score_i.clamp(1e-6, 1 - 1e-6)
-            cls_score_j = cls_score_j.clamp(1e-6, 1 - 1e-6)
+            cls_score_i = cls_score_i.clamp(1e-6, 1 - 1e-6).to('cuda')
+            cls_score_j = cls_score_j.clamp(1e-6, 1 - 1e-6).to('cuda')
 
             loss -= sim_mat[i][j] * torch.log(cls_score_i * cls_score_j) + (1 - sim_mat[i][j]) * torch.log(1 - torch.transpose(cls_score_i, 0, 0) * cls_score_j)
 
