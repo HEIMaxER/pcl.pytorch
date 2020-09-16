@@ -12,5 +12,7 @@ import numpy as np
 def BCE_loss(box_cls_scores, sim_mat):
     print("sim mat shape : ", sim_mat.shape)
     print("box scores shape : ", box_cls_scores.shape)
-    loss = -sim_mat * torch.log(torch.transpose(box_cls_scores, 0, 1) * box_cls_scores) - (1 - sim_mat) * np.log(1 - torch.transpose(box_cls_scores, 0, 1)*box_cls_scores)
+    t_box_cls_scores = torch.transpose(box_cls_scores, 0, 1)
+    print("transpose box scores shape : ", t_box_cls_scores.shape)
+    loss = -sim_mat * torch.log(t_box_cls_scores * box_cls_scores) - (1 - sim_mat) * np.log(1 - t_box_cls_scores * box_cls_scores)
     return loss.mean()
