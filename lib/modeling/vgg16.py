@@ -198,13 +198,13 @@ class roi_2mlp_head_with_sim(nn.Module):
             for i in range(batch_size):
                 feature_ranking[i] = np.sort(feature_ranking[i][N-self.sim_dim:])  #if feature ranking doesn't have to be strictly equal, top k feature positions are sorted for easier checking
 
-        sim_mat = torch.zeros(batch_size, batch_size)
+        sim_mat = np.zeros(batch_size, batch_size)
         for i in range(batch_size):
             for j in range(i, batch_size):
                 if (feature_ranking[i][N-self.sim_dim:] == feature_ranking[j][N-self.sim_dim:]).all():
                     sim_mat[i][j] = 1
                     sim_mat[j][i] = 1
-        sim_mat.to('cuda')
+        sim_mat
         return x, sim_mat
 
 
