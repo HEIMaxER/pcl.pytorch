@@ -138,14 +138,17 @@ def parse_args():
     return parser.parse_args()
 
 
-def save_ckpt(output_dir, args, step, train_size, model, optimizer, unkwn_nbr, seed):
+def save_ckpt(output_dir, args, step, train_size, model, optimizer, unkwn_nbr, seed, strict, rank, loss):
     """Save checkpoint"""
     if args.no_save:
         return
     ckpt_dir = os.path.join(output_dir, 'ckpt')
     if not os.path.exists(ckpt_dir):
         os.makedirs(ckpt_dir)
-    save_name = os.path.join(ckpt_dir, 'model_{}_{}_step{}.pth'.format(unkwn_nbr, seed, step))
+    if strict:
+        save_name = os.path.join(ckpt_dir, 'model_{}_{}_S_{}_{}step{}.pth'.format(unkwn_nbr, seed, rank, loss, step))
+    else :
+        save_name = os.path.join(ckpt_dir, 'model_{}_{}_N_{}_{}step{}.pth'.format(unkwn_nbr, seed, rank, loss, step))
     if isinstance(model, mynn.DataParallel):
         model = model.module
     model_state_dict = model.state_dict()
@@ -445,15 +448,15 @@ def main():
             training_stats.LogIterStats(step, lr)
 
             if (step+1) % CHECKPOINT_PERIOD == 0:
-                save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, args.seed)
+                save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, args.seed, args.strict_sim, args.sim_rank, args.cluster_loss), args.strict_sim, args.sim_rank, args.cluster_loss
         # ---- Training ends ----
         # Save last checkpoint
-        save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, args.seed)
+        save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, args.seed, args.strict_sim, args.sim_rank, args.cluster_loss)
 
     except (RuntimeError, KeyboardInterrupt):
         del dataiterator
         logger.info('Save ckpt on exception ...')
-        save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, args.seed)
+        save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, args.seed, args.strict_sim, args.sim_rank, args.cluster_loss)
         logger.info('Save ckpt done.')
         stack_trace = traceback.format_exc()
         print(stack_trace)
