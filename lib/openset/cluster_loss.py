@@ -22,7 +22,7 @@ def BCE_loss(box_cls_scores, sim_mat):
             cls_score_i = cls_score_i.clamp(1e-6, 1 - 1e-6)
             cls_score_j = cls_score_j.clamp(1e-6, 1 - 1e-6)
 
-            loss -= sim_mat[i][j] * np.log(cls_score_i * cls_score_j) + (1 - sim_mat[i][j]) * np.log(1 - torch.transpose(cls_score_i, 0, 0) * cls_score_j)
+            loss -= sim_mat[i][j] * np.log(cls_score_i * cls_score_j) + (1 - sim_mat[i][j]) * np.log(1 - cls_score_i * cls_score_j)
 
     loss *= (1/M**2)
 
