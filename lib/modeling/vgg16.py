@@ -226,11 +226,11 @@ def freeze_params(m):
 def rank_stat(x, K):
     batch_size = x.size(0)
     feature_ranking = np.zeros((batch_size, K))
-
+    print(x.size(1))
     for i in range(batch_size):
         ids = list(range(x.size(1)))
         j = 0
-
+        print(i)
         while j < K:
             max_id = 0
             m = -99999999
@@ -240,6 +240,8 @@ def rank_stat(x, K):
                     max_id = id
             ids.remove(max_id)
             feature_ranking[i][j] = max_id
+            print(j)
             j += 1
+
     print('OK !')
     return feature_ranking
