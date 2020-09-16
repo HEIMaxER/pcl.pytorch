@@ -241,4 +241,5 @@ def rank_stat(x, K):
             ids.remove(max_id)
             feature_ranking[i][j] = max_id
             j += 1
+    print('OK !')
     return feature_ranking
