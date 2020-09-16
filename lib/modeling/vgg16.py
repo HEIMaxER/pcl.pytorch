@@ -204,6 +204,7 @@ class roi_2mlp_head_with_sim(nn.Module):
                 if (feature_ranking[i][N-self.sim_dim:] == feature_ranking[j][N-self.sim_dim:]).all():
                     sim_mat[i][j] = 1
                     sim_mat[j][i] = 1
+        sim_mat.to('cuda')
         return x, sim_mat
 
 
