@@ -297,12 +297,12 @@ class Sim_RCNN(nn.Module):
                 clust_loss = cluster_loss.BCE_loss(mil_score, sim_mat)
                 return_dict['losses']['cluster_loss_mil'] = clust_loss
             elif self.sim_eval == 1:
-                clust_loss = cluster_loss.BCE_loss(refine_score, sim_mat)
+                clust_loss = cluster_loss.BCE_loss(refine_score[-1], sim_mat)
                 return_dict['losses']['cluster_loss_refine'] = clust_loss
             elif self.sim_eval == 2:
                 clust_loss_1 = cluster_loss.BCE_loss(mil_score, sim_mat)
                 return_dict['losses']['cluster_loss_mil'] = clust_loss_1
-                clust_loss_2 = cluster_loss.BCE_loss(refine_score, sim_mat)
+                clust_loss_2 = cluster_loss.BCE_loss(refine_score[-1], sim_mat)
                 return_dict['losses']['cluster_loss_refine'] = clust_loss_2
 
 
