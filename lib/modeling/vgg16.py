@@ -191,7 +191,7 @@ class roi_2mlp_head_with_sim(nn.Module):
         x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)
         x = F.relu(self.fc2(x), inplace=True)
 
-        _, feature_ranking = torch.sort(x.clone().detach().cpu().numpy(), dim=1, descending=True)
+        _, feature_ranking = torch.sort(x, dim=1, descending=True)
         N = feature_ranking.shape[0] - 1
 
         rank_idx1, rank_idx2 = PairEnum(feature_ranking)
