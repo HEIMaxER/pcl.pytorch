@@ -229,5 +229,6 @@ def freeze_params(m):
 def PairEnum(x,mask=None):
     # Enumerate all pairs of feature in x
     x1 = x.repeat(x.shape[0],1)
+    print(x1.shape)
     x2 = x.repeat(1,x.shape[0]).reshape(-1,x.shape[1])
     return x1,x2
