@@ -206,6 +206,7 @@ class roi_2mlp_head_with_sim(nn.Module):
         rank_diff = torch.sum(torch.abs(rank_diff), dim=1)
         sim_mat = torch.ones_like(rank_diff).float().to('cuda')
         sim_mat[rank_diff > 0] = 0
+        sim_mat.view(x.size(0),x.size(0))
 
 
         # feature_ranking = np.argsort(x.clone().detach().cpu()numpy(), axis=1)
@@ -233,10 +234,10 @@ def PairEnum(x,mask=None):
     # Enumerate all pairs of feature in x
     assert x.ndimension() == 2, 'Input dimension must be 2'
     x1 = x.repeat(x.size(0),1)
-    x2 = x.repeat(1,x.size(0)).view(-1,x.size(1))
+    x2 = x.repeat(1,x.size(0)).view(-1, x.size(1))
     if mask is not None:
-        xmask = mask.view(-1,1).repeat(1,x.size(1))
+        xmask = mask.view(-1,1).repeat(1, x.size(1))
         #dim 0: #sample, dim 1:#feature
-        x1 = x1[xmask].view(-1,x.size(1))
-        x2 = x2[xmask].view(-1,x.size(1))
+        x1 = x1[xmask].view(-1, x.size(1))
+        x2 = x2[xmask].view(-1, x.size(1))
     return x1,x2
