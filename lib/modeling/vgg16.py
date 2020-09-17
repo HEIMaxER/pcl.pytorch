@@ -191,8 +191,7 @@ class roi_2mlp_head_with_sim(nn.Module):
         x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)
         x = F.relu(self.fc2(x), inplace=True)
 
-        feature_ranking = np.argsort(x.clone().detach().cpu().numpy(), axis=1)
-        feature_ranking = torch.argsort(x.clone().detach(), axis=1)
+        _, feature_ranking = torch.sort(x.clone().detach().cpu().numpy(), dim=1, descending=True)
         N = feature_ranking.shape[0] - 1
 
         rank_idx1, rank_idx2 = PairEnum(feature_ranking)
@@ -229,7 +228,12 @@ def freeze_params(m):
 
 def PairEnum(x,mask=None):
     # Enumerate all pairs of feature in x
-    x1 = x.repeat(x.shape[0],1)
-    print(x1.shape)
-    x2 = x.repeat(1,x.shape[0]).reshape(-1,x.shape[1])
+    assert x.ndimension() == 2, 'Input dimension must be 2'
+    x1 = x.repeat(x.size(0),1)
+    x2 = x.repeat(1,x.size(0)).view(-1,x.size(1))
+    if mask is not None:
+        xmask = mask.view(-1,1).repeat(1,x.size(1))
+        #dim 0: #sample, dim 1:#feature
+        x1 = x1[xmask].view(-1,x.size(1))
+        x2 = x2[xmask].view(-1,x.size(1))
     return x1,x2
