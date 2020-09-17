@@ -193,11 +193,14 @@ class roi_2mlp_head_with_sim(nn.Module):
 
         _, feature_ranking = torch.sort(x, dim=1, descending=True)
         feature_ranking = feature_ranking[:, :self.sim_dim]
-        N = feature_ranking.shape[0] - 1
+        print(feature_ranking)
+        print('feature_ranking', feature_ranking.shape)
 
         rank_idx1, rank_idx2 = PairEnum(feature_ranking)
         rank_idx1, _ = torch.sort(rank_idx1, dim=1)
         rank_idx2, _ = torch.sort(rank_idx2, dim=1)
+        print('rank_idx1', rank_idx1.shape)
+        print('rank_idx2', rank_idx2.shape)
 
         rank_diff = rank_idx1 - rank_idx2
         rank_diff = torch.sum(torch.abs(rank_diff), dim=1)
