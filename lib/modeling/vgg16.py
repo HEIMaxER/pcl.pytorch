@@ -193,6 +193,7 @@ class roi_2mlp_head_with_sim(nn.Module):
         x = F.relu(self.fc2(x), inplace=True)
 
         feature_ranking = torch.from_numpy(np.argsort(x.clone().detach().cpu().numpy(), axis=1)).to('cuda')
+        print(feature_ranking.device)
         N = feature_ranking.shape[0] - 1
         if not self.strict_sim:
             for i in range(batch_size):
