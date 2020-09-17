@@ -193,20 +193,16 @@ class roi_2mlp_head_with_sim(nn.Module):
 
         _, feature_ranking = torch.sort(x, dim=1, descending=True)
         feature_ranking = feature_ranking[:, :self.sim_dim]
-        print(feature_ranking)
-        print('feature_ranking', feature_ranking.shape)
 
         rank_idx1, rank_idx2 = PairEnum(feature_ranking)
         rank_idx1, _ = torch.sort(rank_idx1, dim=1)
         rank_idx2, _ = torch.sort(rank_idx2, dim=1)
-        print('rank_idx1', rank_idx1.shape)
-        print('rank_idx2', rank_idx2.shape)
 
         rank_diff = rank_idx1 - rank_idx2
         rank_diff = torch.sum(torch.abs(rank_diff), dim=1)
         sim_mat = torch.ones_like(rank_diff).float().to('cuda')
         sim_mat[rank_diff > 0] = 0
-        sim_mat.view(x.size(0),x.size(0))
+        sim_mat = sim_mat.view(x.size(0), x.size(0))
 
 
         # feature_ranking = np.argsort(x.clone().detach().cpu()numpy(), axis=1)
