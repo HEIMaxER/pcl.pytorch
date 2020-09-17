@@ -192,10 +192,10 @@ class roi_2mlp_head_with_sim(nn.Module):
         x = F.relu(self.fc2(x), inplace=True)
 
         _, feature_ranking = torch.sort(x, dim=1, descending=True)
+        feature_ranking = feature_ranking[:, :self.sim_dim]
         N = feature_ranking.shape[0] - 1
 
         rank_idx1, rank_idx2 = PairEnum(feature_ranking)
-        rank_idx1, rank_idx2 = rank_idx1[:,N - self.sim_dim:], rank_idx2[:,N - self.sim_dim:]
         rank_idx1, _ = torch.sort(rank_idx1, dim=1)
         rank_idx2, _ = torch.sort(rank_idx2, dim=1)
 
