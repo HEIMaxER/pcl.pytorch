@@ -125,9 +125,6 @@ def parse_args():
         action='store_true')
 
     parser.add_argument(
-        '--strict_sim', help='Use tensorflow tensorboard to log training info',
-        default=True, type=bool)
-    parser.add_argument(
         '--sim_rank', help='Use tensorflow tensorboard to log training info',
         default=5, type=int)
     parser.add_argument(
@@ -286,7 +283,7 @@ def main():
     dataiterator = iter(dataloader)
 
     ### Model ###
-    pcl = Sim_RCNN(args.sim_rank, args.strict_sim, args.cluster_loss)
+    pcl = Sim_RCNN(args.sim_rank, args.cluster_loss)
 
     if cfg.CUDA:
         pcl.cuda()

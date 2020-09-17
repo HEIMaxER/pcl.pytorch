@@ -154,14 +154,13 @@ class roi_2mlp_head(nn.Module):
         return x
 
 class roi_2mlp_head_with_sim(nn.Module):
-    def __init__(self, dim_in, roi_xform_func, spatial_scale, k=5, strict_sim=True):
+    def __init__(self, dim_in, roi_xform_func, spatial_scale, k=5):
         super().__init__()
         self.dim_in = dim_in
         self.roi_xform = roi_xform_func
         self.spatial_scale = spatial_scale
         self.dim_out = hidden_dim = 4096
         self.sim_dim = k
-        self.strict_sim = strict_sim
 
         roi_size = cfg.FAST_RCNN.ROI_XFORM_RESOLUTION
         self.fc1 = nn.Linear(dim_in * roi_size**2, hidden_dim)
@@ -192,20 +191,19 @@ class roi_2mlp_head_with_sim(nn.Module):
         x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)
         x = F.relu(self.fc2(x), inplace=True)
 
-        feature_ranking = torch.from_numpy(np.argsort(x.clone().detach().cpu().numpy(), axis=1)).to('cuda')
-        print(feature_ranking.device)
+        feature_ranking = np.argsort(x.clone().detach().cpu().numpy(), axis=1)
         N = feature_ranking.shape[0] - 1
-        if not self.strict_sim:
-            for i in range(batch_size):
-                feature_ranking[i] = np.sort(feature_ranking[i][
-                                             N - self.sim_dim:])  # if feature ranking doesn't have to be strictly equal, top k feature positions are sorted for easier checking
 
-        sim_mat = torch.zeros(batch_size, batch_size, device='cuda')
-        for i in range(batch_size):
-            for j in range(i, batch_size):
-                if False not in torch.eq(feature_ranking[i][N - self.sim_dim:], feature_ranking[j][N - self.sim_dim:]):
-                    sim_mat[i][j] = 1
-                    sim_mat[j][i] = 1
+        rank_idx1, rank_idx2 = PairEnum(feature_ranking)
+        rank_idx1, rank_idx2 = rank_idx1[:,N - self.sim_dim:], rank_idx2[:,N - self.sim_dim:]
+        rank_idx1, _ = torch.sort(rank_idx1, dim=1)
+        rank_idx2, _ = torch.sort(rank_idx2, dim=1)
+
+        rank_diff = rank_idx1 - rank_idx2
+        rank_diff = torch.sum(torch.abs(rank_diff), dim=1)
+        sim_mat = np.zeros(rank_diff).float().to('cuda')
+        sim_mat[rank_diff > 0] = 0
+
 
         # feature_ranking = np.argsort(x.clone().detach().cpu()numpy(), axis=1)
         # N = feature_ranking.shape[0]-1
@@ -227,3 +225,15 @@ def freeze_params(m):
     """
     for p in m.parameters():
         p.requires_grad = False
+
+def PairEnum(x,mask=None):
+    # Enumerate all pairs of feature in x
+    assert x.ndimension() == 2, 'Input dimension must be 2'
+    x1 = x.repeat(x.size(0),1)
+    x2 = x.repeat(1,x.size(0)).view(-1,x.size(1))
+    if mask is not None:
+        xmask = mask.view(-1,1).repeat(1,x.size(1))
+        #dim 0: #sample, dim 1:#feature
+        x1 = x1[xmask].view(-1,x.size(1))
+        x2 = x2[xmask].view(-1,x.size(1))
+    return x1,x2

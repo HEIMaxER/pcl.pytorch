@@ -228,7 +228,7 @@ class Generalized_RCNN(nn.Module):
 
 
 class Sim_RCNN(nn.Module):
-    def __init__(self, sim_dim=5, strict_sim=True, sim_eval=0):
+    def __init__(self, sim_dim=5, sim_eval=0):
         super().__init__()
 
         self.sim_eval = sim_eval
@@ -241,7 +241,7 @@ class Sim_RCNN(nn.Module):
         self.Conv_Body = get_func(cfg.MODEL.CONV_BODY)()
 
         self.Box_Head = get_func(cfg.FAST_RCNN.ROI_BOX_HEAD)(
-            self.Conv_Body.dim_out, self.roi_feature_transform, self.Conv_Body.spatial_scale, sim_dim, strict_sim)
+            self.Conv_Body.dim_out, self.roi_feature_transform, self.Conv_Body.spatial_scale, sim_dim)
         self.Box_MIL_Outs = pcl_heads.mil_outputs(
             self.Box_Head.dim_out, cfg.MODEL.NUM_CLASSES)
         self.Box_Refine_Outs = pcl_heads.refine_outputs(
