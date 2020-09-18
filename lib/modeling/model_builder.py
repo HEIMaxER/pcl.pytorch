@@ -275,17 +275,13 @@ class Sim_RCNN(nn.Module):
         device_id = im_data.get_device()
 
         return_dict = {}  # A dict to collect return variables
-
+        print('image', im_data)
         blob_conv = self.Conv_Body(im_data)
 
         if not self.training:
             return_dict['blob_conv'] = blob_conv
 
-        print('bolb conv',blob_conv[0])
-        print('RoI',rois[0])
         box_feat, sim_mat = self.Box_Head(blob_conv, rois)
-        print('box fet', box_feat[0])
-        print('sim mat', sim_mat[0])
         mil_score = self.Box_MIL_Outs(box_feat)
         refine_score = self.Box_Refine_Outs(box_feat)
 
@@ -317,10 +313,8 @@ class Sim_RCNN(nn.Module):
 
             for i_refine, refine in enumerate(refine_score):
                 if i_refine == 0:
-                    print('mil', mil_score)
                     pcl_output = PCL(boxes, mil_score, im_labels, refine)
                 else:
-                    print('refine', refine_score[i_refine - 1])
                     pcl_output = PCL(boxes, refine_score[i_refine - 1],
                                      im_labels, refine)
 
