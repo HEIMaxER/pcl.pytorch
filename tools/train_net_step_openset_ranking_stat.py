@@ -429,9 +429,8 @@ def main():
                 except StopIteration:
                     dataiterator = iter(dataloader)
                     input_data = next(dataiterator)
-
+                print(dataiterator)
                 for key in input_data:
-                    print(key)
                     if key != 'roidb': # roidb is a list of ndarrays with inconsistent length
                         input_data[key] = list(map(Variable, input_data[key]))
                 net_outputs = pcl(**input_data)
