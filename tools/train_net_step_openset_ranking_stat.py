@@ -431,9 +431,9 @@ def main():
                     input_data = next(dataiterator)
 
                 for key in input_data:
+                    print(key)
                     if key != 'roidb': # roidb is a list of ndarrays with inconsistent length
                         input_data[key] = list(map(Variable, input_data[key]))
-                print(input_data)
                 net_outputs = pcl(**input_data)
                 training_stats.UpdateIterStats(net_outputs, inner_iter)
                 loss = net_outputs['total_loss']
