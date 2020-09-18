@@ -443,7 +443,7 @@ def main():
             training_stats.LogIterStats(step, lr)
 
             if (step+1) % CHECKPOINT_PERIOD == 0:
-                save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, args.seed, args.sim_rank, args.cluster_loss), args.strict_sim, args.sim_rank, args.cluster_loss
+                save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, args.seed, args.sim_rank, args.cluster_loss)
         # ---- Training ends ----
         # Save last checkpoint
         save_ckpt(output_dir, args, step, train_size, pcl, optimizer, unkwn_nbr, args.seed, args.sim_rank, args.cluster_loss)
