@@ -239,7 +239,7 @@ class Sim_RCNN(nn.Module):
 
         # Backbone for feature extraction
         self.Conv_Body = get_func(cfg.MODEL.CONV_BODY)()
-
+        print(self.Conv_Body)
         self.Box_Head = get_func(cfg.FAST_RCNN.ROI_BOX_HEAD)(
             self.Conv_Body.dim_out, self.roi_feature_transform, self.Conv_Body.spatial_scale, sim_dim)
         self.Box_MIL_Outs = pcl_heads.mil_outputs(
