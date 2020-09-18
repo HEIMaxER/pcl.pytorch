@@ -281,7 +281,11 @@ class Sim_RCNN(nn.Module):
         if not self.training:
             return_dict['blob_conv'] = blob_conv
 
+        print('bolb conv',blob_conv[0])
+        print('RoI',rois[0])
         box_feat, sim_mat = self.Box_Head(blob_conv, rois)
+        print('box fet', box_feat[0])
+        print('sim mat', sim_mat[0])
         mil_score = self.Box_MIL_Outs(box_feat)
         refine_score = self.Box_Refine_Outs(box_feat)
 
