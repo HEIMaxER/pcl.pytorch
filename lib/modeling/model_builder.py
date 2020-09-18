@@ -275,7 +275,6 @@ class Sim_RCNN(nn.Module):
         device_id = im_data.get_device()
 
         return_dict = {}  # A dict to collect return variables
-        print('image', im_data)
         blob_conv = self.Conv_Body(im_data)
 
         if not self.training:
