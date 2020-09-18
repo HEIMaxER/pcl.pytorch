@@ -313,8 +313,10 @@ class Sim_RCNN(nn.Module):
 
             for i_refine, refine in enumerate(refine_score):
                 if i_refine == 0:
+                    print('mil', mil_score)
                     pcl_output = PCL(boxes, mil_score, im_labels, refine)
                 else:
+                    print('refine', refine_score[i_refine - 1])
                     pcl_output = PCL(boxes, refine_score[i_refine - 1],
                                      im_labels, refine)
 
