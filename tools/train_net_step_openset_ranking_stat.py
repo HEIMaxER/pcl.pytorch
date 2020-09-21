@@ -394,7 +394,7 @@ def main():
         logger.info('Training starts !')
         step = args.start_step
         for step in range(args.start_step, cfg.SOLVER.MAX_ITER):
-
+            print(step)
             # Warm up
             if step < cfg.SOLVER.WARM_UP_ITERS:
                 method = cfg.SOLVER.WARM_UP_METHOD
@@ -434,7 +434,10 @@ def main():
                 for key in input_data:
                     if key != 'roidb': # roidb is a list of ndarrays with inconsistent length
                         input_data[key] = list(map(Variable, input_data[key]))
-                net_outputs = pcl(**input_data)
+                try:
+                    net_outputs = pcl(**input_data)
+                except:
+                    print('input', input_data)
                 training_stats.UpdateIterStats(net_outputs, inner_iter)
                 loss = net_outputs['total_loss']
                 loss.backward(retain_graph=True)
