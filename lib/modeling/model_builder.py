@@ -309,22 +309,12 @@ class Sim_RCNN(nn.Module):
             boxes = boxes[:, 1:]
 
             for i_refine, refine in enumerate(refine_score):
-                try:
-                    if i_refine == 0:
-                        pcl_output = PCL(boxes, mil_score, im_labels, refine)
-                    else:
-                        pcl_output = PCL(boxes, refine_score[i_refine - 1],
-                                         im_labels, refine)
-                except:
-                    print('conv', blob_conv)
-                    print('box feat', box_feat)
-                    print('mil scor', mil_score)
-                    print('refin score', refine_score)
+                if i_refine == 0:
+                    pcl_output = PCL(boxes, mil_score, im_labels, refine)
+                else:
+                    pcl_output = PCL(boxes, refine_score[i_refine - 1],
+                                     im_labels, refine)
 
-                    print('conv', (blob_conv == 0))
-                    print('box', (box_feat == 0))
-                    print('mil', (mil_score == 0))
-                    print('refin', (refine_score == 0))
 
                 refine_loss = self.Refine_Losses[i_refine](refine,
                                                            Variable(torch.from_numpy(pcl_output['labels'])),

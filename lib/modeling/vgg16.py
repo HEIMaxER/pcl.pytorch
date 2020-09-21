@@ -189,12 +189,11 @@ class roi_2mlp_head_with_sim(nn.Module):
             spatial_scale=self.spatial_scale,
             sampling_ratio=cfg.FAST_RCNN.ROI_XFORM_SAMPLING_RATIO
         )
-        print('roi box out', x)
+        print('fc1', self.fc1)
         batch_size = x.size(0)
         x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)
-        print('roi box out 1', x)
+        print('fc2', self.fc2)
         x = F.relu(self.fc2(x), inplace=True)
-        print('roi box out 2', x)
 
         _, feature_ranking = torch.sort(x, dim=1, descending=True)
         feature_ranking = feature_ranking[:, :self.sim_dim]
@@ -209,7 +208,6 @@ class roi_2mlp_head_with_sim(nn.Module):
         sim_mat[rank_diff > 0] = 0
         sim_mat = sim_mat.view(x.size(0), x.size(0))
 
-        print('roi box out final', x)
         # feature_ranking = np.argsort(x.clone().detach().cpu()numpy(), axis=1)
         # N = feature_ranking.shape[0]-1
         # if not self.strict_sim:
