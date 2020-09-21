@@ -187,10 +187,8 @@ class roi_2mlp_head_with_sim(nn.Module):
             spatial_scale=self.spatial_scale,
             sampling_ratio=cfg.FAST_RCNN.ROI_XFORM_SAMPLING_RATIO
         )
-        print('fc1', self.fc1)
         batch_size = x.size(0)
         x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)
-        print('fc2', self.fc2)
         x = F.relu(self.fc2(x), inplace=True)
 
         _, feature_ranking = torch.sort(x, dim=1, descending=True)
