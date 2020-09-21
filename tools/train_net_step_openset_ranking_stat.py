@@ -325,7 +325,7 @@ def main():
         load_name = args.load_ckpt
         logging.info("loading checkpoint %s", load_name)
         checkpoint = torch.load(load_name, map_location=lambda storage, loc: storage)
-        print('checkpoint', checkpoint)
+        print('checkpoint', checkpoint.keys())
         net_utils.load_ckpt(pcl, checkpoint['model'])
         if args.resume:
             args.start_step = checkpoint['step'] + 1
