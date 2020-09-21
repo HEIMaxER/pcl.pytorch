@@ -329,6 +329,7 @@ def main():
         if args.resume:
             print("True")
             args.start_step = checkpoint['step'] + 1
+            print(args.start_step)
             if 'train_size' in checkpoint:  # For backward compatibility
                 if checkpoint['train_size'] != train_size:
                     print('train_size value: %d different from the one in checkpoint: %d'
