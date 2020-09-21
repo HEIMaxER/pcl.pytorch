@@ -110,10 +110,8 @@ class dilated_conv5_body(nn.Module):
             getattr(self, 'conv%d' % i).train(mode)
 
     def forward(self, x):
-        print('conv input', x)
         for i in range(1, 6):
             x = getattr(self, 'conv%d' % i)(x)
-            print('conv output {}'.format(i), x)
         return x
 
 
