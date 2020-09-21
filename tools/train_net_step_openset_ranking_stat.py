@@ -325,11 +325,10 @@ def main():
         load_name = args.load_ckpt
         logging.info("loading checkpoint %s", load_name)
         checkpoint = torch.load(load_name, map_location=lambda storage, loc: storage)
+        print('checkpoint', checkpoint)
         net_utils.load_ckpt(pcl, checkpoint['model'])
         if args.resume:
-            print("True")
             args.start_step = checkpoint['step'] + 1
-            print(args.start_step)
             if 'train_size' in checkpoint:  # For backward compatibility
                 if checkpoint['train_size'] != train_size:
                     print('train_size value: %d different from the one in checkpoint: %d'
@@ -394,7 +393,6 @@ def main():
         logger.info('Training starts !')
         step = args.start_step
         for step in range(args.start_step, cfg.SOLVER.MAX_ITER):
-            print(step)
             # Warm up
             if step < cfg.SOLVER.WARM_UP_ITERS:
                 method = cfg.SOLVER.WARM_UP_METHOD
@@ -434,10 +432,7 @@ def main():
                 for key in input_data:
                     if key != 'roidb': # roidb is a list of ndarrays with inconsistent length
                         input_data[key] = list(map(Variable, input_data[key]))
-                try:
-                    net_outputs = pcl(**input_data)
-                except:
-                    print('input', input_data)
+                net_outputs = pcl(**input_data)
                 training_stats.UpdateIterStats(net_outputs, inner_iter)
                 loss = net_outputs['total_loss']
                 loss.backward(retain_graph=True)
