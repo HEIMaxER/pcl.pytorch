@@ -321,10 +321,10 @@ class Sim_RCNN(nn.Module):
                     print('mil scor', mil_score)
                     print('refin score', refine_score)
 
-                    print('conv', (blob_conv == 0).all())
-                    print('box', (box_feat == 0).all())
-                    print('mil', (mil_score == 0).all())
-                    print('refin', (refine_score == 0).all())
+                    print('conv', (blob_conv == 0))
+                    print('box', (box_feat == 0))
+                    print('mil', (mil_score == 0))
+                    print('refin', (refine_score == 0))
 
                 refine_loss = self.Refine_Losses[i_refine](refine,
                                                            Variable(torch.from_numpy(pcl_output['labels'])),
