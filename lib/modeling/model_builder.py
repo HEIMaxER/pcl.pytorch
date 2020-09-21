@@ -136,7 +136,7 @@ class Generalized_RCNN(nn.Module):
             boxes = rois.data.cpu().numpy()
             im_labels = labels.data.cpu().numpy()
             boxes = boxes[:, 1:]
-
+            print('oops')
             for i_refine, refine in enumerate(refine_score):
                 try:
                     if i_refine == 0:
