@@ -212,7 +212,7 @@ class roi_2mlp_head_with_sim(nn.Module):
         rank_diff = rank_idx1 - rank_idx2
         rank_diff = torch.sum(torch.abs(rank_diff), dim=1)
         sim_mat = torch.ones_like(rank_diff).float().to('cuda')
-        sim_mat[(rank_diff > 0)+5] = 0
+        sim_mat[rank_diff > 0] = 0
         sim_mat = sim_mat.view(x.size(0), x.size(0))
 
         # feature_ranking = np.argsort(x.clone().detach().cpu()numpy(), axis=1)
