@@ -190,14 +190,11 @@ class roi_2mlp_head_with_sim(nn.Module):
             sampling_ratio=cfg.FAST_RCNN.ROI_XFORM_SAMPLING_RATIO
         )
         batch_size = x.size(0)
-        print('weight1',self.fc1.weight)
-        print('bias1', self.fc1.bias)
         x = self.fc1(x.view(batch_size, -1))
         x = F.relu(x, inplace=True)
         x = F.relu(self.fc2(x), inplace=True)
 
         _, feature_ranking = torch.sort(x, dim=1, descending=True)
-        print('post sort', x)
         feature_ranking = feature_ranking[:, :self.sim_dim]
 
         rank_idx1, rank_idx2 = PairEnum(feature_ranking)
