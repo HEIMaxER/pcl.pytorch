@@ -168,8 +168,6 @@ class roi_2mlp_head_with_sim(nn.Module):
         self.fc1 = nn.Linear(dim_in * roi_size**2, hidden_dim)
         self.fc2 = nn.Linear(hidden_dim, hidden_dim)
 
-        print(self.fc1)
-
         # self._init_modules()
 
     # def _init_modules(self):
@@ -194,11 +192,14 @@ class roi_2mlp_head_with_sim(nn.Module):
         # print('roixform', x)
         batch_size = x.size(0)
         # print('view', x.view(batch_size, -1))
-        print(self.fc1)
+        print('weight1',self.fc1.weight)
+        print('bias1', self.fc1.bias)
         x = self.fc1(x.view(batch_size, -1))
         # print('post fc', x)
         x = F.relu(x, inplace=True)
         # print('post relu', x)
+        print('weight2', self.fc2.weight)
+        print('bias2', self.fc2.bias)
         x = F.relu(self.fc2(x), inplace=True)
         # print('roiFC2', x)
 
