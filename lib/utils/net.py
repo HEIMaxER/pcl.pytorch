@@ -142,7 +142,7 @@ def load_ckpt(model, ckpt):
         ckpt_keys.append(name)
         if mapping[name]:
             state_dict[name] = ckpt[name]
-    print('equel', (list(mapping.keys()) == ckpt_keys).all())
+    print('equel', (list(mapping.keys()) == ckpt_keys))
     model.load_state_dict(state_dict, strict=False)
 
 
