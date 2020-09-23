@@ -13,9 +13,11 @@ import math
 def BCE_loss(box_cls_scores, sim_mat):
     t_box_cls_scores = torch.transpose(box_cls_scores, 0, 1)
     loss = - sim_mat * torch.log(torch.mm(box_cls_scores, t_box_cls_scores)) - (1 - sim_mat) * torch.log(1 - torch.mm(box_cls_scores, t_box_cls_scores))
+    print('clust loss', loss)
+    loss = loss.mean()
     if math.isnan(loss):
         print("NANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANANAN")
         print('cls proba', box_cls_scores)
         print('cls proba transpose', t_box_cls_scores)
         print('sim mat', sim_mat)
-    return loss.mean()
+    return loss
