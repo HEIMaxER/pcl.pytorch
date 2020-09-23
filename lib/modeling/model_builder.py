@@ -279,8 +279,11 @@ class Sim_RCNN(nn.Module):
             return_dict['blob_conv'] = blob_conv
 
         box_feat, sim_mat = self.Box_Head(blob_conv, rois)
+        print('box features', box_feat)
         mil_score = self.Box_MIL_Outs(box_feat)
+        print('mil score', mil_score)
         refine_score = self.Box_Refine_Outs(box_feat)
+        print('refine_score', refine_score)
 
         if self.training:
             return_dict['losses'] = {}
