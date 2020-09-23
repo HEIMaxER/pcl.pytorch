@@ -279,7 +279,7 @@ class Sim_RCNN(nn.Module):
             return_dict['blob_conv'] = blob_conv
 
         print('len roi befor', rois.shape)
-        box_feat, sim_mat = self.Box_Head(blob_conv, rois)
+        box_feat, sim_mat, rois = self.Box_Head(blob_conv, rois)
         print('len roi after', rois.shape)
         mil_score = self.Box_MIL_Outs(box_feat)
         refine_score = self.Box_Refine_Outs(box_feat)
