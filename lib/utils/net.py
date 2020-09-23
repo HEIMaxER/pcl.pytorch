@@ -137,10 +137,19 @@ def load_ckpt(model, ckpt):
     """Load checkpoint"""
     mapping, _ = model.detectron_weight_mapping
     state_dict = {}
-    ckpt_keys =[]
+    l = ['Conv_Body.conv1.0.weight', 'Conv_Body.conv1.0.bias', 'Conv_Body.conv1.2.weight', 'Conv_Body.conv1.2.bias',
+     'Conv_Body.conv2.0.weight', 'Conv_Body.conv2.0.bias', 'Conv_Body.conv2.2.weight', 'Conv_Body.conv2.2.bias',
+     'Conv_Body.conv3.0.weight', 'Conv_Body.conv3.0.bias', 'Conv_Body.conv3.2.weight', 'Conv_Body.conv3.2.bias',
+     'Conv_Body.conv3.4.weight', 'Conv_Body.conv3.4.bias', 'Conv_Body.conv4.0.weight', 'Conv_Body.conv4.0.bias',
+     'Conv_Body.conv4.2.weight', 'Conv_Body.conv4.2.bias', 'Conv_Body.conv4.4.weight', 'Conv_Body.conv4.4.bias',
+     'Conv_Body.conv5.0.weight', 'Conv_Body.conv5.0.bias', 'Conv_Body.conv5.2.weight', 'Conv_Body.conv5.2.bias',
+     'Conv_Body.conv5.4.weight', 'Conv_Body.conv5.4.bias', 'Box_MIL_Outs.mil_score0.weight',
+     'Box_MIL_Outs.mil_score0.bias', 'Box_MIL_Outs.mil_score1.weight', 'Box_MIL_Outs.mil_score1.bias',
+     'Box_Refine_Outs.refine_score.0.weight', 'Box_Refine_Outs.refine_score.0.bias',
+     'Box_Refine_Outs.refine_score.1.weight', 'Box_Refine_Outs.refine_score.1.bias',
+     'Box_Refine_Outs.refine_score.2.weight', 'Box_Refine_Outs.refine_score.2.bias']
     for name in ckpt:
-        ckpt_keys.append(name)
-        if mapping[name]:
+        if mapping[name] and name in l:
             state_dict[name] = ckpt[name]
     model.load_state_dict(state_dict, strict=False)
 

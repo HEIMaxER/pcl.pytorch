@@ -431,15 +431,12 @@ def main():
                 for key in input_data:
                     if key != 'roidb': # roidb is a list of ndarrays with inconsistent length
                         input_data[key] = list(map(Variable, input_data[key]))
-                try:
-                    net_outputs = pcl(**input_data)
-                    training_stats.UpdateIterStats(net_outputs, inner_iter)
-                    loss = net_outputs['total_loss']
-                    loss.backward(retain_graph=True)
-                except:
-                    print('oops')
-                    loss = -net_outputs['total_loss']
-                    loss.backward(retain_graph=True)
+
+                net_outputs = pcl(**input_data)
+                training_stats.UpdateIterStats(net_outputs, inner_iter)
+                loss = net_outputs['total_loss']
+                loss.backward(retain_graph=True)
+
             optimizer.step()
             training_stats.IterToc()
 
