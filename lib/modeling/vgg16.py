@@ -194,7 +194,7 @@ class roi_2mlp_head_with_sim(nn.Module):
         # print('roixform', x)
         batch_size = x.size(0)
         # print('view', x.view(batch_size, -1))
-        print(self.fc1.weights)
+        print(self.fc1)
         x = self.fc1(x.view(batch_size, -1))
         # print('post fc', x)
         x = F.relu(x, inplace=True)
