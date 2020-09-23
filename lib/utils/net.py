@@ -137,13 +137,12 @@ def load_ckpt(model, ckpt):
     """Load checkpoint"""
     mapping, _ = model.detectron_weight_mapping
     state_dict = {}
-    print('mapping', mapping.keys())
     ckpt_keys =[]
     for name in ckpt:
         ckpt_keys.append(name)
         if mapping[name]:
             state_dict[name] = ckpt[name]
-    print('ckpt', ckpt_keys)
+    print('equel', (list(mapping.keys()) == ckpt_keys).all())
     model.load_state_dict(state_dict, strict=False)
 
 
