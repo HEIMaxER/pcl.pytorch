@@ -190,7 +190,13 @@ class roi_2mlp_head_with_sim(nn.Module):
             sampling_ratio=cfg.FAST_RCNN.ROI_XFORM_SAMPLING_RATIO
         )
         batch_size = x.size(0)
+
+
+        if batch_size > 1000:
+            x = x[:1000, :]
+            batch_size = x.size(0)
         print('batch_size', batch_size)
+
         x = self.fc1(x.view(batch_size, -1))
         x = F.relu(x, inplace=True)
         x = F.relu(self.fc2(x), inplace=True)
