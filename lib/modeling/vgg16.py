@@ -182,10 +182,6 @@ class roi_2mlp_head_with_sim(nn.Module):
         return detectron_weight_mapping, []
 
     def forward(self, x, rois):
-        print('method', cfg.FAST_RCNN.ROI_XFORM_METHOD)
-        print('resolution', cfg.FAST_RCNN.ROI_XFORM_RESOLUTION)
-        print('spatial_scale', self.spatial_scale)
-        print('sampling_ratio', cfg.FAST_RCNN.ROI_XFORM_SAMPLING_RATIO)
         x = self.roi_xform(
             x, rois,
             method=cfg.FAST_RCNN.ROI_XFORM_METHOD,
@@ -196,6 +192,8 @@ class roi_2mlp_head_with_sim(nn.Module):
         print('roixform', x)
         batch_size = x.size(0)
         x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)
+        print('tensor is null', torch.eq(x, torch.zeros(x.size)))
+        print('tensor is null', torch.eq(x, torch.zeros(x.size)).all())
         print('roiFC1', x)
         x = F.relu(self.fc2(x), inplace=True)
         print('roiFC2', x)
