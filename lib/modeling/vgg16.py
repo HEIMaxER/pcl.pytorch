@@ -110,10 +110,10 @@ class dilated_conv5_body(nn.Module):
             getattr(self, 'conv%d' % i).train(mode)
 
     def forward(self, x):
-        print('input', x)
+        # print('input', x)
         for i in range(1, 6):
             x = getattr(self, 'conv%d' % i)(x)
-            print('conv_{}'.format(i), x)
+            # print('conv_{}'.format(i), x)
         return x
 
 
@@ -168,6 +168,8 @@ class roi_2mlp_head_with_sim(nn.Module):
         self.fc1 = nn.Linear(dim_in * roi_size**2, hidden_dim)
         self.fc2 = nn.Linear(hidden_dim, hidden_dim)
 
+        print(self.fc1)
+
         # self._init_modules()
 
     # def _init_modules(self):
@@ -189,15 +191,16 @@ class roi_2mlp_head_with_sim(nn.Module):
             spatial_scale=self.spatial_scale,
             sampling_ratio=cfg.FAST_RCNN.ROI_XFORM_SAMPLING_RATIO
         )
-        print('roixform', x)
+        # print('roixform', x)
         batch_size = x.size(0)
-        print('view', x.view(batch_size, -1))
+        # print('view', x.view(batch_size, -1))
+        print(self.fc1.weights)
         x = self.fc1(x.view(batch_size, -1))
-        print('post fc', x)
+        # print('post fc', x)
         x = F.relu(x, inplace=True)
-        print('post relu', x)
+        # print('post relu', x)
         x = F.relu(self.fc2(x), inplace=True)
-        print('roiFC2', x)
+        # print('roiFC2', x)
 
         _, feature_ranking = torch.sort(x, dim=1, descending=True)
         print('post sort', x)
