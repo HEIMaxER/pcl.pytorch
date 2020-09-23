@@ -110,8 +110,10 @@ class dilated_conv5_body(nn.Module):
             getattr(self, 'conv%d' % i).train(mode)
 
     def forward(self, x):
+        print('input', x)
         for i in range(1, 6):
             x = getattr(self, 'conv%d' % i)(x)
+            print('conv_{}'.format(i), x)
         return x
 
 
@@ -180,6 +182,10 @@ class roi_2mlp_head_with_sim(nn.Module):
         return detectron_weight_mapping, []
 
     def forward(self, x, rois):
+        print('method', cfg.FAST_RCNN.ROI_XFORM_METHOD)
+        print('resolution', cfg.FAST_RCNN.ROI_XFORM_RESOLUTION)
+        print('spatial_scale', self.spatial_scale)
+        print('sampling_ratio', cfg.FAST_RCNN.ROI_XFORM_SAMPLING_RATIO)
         x = self.roi_xform(
             x, rois,
             method=cfg.FAST_RCNN.ROI_XFORM_METHOD,
@@ -187,6 +193,7 @@ class roi_2mlp_head_with_sim(nn.Module):
             spatial_scale=self.spatial_scale,
             sampling_ratio=cfg.FAST_RCNN.ROI_XFORM_SAMPLING_RATIO
         )
+        print('roixform', x)
         batch_size = x.size(0)
         x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)
         x = F.relu(self.fc2(x), inplace=True)
