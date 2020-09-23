@@ -434,6 +434,7 @@ def main():
 
                 net_outputs = pcl(**input_data)
                 training_stats.UpdateIterStats(net_outputs, inner_iter)
+                print('total loss', net_outputs['total_loss'])
                 loss = net_outputs['total_loss']
                 loss.backward(retain_graph=True)
 
