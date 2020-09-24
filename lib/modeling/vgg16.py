@@ -192,9 +192,9 @@ class roi_2mlp_head_with_sim(nn.Module):
         batch_size = x.size(0)
 
 
-        if batch_size > 1000:
-            x = x[:1000, :]
-            rois = rois[:1000, :]
+        if batch_size > 3000:
+            x = x[:3000, :]
+            rois = rois[:3000, :]
             batch_size = x.size(0)
 
         x = self.fc1(x.view(batch_size, -1))
