@@ -229,6 +229,7 @@ class Generalized_RCNN(nn.Module):
 
 class Sim_RCNN(nn.Module):
     def __init__(self, sim_dim=5, sim_eval=0):
+        print('refine times', cfg.REFINE_TIMES)
         super().__init__()
 
         self.sim_eval = sim_eval
