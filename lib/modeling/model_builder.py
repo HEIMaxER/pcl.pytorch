@@ -228,11 +228,11 @@ class Generalized_RCNN(nn.Module):
 
 
 class Sim_RCNN(nn.Module):
-    def __init__(self, sim_dim=5, sim_eval=0):
-        print('refine times', cfg.REFINE_TIMES)
+    def __init__(self, sim_dim=5, sim_eval=0, cluster_loss_factor=1):
         super().__init__()
 
         self.sim_eval = sim_eval
+        self.cluster_loss_factor = cluster_loss_factor
 
         # For cache
         self.mapping_to_detectron = None
@@ -292,15 +292,15 @@ class Sim_RCNN(nn.Module):
             return_dict['losses']['loss_im_cls'] = loss_im_cls
 
             if self.sim_eval == 0:
-                clust_loss = cluster_loss.BCE_loss(mil_score, sim_mat)
+                clust_loss = self.cluster_loss_factor * cluster_loss.BCE_loss(mil_score, sim_mat)
                 return_dict['losses']['cluster_loss_mil'] = clust_loss
             elif self.sim_eval == 1:
-                clust_loss = cluster_loss.BCE_loss(refine_score[-1], sim_mat)
+                clust_loss = self.cluster_loss_factor * cluster_loss.BCE_loss(refine_score[-1], sim_mat)
                 return_dict['losses']['cluster_loss_refine'] = clust_loss
             elif self.sim_eval == 2:
-                clust_loss_1 = cluster_loss.BCE_loss(mil_score, sim_mat)
+                clust_loss_1 = self.cluster_loss_factor * cluster_loss.BCE_loss(mil_score, sim_mat)
                 return_dict['losses']['cluster_loss_mil'] = clust_loss_1
-                clust_loss_2 = cluster_loss.BCE_loss(refine_score[-1], sim_mat)
+                clust_loss_2 = self.cluster_loss_factor * cluster_loss.BCE_loss(refine_score[-1], sim_mat)
                 return_dict['losses']['cluster_loss_refine'] = clust_loss_2
 
 

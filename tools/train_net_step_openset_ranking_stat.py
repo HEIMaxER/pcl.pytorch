@@ -125,12 +125,14 @@ def parse_args():
         action='store_true')
 
     parser.add_argument(
-        '--sim_rank', help='Use tensorflow tensorboard to log training info',
+        '--sim_rank', help='Number of deep features considered for similarity',
         default=5, type=int)
     parser.add_argument(
         '--cluster_loss', help='Use tensorflow tensorboard to log training info',
         default=0, type=int)
-
+    parser.add_argument(
+        '--cluster_loss_factor', help='Use tensorflow tensorboard to log training info',
+        default=1, type=float)
 
     return parser.parse_args()
 
@@ -281,7 +283,7 @@ def main():
     dataiterator = iter(dataloader)
 
     ### Model ###
-    pcl = Sim_RCNN(args.sim_rank, args.cluster_loss)
+    pcl = Sim_RCNN(args.sim_rank, args.cluster_loss, args.cluster_loss_factor)
 
     if cfg.CUDA:
         pcl.cuda()
