@@ -55,6 +55,8 @@ def parse_args():
         action='store_true')
     parser.add_argument(
         '--vis', dest='vis', help='visualize detections', action='store_true')
+    parser.add_argument(
+        '--sim', help='sim model', type=bool, default=False)
 
     return parser.parse_args()
 
@@ -79,6 +81,9 @@ if __name__ == '__main__':
     model_name = args.load_ckpt.split('/')[-1]
     if seed not in model_name.split('_') or str(unkwn_nbr) not in model_name.split('_'):
         raise ValueError("Open dataset and model don't match.")
+
+    args.sim_dim = model_name.split('_')[-3]
+    print('sim dim', args.sim_dim)
 
     assert (torch.cuda.device_count() == 1) ^ bool(args.multi_gpu_testing)
 

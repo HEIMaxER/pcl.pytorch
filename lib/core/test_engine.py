@@ -382,7 +382,10 @@ def initialize_model_from_cfg(args, gpu_id=0):
     """Initialize a model from the global cfg. Loads test-time weights and
     set to evaluation mode.
     """
-    model = model_builder.Generalized_RCNN()
+    if args.sim:
+        mmodel = model_builder.Sim_RCNN(sim_dim=args.sim_dim)
+    else:
+        model = model_builder.Generalized_RCNN()
     model.eval()
 
     if args.cuda:
