@@ -191,6 +191,7 @@ class roi_2mlp_head_with_sim(nn.Module):
 
 
         if batch_size > 3000:
+            print('yes')
             _, feature_ranking = torch.sort(x, dim=1, descending=True)
             feature_ranking = feature_ranking[:, :self.sim_dim]
             feature_ranking, _ = torch.sort(feature_ranking, dim=1)
