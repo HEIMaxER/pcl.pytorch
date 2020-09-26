@@ -83,7 +83,7 @@ if __name__ == '__main__':
         raise ValueError("Open dataset and model don't match.")
 
     args.sim_dim = model_name.split('_')[-3]
-    print('sim dim', args.sim_dim)
+    print('sim dim', int(args.sim_dim))
 
     assert (torch.cuda.device_count() == 1) ^ bool(args.multi_gpu_testing)
 
