@@ -34,6 +34,7 @@ class mil_outputs(nn.Module):
         return detectron_weight_mapping, orphan_in_detectron
 
     def forward(self, x):
+        print('x : ', x)
         if x.dim() == 4:
             x = x.squeeze(3).squeeze(2)
         mil_score0 = self.mil_score0(x)
