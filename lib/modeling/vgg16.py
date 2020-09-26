@@ -206,7 +206,7 @@ class roi_2mlp_head_with_sim(nn.Module):
                 rank_diff = torch.sum(torch.abs(rank_diff), dim=1)
                 sim_mat[i][rank_diff > 0] = 0
                 print('be4', f_r_2[0], f_r_2[-1])
-                f_r_2 = torch.cat((f_r_2[1:], f_r_2[0]), 0)
+                f_r_2 = torch.cat((f_r_2[1:], f_r_2[0].unsqueeze(0)), 0)
                 print('after', f_r_2[0], f_r_2[-1])
         else:
 
