@@ -82,7 +82,8 @@ if __name__ == '__main__':
     if seed not in model_name.split('_') or str(unkwn_nbr) not in model_name.split('_'):
         raise ValueError("Open dataset and model don't match.")
 
-    args.sim_dim = int(model_name.split('_')[-3])
+    if args.sim:
+        args.sim_dim = int(model_name.split('_')[-3])
 
     assert (torch.cuda.device_count() == 1) ^ bool(args.multi_gpu_testing)
 
