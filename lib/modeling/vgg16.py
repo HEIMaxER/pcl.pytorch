@@ -191,39 +191,35 @@ class roi_2mlp_head_with_sim(nn.Module):
 
 
         if batch_size > 3000:
-            x = x[:3000, :]
-            rois = rois[:3000, :]
-            batch_size = x.size(0)
+            _, feature_ranking = torch.sort(x, dim=1, descending=True)
+            feature_ranking = feature_ranking[:, :self.sim_dim]
+            feature_ranking, _ = torch.sort(feature_ranking, dim=1)
 
-        x = self.fc1(x.view(batch_size, -1))
-        x = F.relu(x, inplace=True)
-        x = F.relu(self.fc2(x), inplace=True)
+            sim_mat = torch.zeros(batch_size, batch_size, device='cuda')
+            for i in range(batch_size):
+                for j in range(i, batch_size):
+                    if (feature_ranking[i] == feature_ranking[j]).all():
+                        sim_mat[i][j] = 1
+                        sim_mat[j][i] = 1
+        else:
+            x = self.fc1(x.view(batch_size, -1))
+            x = F.relu(x, inplace=True)
+            x = F.relu(self.fc2(x), inplace=True)
 
-        _, feature_ranking = torch.sort(x, dim=1, descending=True)
-        feature_ranking = feature_ranking[:, :self.sim_dim]
+            _, feature_ranking = torch.sort(x, dim=1, descending=True)
+            feature_ranking = feature_ranking[:, :self.sim_dim]
 
-        rank_idx1, rank_idx2 = PairEnum(feature_ranking)
-        rank_idx1, _ = torch.sort(rank_idx1, dim=1)
-        rank_idx2, _ = torch.sort(rank_idx2, dim=1)
+            rank_idx1, rank_idx2 = PairEnum(feature_ranking)
+            rank_idx1, _ = torch.sort(rank_idx1, dim=1)
+            rank_idx2, _ = torch.sort(rank_idx2, dim=1)
 
-        rank_diff = rank_idx1 - rank_idx2
-        rank_diff = torch.sum(torch.abs(rank_diff), dim=1)
-        sim_mat = torch.ones_like(rank_diff).float().to('cuda')
-        sim_mat[rank_diff > 0] = 0
-        sim_mat = sim_mat.view(x.size(0), x.size(0))
+            rank_diff = rank_idx1 - rank_idx2
+            rank_diff = torch.sum(torch.abs(rank_diff), dim=1)
+            sim_mat = torch.ones_like(rank_diff).float().to('cuda')
+            sim_mat[rank_diff > 0] = 0
+            sim_mat = sim_mat.view(x.size(0), x.size(0))
 
-        # feature_ranking = np.argsort(x.clone().detach().cpu()numpy(), axis=1)
-        # N = feature_ranking.shape[0]-1
-        # if not self.strict_sim:
-        #     for i in range(batch_size):
-        #         feature_ranking[i] = np.sort(feature_ranking[i][N-self.sim_dim:])  #if feature ranking doesn't have to be strictly equal, top k feature positions are sorted for easier checking
-        #
-        # sim_mat = torch.zeros(batch_size, batch_size, device='cuda')
-        # for i in range(batch_size):
-        #     for j in range(i, batch_size):
-        #         if (feature_ranking[i][N-self.sim_dim:] == feature_ranking[j][N-self.sim_dim:]).all():
-        #             sim_mat[i][j] = 1
-        #             sim_mat[j][i] = 1
+
         return x, sim_mat, rois
 
 
