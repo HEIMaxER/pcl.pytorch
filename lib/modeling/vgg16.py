@@ -189,6 +189,9 @@ class roi_2mlp_head_with_sim(nn.Module):
         )
         batch_size = x.size(0)
 
+        x = self.fc1(x.view(batch_size, -1))
+        x = F.relu(x, inplace=True)
+        x = F.relu(self.fc2(x), inplace=True)
 
         if batch_size > 3000:
             print('yes')
@@ -203,9 +206,6 @@ class roi_2mlp_head_with_sim(nn.Module):
                         sim_mat[i][j] = 1
                         sim_mat[j][i] = 1
         else:
-            x = self.fc1(x.view(batch_size, -1))
-            x = F.relu(x, inplace=True)
-            x = F.relu(self.fc2(x), inplace=True)
 
             _, feature_ranking = torch.sort(x, dim=1, descending=True)
             feature_ranking = feature_ranking[:, :self.sim_dim]
