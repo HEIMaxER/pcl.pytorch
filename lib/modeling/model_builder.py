@@ -268,7 +268,6 @@ class Sim_RCNN(nn.Module):
 
     def _forward(self, data, rois, labels):
         im_data = data
-        print('data', data)
         if self.training:
             rois = rois.squeeze(dim=0).type(im_data.dtype)
             labels = labels.squeeze(dim=0).type(im_data.dtype)
@@ -281,7 +280,6 @@ class Sim_RCNN(nn.Module):
             return_dict['blob_conv'] = blob_conv
 
         box_feat, sim_mat, rois = self.Box_Head(blob_conv, rois)
-        print('box_feat',box_feat)
         mil_score = self.Box_MIL_Outs(box_feat)
         refine_score = self.Box_Refine_Outs(box_feat)
 
