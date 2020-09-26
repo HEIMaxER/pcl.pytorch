@@ -383,7 +383,7 @@ def initialize_model_from_cfg(args, gpu_id=0):
     set to evaluation mode.
     """
     if args.sim:
-        mmodel = model_builder.Sim_RCNN(sim_dim=args.sim_dim)
+        model = model_builder.Sim_RCNN(sim_dim=args.sim_dim)
     else:
         model = model_builder.Generalized_RCNN()
     model.eval()
