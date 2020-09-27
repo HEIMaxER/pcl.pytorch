@@ -107,7 +107,6 @@ def im_detect_bbox(model, im, target_scale, target_max_size, boxes=None):
 
     return_dict = model(**inputs)
     # cls prob (activations after softmax)
-    print(cfg.REFINE_TIMES)
     if cfg.REFINE_TIMES >= 0:
         scores = return_dict['refine_score'][0].data.cpu().numpy().squeeze()
         for i in range(1, cfg.REFINE_TIMES):
