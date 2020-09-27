@@ -107,10 +107,13 @@ def im_detect_bbox(model, im, target_scale, target_max_size, boxes=None):
 
     return_dict = model(**inputs)
     # cls prob (activations after softmax)
-    scores = return_dict['refine_score'][0].data.cpu().numpy().squeeze()
-    for i in range(1, cfg.REFINE_TIMES):
-        scores += return_dict['refine_score'][i].data.cpu().numpy().squeeze()
-    scores /= cfg.REFINE_TIMES
+    if cfg.REFINE_TIMES >=
+        scores = return_dict['refine_score'][0].data.cpu().numpy().squeeze()
+        for i in range(1, cfg.REFINE_TIMES):
+            scores += return_dict['refine_score'][i].data.cpu().numpy().squeeze()
+        scores /= cfg.REFINE_TIMES
+    else:
+        scores = return_dict['mil_score'].data.cpu().numpy().squeeze()
     # In case there is 1 proposal
     scores = scores.reshape([-1, scores.shape[-1]])
     pred_boxes = boxes
