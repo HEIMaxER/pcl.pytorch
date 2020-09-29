@@ -106,7 +106,6 @@ if __name__ == '__main__':
     with open(args.result_path, 'rb') as f:
         results = pickle.load(f)
         logger.info('Loading results from {}.'.format(args.result_path))
-    print('results', results)
     all_boxes = results['all_boxes']
 
     dataset_name = cfg.TEST.DATASETS[0]
