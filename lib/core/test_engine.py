@@ -368,8 +368,6 @@ def test_net(
         else:
             det_name = 'detections.pkl'
     det_file = os.path.join(output_dir, det_name)
-    print('all_boxes', all_boxes)
-    print('scores', all_boxes['scores'])
     save_object(
         dict(
             all_boxes=all_boxes,

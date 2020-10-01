@@ -113,7 +113,6 @@ def im_detect_bbox(model, im, target_scale, target_max_size, boxes=None):
             scores += return_dict['refine_score'][i].data.cpu().numpy().squeeze()
         scores /= cfg.REFINE_TIMES
     else:
-        print('mil_score', return_dict['mil_score'])
         scores = return_dict['mil_score'].data.cpu().numpy().squeeze()
     # In case there is 1 proposal
     scores = scores.reshape([-1, scores.shape[-1]])

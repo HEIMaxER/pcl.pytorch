@@ -120,6 +120,7 @@ if __name__ == '__main__':
         if test_corloc:
             _, _, cls_boxes_i = box_results_for_corloc(boxes['scores'], boxes['boxes'])
         else:
+            print('box scores', boxes['scores'])
             _, _, cls_boxes_i = box_results_with_nms_limit_and_openset_threshold(boxes['scores'],
                                                          boxes['boxes'], args.threshold)
         extend_results(i, final_boxes, cls_boxes_i)
