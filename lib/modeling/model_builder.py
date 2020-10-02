@@ -342,6 +342,7 @@ class Sim_RCNN(nn.Module):
             return_dict['rois'] = rois
             return_dict['mil_score'] = mil_score
             return_dict['refine_score'] = refine_score
+            return_dict['sim_mat'] = sim_mat
 
         return return_dict
 

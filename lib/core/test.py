@@ -64,10 +64,10 @@ def im_detect_all(model, im, box_proposals=None, timers=None):
 
     timers['im_detect_bbox'].tic()
     if cfg.TEST.BBOX_AUG.ENABLED:
-        scores, boxes, im_scale, blob_conv = im_detect_bbox_aug(
+        scores, boxes, im_scale, blob_conv, sim_mat = im_detect_bbox_aug(
             model, im, box_proposals)
     else:
-        scores, boxes, im_scale, blob_conv = im_detect_bbox(
+        scores, boxes, im_scale, blob_conv, sim_mat = im_detect_bbox(
             model, im, cfg.TEST.SCALE, cfg.TEST.MAX_SIZE, box_proposals)
     timers['im_detect_bbox'].toc()
 
@@ -78,6 +78,8 @@ def im_detect_all(model, im, box_proposals=None, timers=None):
     # timers['misc_bbox'].tic()
     # scores, boxes, cls_boxes = box_results_with_nms_and_limit(scores, boxes)
     # timers['misc_bbox'].toc()
+    if sim_mat != None:
+        return {'scores': scores, 'boxes' : boxes, 'sim_mat': sim_mat}
 
     return {'scores': scores, 'boxes' : boxes}
 
@@ -123,7 +125,10 @@ def im_detect_bbox(model, im, target_scale, target_max_size, boxes=None):
         scores = scores[inv_index, :]
         pred_boxes = pred_boxes[inv_index, :]
 
-    return scores, pred_boxes, im_scale, return_dict['blob_conv']
+    if return_dict['sim_mat']:
+        return scores, pred_boxes, im_scale, return_dict['blob_conv'], return_dict['sim_mat']
+    else:
+        return scores, pred_boxes, im_scale, return_dict['blob_conv'], None
 
 
 def im_detect_bbox_aug(model, im, box_proposals=None):
