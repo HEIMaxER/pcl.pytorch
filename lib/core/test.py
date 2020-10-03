@@ -79,8 +79,7 @@ def im_detect_all(model, im, box_proposals=None, timers=None):
     # scores, boxes, cls_boxes = box_results_with_nms_and_limit(scores, boxes)
     # timers['misc_bbox'].toc()
 
-    print(sim_mat)
-    if sim_mat != None:
+    if type(sim_mat) != type(None):
         return {'scores': scores, 'boxes' : boxes, 'sim_mat': sim_mat}
 
     return {'scores': scores, 'boxes' : boxes}
