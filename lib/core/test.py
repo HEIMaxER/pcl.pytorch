@@ -154,49 +154,49 @@ def im_detect_bbox_aug(model, im, box_proposals=None):
 
     # Perform detection on the horizontally flipped image
     if cfg.TEST.BBOX_AUG.H_FLIP:
-        scores_hf, boxes_hf, _ = im_detect_bbox_hflip(
+        scores_hf, boxes_hf, _, sim_mat_hf = im_detect_bbox_hflip(
             model,
             im,
             cfg.TEST.SCALE,
             cfg.TEST.MAX_SIZE,
             box_proposals=box_proposals
         )
-        add_preds_t(scores_hf, boxes_hf)
+        add_preds_t(scores_hf, boxes_hf, sim_mat_hf)
 
     # Compute detections at different scales
     for scale in cfg.TEST.BBOX_AUG.SCALES:
         max_size = cfg.TEST.BBOX_AUG.MAX_SIZE
-        scores_scl, boxes_scl = im_detect_bbox_scale(
+        scores_scl, boxes_scl, sim_mat_scl = im_detect_bbox_scale(
             model, im, scale, max_size, box_proposals
         )
-        add_preds_t(scores_scl, boxes_scl)
+        add_preds_t(scores_scl, boxes_scl, sim_mat_scl)
 
         if cfg.TEST.BBOX_AUG.SCALE_H_FLIP:
-            scores_scl_hf, boxes_scl_hf = im_detect_bbox_scale(
+            scores_scl_hf, boxes_scl_hf, sim_mat_hf = im_detect_bbox_scale(
                 model, im, scale, max_size, box_proposals, hflip=True
             )
-            add_preds_t(scores_scl_hf, boxes_scl_hf)
+            add_preds_t(scores_scl_hf, boxes_scl_hf, sim_mat_hf)
 
     # Perform detection at different aspect ratios
     for aspect_ratio in cfg.TEST.BBOX_AUG.ASPECT_RATIOS:
-        scores_ar, boxes_ar = im_detect_bbox_aspect_ratio(
+        scores_ar, boxes_ar, sim_mat_ar = im_detect_bbox_aspect_ratio(
             model, im, aspect_ratio, box_proposals
         )
-        add_preds_t(scores_ar, boxes_ar)
+        add_preds_t(scores_ar, boxes_ar, sim_mat_ar)
 
         if cfg.TEST.BBOX_AUG.ASPECT_RATIO_H_FLIP:
-            scores_ar_hf, boxes_ar_hf = im_detect_bbox_aspect_ratio(
+            scores_ar_hf, boxes_ar_hf, sim_mat_ar_hf = im_detect_bbox_aspect_ratio(
                 model, im, aspect_ratio, box_proposals, hflip=True
             )
-            add_preds_t(scores_ar_hf, boxes_ar_hf)
+            add_preds_t(scores_ar_hf, boxes_ar_hf, sim_mat_ar_hf)
 
     # Compute detections for the original image (identity transform) last to
     # ensure that the Caffe2 workspace is populated with blobs corresponding
     # to the original image on return (postcondition of im_detect_bbox)
-    scores_i, boxes_i, im_scale_i, blob_conv_i = im_detect_bbox(
+    scores_i, boxes_i, im_scale_i, blob_conv_i, sim_mat_i = im_detect_bbox(
         model, im, cfg.TEST.SCALE, cfg.TEST.MAX_SIZE, boxes=box_proposals
     )
-    add_preds_t(scores_i, boxes_i)
+    add_preds_t(scores_i, boxes_i, sim_mat_i)
 
     # Combine the predicted scores
     if cfg.TEST.BBOX_AUG.SCORE_HEUR == 'ID':
@@ -222,7 +222,7 @@ def im_detect_bbox_aug(model, im, box_proposals=None):
             'Coord heur {} not supported'.format(cfg.TEST.BBOX_AUG.COORD_HEUR)
         )
 
-    return scores_c, boxes_c, im_scale_i, blob_conv_i
+    return scores_c, boxes_c, im_scale_i, blob_conv_i, sim_mat_i
 
 
 def im_detect_bbox_hflip(
