@@ -236,14 +236,14 @@ def im_detect_bbox_hflip(
 
     box_proposals_hf = box_utils.flip_boxes(box_proposals, im_width)
 
-    scores_hf, boxes_hf, im_scale, _ = im_detect_bbox(
+    scores_hf, boxes_hf, im_scale, _, sim_mat = im_detect_bbox(
         model, im_hf, target_scale, target_max_size, boxes=box_proposals_hf
     )
 
     # Invert the detections computed on the flipped image
     boxes_inv = box_utils.flip_boxes(boxes_hf, im_width)
 
-    return scores_hf, boxes_inv, im_scale
+    return scores_hf, boxes_inv, im_scale, sim_mat
 
 
 def im_detect_bbox_scale(
