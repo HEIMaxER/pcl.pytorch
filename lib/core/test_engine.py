@@ -333,7 +333,6 @@ def test_net(
 
         im = cv2.imread(entry['image'])
         cls_boxes_i = im_detect_all(model, im, box_proposals, timers)
-        print(cls_boxes_i['sim_mat'])
         all_boxes[entry['image']] = cls_boxes_i
 
         if i % 10 == 0:  # Reduce log file size
