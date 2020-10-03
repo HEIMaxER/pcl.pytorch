@@ -161,7 +161,7 @@ def im_detect_bbox_aug(model, im, box_proposals=None):
             cfg.TEST.MAX_SIZE,
             box_proposals=box_proposals
         )
-        add_preds_t(scores_hf, boxes_hf, sim_mat_hf)
+        add_preds_t(scores_hf, boxes_hf)
 
     # Compute detections at different scales
     for scale in cfg.TEST.BBOX_AUG.SCALES:
@@ -236,14 +236,14 @@ def im_detect_bbox_hflip(
 
     box_proposals_hf = box_utils.flip_boxes(box_proposals, im_width)
 
-    scores_hf, boxes_hf, im_scale, _, sim_mat = im_detect_bbox(
+    scores_hf, boxes_hf, im_scale, _, _ = im_detect_bbox(
         model, im_hf, target_scale, target_max_size, boxes=box_proposals_hf
     )
 
     # Invert the detections computed on the flipped image
     boxes_inv = box_utils.flip_boxes(boxes_hf, im_width)
 
-    return scores_hf, boxes_inv, im_scale, sim_mat
+    return scores_hf, boxes_inv, im_scale
 
 
 def im_detect_bbox_scale(
