@@ -256,7 +256,7 @@ def im_detect_bbox_scale(
             model, im, target_scale, target_max_size, box_proposals=box_proposals
         )
     else:
-        scores_scl, boxes_scl, _, _ = im_detect_bbox(
+        scores_scl, boxes_scl, _, _, _ = im_detect_bbox(
             model, im, target_scale, target_max_size, boxes=box_proposals
         )
     return scores_scl, boxes_scl
