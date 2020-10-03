@@ -55,6 +55,8 @@ def parse_args():
         action='store_true')
     parser.add_argument(
         '--vis', dest='vis', help='visualize detections', action='store_true')
+    parser.add_argument(
+        '--sim', help='sim model', type=bool, default=False)
 
     return parser.parse_args()
 
