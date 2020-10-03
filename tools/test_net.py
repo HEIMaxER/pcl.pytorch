@@ -58,7 +58,7 @@ def parse_args():
     parser.add_argument(
         '--sim', help='sim model', type=bool, default=False)
     parser.add_argument(
-        '--sim_rank', help='Number of deep features considered for similarity',
+        '--sim_dim', help='Number of deep features considered for similarity',
         default=5, type=int)
 
     return parser.parse_args()
