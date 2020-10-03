@@ -196,7 +196,7 @@ def im_detect_bbox_aug(model, im, box_proposals=None):
     scores_i, boxes_i, im_scale_i, blob_conv_i, sim_mat_i = im_detect_bbox(
         model, im, cfg.TEST.SCALE, cfg.TEST.MAX_SIZE, boxes=box_proposals
     )
-    add_preds_t(scores_i, boxes_i, sim_mat_i)
+    add_preds_t(scores_i, boxes_i)
 
     # Combine the predicted scores
     if cfg.TEST.BBOX_AUG.SCORE_HEUR == 'ID':
