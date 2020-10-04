@@ -127,7 +127,7 @@ def im_detect_bbox(model, im, target_scale, target_max_size, boxes=None):
         pred_boxes = pred_boxes[inv_index, :]
 
     try:
-        return scores, pred_boxes, im_scale, return_dict['blob_conv'], return_dict['sim_mat']
+        return scores, pred_boxes, im_scale, return_dict['blob_conv'], return_dict['sim_mat'].data.cpu().numpy()
     except:
         return scores, pred_boxes, im_scale, return_dict['blob_conv'], None
 
