@@ -334,7 +334,7 @@ def test_net(
         im = cv2.imread(entry['image'])
         cls_boxes_i = im_detect_all(model, im, box_proposals, timers)
         if args.sim:
-            all_boxes[entry['image']] = cls_boxes_i
+            all_boxes[entry['image']] = cls_boxes_i['sim_mat']
         else:
             all_boxes[entry['image']]['boxes'] = cls_boxes_i['boxes']
             all_boxes[entry['image']]['scores'] = cls_boxes_i['scores']
