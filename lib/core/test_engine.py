@@ -333,7 +333,11 @@ def test_net(
 
         im = cv2.imread(entry['image'])
         cls_boxes_i = im_detect_all(model, im, box_proposals, timers)
-        all_boxes[entry['image']] = cls_boxes_i
+        if args.sim:
+            all_boxes[entry['image']] = cls_boxes_i
+        else:
+            all_boxes[entry['image']]['boxes'] = cls_boxes_i['boxes']
+            all_boxes[entry['image']]['scores'] = cls_boxes_i['scores']
 
         if i % 10 == 0:  # Reduce log file size
             ave_total_time = np.sum([t.average_time for t in timers.values()])
