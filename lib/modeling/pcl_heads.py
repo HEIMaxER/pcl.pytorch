@@ -36,7 +36,6 @@ class mil_outputs(nn.Module):
     def forward(self, x):
         if type(x) == tuple:
             x = x[0]
-        print('after', x.dim())
         if x.dim() == 4:
             x = x.squeeze(3).squeeze(2)
         mil_score0 = self.mil_score0(x)
@@ -72,6 +71,8 @@ class refine_outputs(nn.Module):
         return detectron_weight_mapping, orphan_in_detectron
 
     def forward(self, x):
+        if type(x) == tuple:
+            x = x[0]
         if x.dim() == 4:
             x = x.squeeze(3).squeeze(2)
         refine_score = [F.softmax(refine(x), dim=1) for refine in self.refine_score]
