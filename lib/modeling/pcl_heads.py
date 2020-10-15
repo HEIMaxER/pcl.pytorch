@@ -34,14 +34,9 @@ class mil_outputs(nn.Module):
         return detectron_weight_mapping, orphan_in_detectron
 
     def forward(self, x):
-        print('x be4', x)
-        print('type', type(x))
-        print('x be4', x[0])
-        print('type', type(x[0]))
         if type(x) == tuple:
             x = x[0]
-        print('after', x)
-        print('type', type(x))
+        print('after', x.dim())
         if x.dim() == 4:
             x = x.squeeze(3).squeeze(2)
         mil_score0 = self.mil_score0(x)
