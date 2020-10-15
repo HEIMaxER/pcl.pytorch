@@ -334,7 +334,8 @@ def test_net(
         im = cv2.imread(entry['image'])
         cls_boxes_i = im_detect_all(model, im, box_proposals, timers)
         if args.sim:
-            all_boxes[entry['image']] = cls_boxes_i['sim_mat']
+            all_boxes[entry['image']]['boxes'] = cls_boxes_i['boxes']
+            all_boxes[entry['image']]['sim_mat'] = cls_boxes_i['sim_mat']
         else:
             all_boxes[entry['image']]['boxes'] = cls_boxes_i['boxes']
             all_boxes[entry['image']]['scores'] = cls_boxes_i['scores']
@@ -357,20 +358,38 @@ def test_net(
             )
 
     cfg_yaml = yaml.dump(cfg)
-    if 'train' in dataset_name:
-        if ind_range is not None:
-            det_name = 'discovery_range_%s_%s.pkl' % tuple(ind_range)
-        elif seed is not None and unkwn_nbr is not None:
-            det_name = 'discovery_{}_{}.pkl'.format(unkwn_nbr, seed)
+
+    if args.sim :
+        if 'train' in dataset_name:
+            if ind_range is not None:
+                det_name = 'discovery_sim_range_%s_%s.pkl' % tuple(ind_range)
+            elif seed is not None and unkwn_nbr is not None:
+                det_name = 'discovery_sim_{}_{}.pkl'.format(unkwn_nbr, seed)
+            else:
+                det_name = 'discovery_sim.pkl'
         else:
-            det_name = 'discovery.pkl'
+            if ind_range is not None:
+                det_name = 'detection_sim_range_%s_%s.pkl' % tuple(ind_range)
+            elif seed is not None and unkwn_nbr is not None:
+                det_name = 'detections_sim_{}_{}.pkl'.format(unkwn_nbr, seed)
+            else:
+                det_name = 'detections_sim.pkl'
+
     else:
-        if ind_range is not None:
-            det_name = 'detection_range_%s_%s.pkl' % tuple(ind_range)
-        elif seed is not None and unkwn_nbr is not None:
-            det_name = 'detections_{}_{}.pkl'.format(unkwn_nbr, seed)
+        if 'train' in dataset_name:
+            if ind_range is not None:
+                det_name = 'discovery_range_%s_%s.pkl' % tuple(ind_range)
+            elif seed is not None and unkwn_nbr is not None:
+                det_name = 'discovery_{}_{}.pkl'.format(unkwn_nbr, seed)
+            else:
+                det_name = 'discovery.pkl'
         else:
-            det_name = 'detections.pkl'
+            if ind_range is not None:
+                det_name = 'detection_range_%s_%s.pkl' % tuple(ind_range)
+            elif seed is not None and unkwn_nbr is not None:
+                det_name = 'detections_{}_{}.pkl'.format(unkwn_nbr, seed)
+            else:
+                det_name = 'detections.pkl'
     det_file = os.path.join(output_dir, det_name)
     save_object(
         dict(
