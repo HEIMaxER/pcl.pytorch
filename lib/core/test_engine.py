@@ -340,6 +340,8 @@ def test_net(
             all_boxes[entry['image']]['boxes'] = cls_boxes_i['boxes']
             all_boxes[entry['image']]['scores'] = cls_boxes_i['scores']
 
+        print(all_boxes[entry['image']])
+
         if i % 10 == 0:  # Reduce log file size
             ave_total_time = np.sum([t.average_time for t in timers.values()])
             eta_seconds = ave_total_time * (num_images - i - 1)
