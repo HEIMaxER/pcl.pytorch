@@ -36,6 +36,8 @@ class mil_outputs(nn.Module):
     def forward(self, x):
         print('x be4', x)
         print('type', type(x))
+        print('x be4', x[0])
+        print('type', type(x[0]))
         if type(x) == tuple:
             x = x[0]
         print('after', x)
