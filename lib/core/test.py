@@ -324,6 +324,106 @@ def box_results_for_corloc(scores, boxes):  # NOTE: support single-batch
     return scores, boxes, cls_boxes
 
 
+def box_results_with_sim_nms_limit(sim_mat, boxes, scores):
+    cluster_boxes = []
+    cluster_scores = []
+    cluster_open_scores = []
+
+    cluster_indexes = []
+    unseen_indexes = list(range(len(sim_mat)))
+    for i in range(len(sim_mat)):
+        unseen_indexes.remove(i)
+        im_clus_id = -1
+        if cluster_indexes != []:
+            for c in range(len(cluster_indexes)):
+                if i in cluster_indexes[c]:
+                    im_clus_id = c
+
+        if im_clus_id == -1:
+            cluster_indexes.append([i])
+
+        for j in unseen_indexes:
+            if sim_mat[i][j] == 1:
+                cluster_indexes[im_clus_id] = j
+                unseen_indexes.remove(j)
+
+    for clust in cluster_indexes:
+        b = []
+        s = []
+        os = []
+        cls_scores = [0 for _ in range(cfg.MODEL.NUM_CLASSES + 1)]
+
+        for i in clust:
+            b.append(boxes[i])
+            os.append(1-max(scores[i]))
+            cls_scores[np.argmax(scores[i])]
+
+        cls_id = np.argmax(cls_scores)
+        for i in clust:
+            s.append(scores[i][cls_id])
+
+        cluster_boxes.append(b)
+        cluster_scores.append(s)
+        cluster_open_scores.append(os)
+
+    cls_boxes = []
+
+    # Apply threshold on detection probabilities and apply NMS
+    # Skip j = 0, because it's the background class
+    for j in range(len(cluster_indexes)):
+        inds = np.where(cluster_scores[j] > cfg.TEST.SCORE_THRESH)[0]
+        os_inds = np.where(cluster_open_scores[j] > cfg.TEST.SCORE_THRESH)[0]
+
+        scores_j = cluster_scores[j][inds]
+        boxes_j = cluster_boxes[j][inds]
+        dets_j = np.hstack((boxes_j, scores_j[:, np.newaxis])).astype(np.float32, copy=False)
+
+        scores_j_os = cluster_scores[j][os_inds]
+        boxes_j_os = cluster_boxes[j][os_inds]
+        dets_j_os = np.hstack((boxes_j_os, scores_j_os[:, np.newaxis])).astype(np.float32, copy=False)
+        if cfg.TEST.SOFT_NMS.ENABLED:
+            nms_dets, _ = box_utils.soft_nms(
+                dets_j,
+                sigma=cfg.TEST.SOFT_NMS.SIGMA,
+                overlap_thresh=cfg.TEST.NMS,
+                score_thresh=0.0001,
+                method=cfg.TEST.SOFT_NMS.METHOD
+            )
+            nms_dets_os, _ = box_utils.soft_nms(
+                dets_j_os,
+                sigma=cfg.TEST.SOFT_NMS.SIGMA,
+                overlap_thresh=cfg.TEST.NMS,
+                score_thresh=0.0001,
+                method=cfg.TEST.SOFT_NMS.METHOD
+            )
+        else:
+            keep = box_utils.nms(dets_j, cfg.TEST.NMS)
+            nms_dets = dets_j[keep, :]
+            keep_os = box_utils.nms(dets_j_os, cfg.TEST.NMS)
+            nms_dets_os = dets_j_os[keep_os, :]
+        # Refine the post-NMS boxes using bounding-box voting
+        if cfg.TEST.BBOX_VOTE.ENABLED:
+            nms_dets = box_utils.box_voting(
+                nms_dets,
+                dets_j,
+                cfg.TEST.BBOX_VOTE.VOTE_TH,
+                scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
+            )
+            nms_dets_os = box_utils.box_voting(
+                nms_dets_os,
+                dets_j_os,
+                cfg.TEST.BBOX_VOTE.VOTE_TH,
+                scoring_method=cfg.TEST.BBOX_VOTE.SCORING_METHOD
+            )
+        cls_boxes.append(nms_dets)
+        cls_boxes.append(nms_dets_os)
+
+
+    im_results = np.vstack([cls_boxes[j] for j in range(len(cluster_indexes))])
+    boxes = im_results[:, :-1]
+    scores = im_results[:, -1]
+    return scores, boxes, cls_boxes
+
 def box_results_with_nms_and_limit(scores, boxes):  # NOTE: support single-batch
     """Returns bounding-box detection results by thresholding on scores and
     applying non-maximum suppression (NMS).
