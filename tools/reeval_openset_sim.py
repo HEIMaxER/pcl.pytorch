@@ -108,7 +108,7 @@ if __name__ == '__main__':
         logger.info('Loading results from {}.'.format(args.result_path))
     with open(args.sim_path, 'rb') as f:
         sim = pickle.load(f)
-        logger.info('Loading results from {}.'.format(args.result_path))
+        logger.info('Loading results from {}.'.format(args.sim_path))
     all_boxes = results['all_boxes']
     sim_boxes = results['all_boxes']
 

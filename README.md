@@ -170,6 +170,16 @@ Models trained on PASCAL VOC can be downloaded here: [Google Drive](https://driv
   CUDA_VISIBLE_DEVICES=0 python tools/train_net_step.py --dataset voc2007 \
     --cfg configs/baselines/vgg16_voc2007.yaml --bs 1 --nw 4 --iter_size 4
   ```
+Entrainement openset pour un modèle VGG16 sur VOC 2007, "--openness" défini le pourcentage de classes inconnues et "--seed" est un entier positif qui défini les classes qui seront inconnues
+```Shell
+  python tools/train_net_step_openset.py --dataset voc2007 --cfg configs/baselines/vgg16_voc2007.yaml --bs 1 --nw 4 --iter_size 4 --seed 0 --openness 0.05
+  ```
+
+Entrainement avec une loss BCE sur la similarité "--sim_rank" définit le nombre d'éléments de features nécessaire pour considérer des régions comme similaires, "--cluster_loss" définit l'application de la loss : 0 sur le premier stream, 1 sur le dernier stream, 2 sur le premier et le dernier stream et 3 sur l'ensemble des streams PCL,  "--cluster_loss_factor" défini le facteur de pondération de la loss
+```Shell
+  python -u tools/train_net_step_openset_ranking_stat.py --dataset voc2007 --cfg configs/baselines/vgg16_voc2007_with_sim.yaml --bs 1 --nw 4 --iter_size 4 --seed 19 --openness 0.05 --sim_rank 5 --cluster_loss 1 --cluster_loss_factor 1
+  ```
+
 **Note: The current implementation has a bug on multi-gpu training and thus does not support multi-gpu training.**
 
 **Test** a PCL network. For example, test the VGG 16 network on VOC 2007:
@@ -187,6 +197,14 @@ Models trained on PASCAL VOC can be downloaded here: [Google Drive](https://driv
     --load_ckpt Outputs/vgg16_voc2007/$model_path \
     --dataset voc2007test
   ```
+tests sur les données openset :
+  ```Shell
+  python test_net_openset.py --cfg configs/baselines/vgg16_voc2007.yaml --load_ckpt Outputs/vgg16_voc2007/$model_path --dataset voc_2007_test_${nombre de classes inconnues}_${seed}.json
+  ```
+tests de similarité les données openset :
+  ```Shell
+  python test_net_openset.py --cfg configs/baselines/vgg16_voc2007.yaml --load_ckpt Outputs/vgg16_voc2007/$model_path --dataset voc_2007_test_${nombre de classes inconnues}_${seed}.json --sim True
+  ```
 
 Test output is written underneath `$PCL_ROOT/Outputs`.
 
@@ -198,7 +216,22 @@ For mAP, run the python code tools/reval.py
   python tools/reeval.py --result_path $output_dir/detections.pkl \
     --dataset voc2007test --cfg configs/baselines/vgg16_voc2007.yaml
   ```
+Evaluation des résultats sur des donnes openset
 
+ ```Shell
+  python tools/reeval_openset_threshold.py --result_path $output_dir/detections_${nombre de classes inconnues}_${seed}.pkl --dataset voc_2007_test_${nombre de classes inconnues}_${seed}.json --cfg configs/baselines/vgg16_voc2007.yaml --threshold 1
+  ```
+
+Evaluations de la détection de la classe inconnue avec les boîtes des classes connues
+
+```Shell
+python tools/reeval_openset_random_classes.py --result_path $output_dir/detections_${nombre de classes inconnues}_${seed}.pkl --dataset voc_2007_test_${nombre de classes inconnues}_${seed}.json --cfg configs/baselines/vgg16_voc2007.yaml --threshold 1
+```
+
+Evaluation des boîtes générées par similarité
+```Shell
+python tools/reeval_openset_sim.py --result_path $output_dir/detections_${nombre de classes inconnues}_${seed}.pkl --sim_path $output_dir/detections_sim_${nombre de classes inconnues}_${seed}.pkl --dataset voc_2007_test_${nombre de classes inconnues}_${seed}.json --cfg configs/baselines/vgg16_voc2007_with_sim.yaml
+```
 For CorLoc, run the python code tools/reval.py
   ```Shell
   python tools/reeval.py --result_path $output_dir/discovery.pkl \
