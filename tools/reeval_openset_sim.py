@@ -117,7 +117,7 @@ if __name__ == '__main__':
     roidb = dataset.get_roidb()
     num_images = len(roidb)
     num_classes = cfg.MODEL.NUM_CLASSES + 2
-    final_boxes = [[] for _ in range(num_images)]
+    final_boxes = {}
     test_corloc = 'train' in dataset_name
     for i, entry in enumerate(roidb, ):
         boxes = all_boxes[entry['image']]
@@ -125,8 +125,8 @@ if __name__ == '__main__':
 
         _, _, cluster_boxes_i = box_results_with_sim_nms_limit(sim_b['sim_mat'],
                                                          boxes['boxes'], boxes['scores'])
-        final_boxes.append(cluster_boxes_i)
+        final_boxes[entry['image']] = cluster_boxes_i
 
-    results = task_evaluation.evaluate_all(
-        dataset, final_boxes, args.output_dir, test_corloc, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode, threshold=args.threshold
+    results = task_evaluation.evaluate_sim(
+        dataset, final_boxes, args.output_dir, test_corloc, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode
     )

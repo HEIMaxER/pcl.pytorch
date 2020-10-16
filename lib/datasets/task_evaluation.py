@@ -73,6 +73,30 @@ def evaluate_random(dataset, all_boxes, output_dir, test_corloc=False, use_matla
     ds_name = dataset.name+'_'+str(unkwn_nbr)+'_'+str(seed)
     return OrderedDict([(ds_name, box_results)])
 
+def evaluate_sim(dataset, all_boxes, output_dir, test_corloc=False, use_matlab=True, seed=None, unkwn_nbr=None, mode=None):
+    """Evaluate bounding box detection."""
+    logger.info('Evaluating detections')
+    not_comp = not cfg.TEST.COMPETITION_MODE
+    if _use_json_dataset_evaluator(dataset):
+        coco_eval = json_dataset_evaluator.evaluate_boxes(
+            dataset, all_boxes, output_dir, use_salt=not_comp, cleanup=not_comp
+        )
+        box_results = _coco_eval_to_box_results(coco_eval)
+    elif _use_voc_evaluator(dataset):
+        # For VOC, always use salt and always cleanup because results are
+        # written to the shared VOCdevkit results directory
+        voc_eval = voc_dataset_evaluator.eval_sim(
+            dataset, all_boxes, output_dir, test_corloc=test_corloc,
+            use_matlab=use_matlab, seed=seed, unkwn_nbr=unkwn_nbr, mode=mode
+        )
+        box_results = _voc_eval_to_box_results(voc_eval)
+    else:
+        raise NotImplementedError(
+            'No evaluator for dataset: {}'.format(dataset.name)
+        )
+    ds_name = dataset.name+'_'+str(unkwn_nbr)+'_'+str(seed)
+    return OrderedDict([(ds_name, box_results)])
+
 def evaluate_all(
     dataset, all_boxes, output_dir, test_corloc=False, use_matlab=True, seed=None, unkwn_nbr=None, mode=None, threshold=None
 ):

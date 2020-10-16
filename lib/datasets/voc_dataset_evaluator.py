@@ -29,7 +29,7 @@ import uuid
 from core.config import cfg
 from datasets.dataset_catalog import DATASETS
 from datasets.dataset_catalog import DEVKIT_DIR
-from datasets.voc_eval import voc_eval, f1_classification_score, voc_eval_random
+from datasets.voc_eval import voc_eval, f1_classification_score, voc_eval_random, voc_eval_clust
 from datasets.dis_eval import dis_eval
 from utils.io import save_object
 from openset.data import make_openset
@@ -165,6 +165,63 @@ def eval_random(json_dataset,
             json_dataset, salt).format(cls)
         rec, prec, ap = voc_eval_random(
             filename, anno_path, image_set_path, cls, cachedir, ovthresh=0.5,
+            use_07_metric=use_07_metric, seed=seed, unkwn_nbr=unkwn_nbr)
+        aps += [ap]
+        logger.info('AP for unknown with {} boxes = {:.4f}'.format(cls, ap))
+        res_file = os.path.join(output_dir, cls + '_pr.pkl')
+        save_object({'rec': rec, 'prec': prec, 'ap': ap}, res_file)
+    logger.info('Mean AP = {:.4f}'.format(np.mean(aps)))
+    logger.info('~~~~~~~~')
+    logger.info('Results:')
+    for ap in aps:
+        logger.info('{:.3f}'.format(ap))
+    logger.info('{:.3f}'.format(np.mean(aps)))
+    logger.info('~~~~~~~~')
+    logger.info('')
+    logger.info('----------------------------------------------------------')
+    logger.info('Results computed with the **unofficial** Python eval code.')
+    logger.info('Results should be very close to the official MATLAB code.')
+    logger.info('Use `./tools/reval.py --matlab ...` for your paper.')
+    logger.info('-- Thanks, The Management')
+    logger.info('----------------------------------------------------------')
+
+def eval_sim(json_dataset,
+    all_boxes,
+    output_dir,
+    use_salt=True,
+    cleanup=True,
+    test_corloc=False,
+    use_matlab=True, seed=None, unkwn_nbr=None, mode=None):
+    salt = '_{}'.format(str(uuid.uuid4())) if use_salt else ''
+
+    info = voc_info(json_dataset)
+    year = info['year']
+    anno_path = info['anno_path']
+    image_set_path = info['image_set_path']
+    if seed != None and unkwn_nbr != None and mode != None:
+        path = image_set_path.split('/')
+        opensets_path = path[:-2]
+        opensets_path.append("opensets")
+        opensets_path = '/'.join(opensets_path)
+        set_dir = '/'.join(path[:-1])
+        image_set_path = make_openset(set_dir, opensets_path, unkwn_nbr, seed) + '/' + mode + '.txt'
+
+    devkit_path = info['devkit_path']
+    if seed != None and unkwn_nbr != None and mode != None:
+        cachedir = os.path.join(devkit_path, 'annotations_cache_{}_{}_{}'.format(year, unkwn_nbr, seed))
+    else:
+        cachedir = os.path.join(devkit_path, 'annotations_cache_{}'.format(year))
+    aps = []
+    # The PASCAL VOC metric changed in 2010
+    use_07_metric = True if int(year) < 2010 else False
+    logger.info('VOC07 metric? ' + ('Yes' if use_07_metric else 'No'))
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
+    for _, cls in enumerate(json_dataset.classes):
+        if cls == '__background__':
+            continue
+        rec, prec, ap = voc_eval_clust(
+            all_boxes, anno_path, image_set_path, cls, cachedir, ovthresh=0.5,
             use_07_metric=use_07_metric, seed=seed, unkwn_nbr=unkwn_nbr)
         aps += [ap]
         logger.info('AP for unknown with {} boxes = {:.4f}'.format(cls, ap))

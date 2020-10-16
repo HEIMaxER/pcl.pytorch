@@ -422,7 +422,7 @@ def box_results_with_sim_nms_limit(sim_mat, boxes, scores):
     im_results = np.vstack([cls_boxes[j] for j in range(len(cluster_indexes))])
     boxes = im_results[:, :-1]
     scores = im_results[:, -1]
-    return scores, boxes, cls_boxes
+    return scores, cls_boxes,boxes
 
 def box_results_with_nms_and_limit(scores, boxes):  # NOTE: support single-batch
     """Returns bounding-box detection results by thresholding on scores and
